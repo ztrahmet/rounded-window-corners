@@ -1,0 +1,8 @@
+{
+  "name": "Rounded Window Corners Native",
+  "description": "Gives every window the rounded corners, hairline outline and drop shadow that libadwaita apps already have. All values are read from the live GTK/Adwaita theme, so light/dark, high contrast and custom themes are followed automatically. No preferences, and no GNOME Shell methods are patched.",
+  "uuid": "rounded-window-corners@ztrahmet.github.io",
+  "shell-version": ["48", "49", "50"],
+  "url": "https://github.com/ztrahmet/rounded-window-corners",
+  "version-name": "1.0.0"
+}
