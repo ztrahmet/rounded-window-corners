@@ -1,0 +1,18 @@
+/*
+ * Optional hook for shell themes.
+ *
+ * Everything this extension draws is normally taken from the live GTK/Adwaita
+ * theme (see lib/styleResolver.js). A shell theme that wants to override that
+ * can style this class instead:
+ *
+ *   .rounded-window-corners {
+ *       border-radius: 15px;
+ *       border: 1px solid rgba(255, 255, 255, 0.07);
+ *   }
+ *
+ * We ship it with no declarations on purpose: a resolved radius of 0 is the
+ * "theme said nothing" sentinel, and a window with a 0 radius needs no effect
+ * anyway. Absent an override this rule costs nothing.
+ */
+.rounded-window-corners {
+}
