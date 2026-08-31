@@ -13,7 +13,7 @@
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-import {invalidateShaderCache} from './lib/roundedCornersEffect.js';
+import {invalidateShaderCache, preloadShader} from './lib/roundedCornersEffect.js';
 import {StyleResolver} from './lib/styleResolver.js';
 import {WindowTracker} from './lib/windowTracker.js';
 
@@ -22,6 +22,18 @@ export default class RoundedWindowCornersExtension extends Extension {
         this._startupId = 0;
         this._styles = new StyleResolver(this.path, () => this._tracker?.refreshAll());
         this._tracker = new WindowTracker(this._styles);
+
+        // The shader is read off the compositor thread, and no window may be
+        // given an effect before it has landed.
+        preloadShader()
+            .then(() => this._startTracking())
+            .catch(error => logError(error, 'rounded-window-corners: shader'));
+    }
+
+    _startTracking() {
+        // disable() may have run while the shader was loading.
+        if (!this._tracker)
+            return;
 
         // Windows that exist during startup do not have usable geometry yet.
         if (Main.layoutManager._startingUp) {
