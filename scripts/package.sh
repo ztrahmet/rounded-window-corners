@@ -7,15 +7,51 @@
 # produces a package that installs, enables, and then silently does nothing.
 # The check at the end exists so that failure mode cannot come back.
 
-set -euo pipefail
+# Bash arrays and herestrings are used below, so re-exec if invoked as `sh`.
+[ -n "${BASH_VERSION:-}" ] || exec bash "$0" "$@"
 
-cd "$(dirname "$0")/.."
+set -euo pipefail
 
 # Everything the extension needs at runtime. Anything added here must also be
 # added to the pack invocation below.
 RUNTIME=(extension.js metadata.json stylesheet.css lib shaders tools)
 
 OUT=dist
+
+# The nearest ancestor of $1 holding an extension, or nothing.
+find_root() {
+    local dir=$1
+    while [ "$dir" != / ] && [ -n "$dir" ]; do
+        if [ -f "$dir/metadata.json" ] && [ -f "$dir/extension.js" ]; then
+            printf '%s\n' "$dir"
+            return 0
+        fi
+        dir=$(dirname "$dir")
+    done
+    return 1
+}
+
+# Resolve the script's own location through any symlinks, so this still works
+# when it is linked onto PATH rather than run from the checkout. readlink -f
+# would be shorter but is not portable to BSD.
+self=$0
+while [ -L "$self" ]; do
+    link=$(readlink "$self")
+    case $link in
+        /*) self=$link ;;
+        *)  self=$(dirname "$self")/$link ;;
+    esac
+done
+self_dir=$(cd "$(dirname "$self")" && pwd)
+
+# Prefer the checkout the script lives in; fall back to the working directory so
+# a copy of this script still works from inside another checkout.
+root=$(find_root "$self_dir") || root=$(find_root "$PWD") || {
+    if [ "$self_dir" = "$PWD" ]; then searched=$PWD; else searched="$self_dir or $PWD"; fi
+    echo "no extension found: no metadata.json at or above $searched" >&2
+    exit 1
+}
+cd "$root"
 
 command -v gnome-extensions >/dev/null || {
     echo "gnome-extensions not found; install gnome-shell" >&2
@@ -55,7 +91,7 @@ done < <(find "${RUNTIME[@]}" -type f | sort)
 
 files=$(grep -c . <<<"$contents")
 echo
-echo "$zip"
+echo "$root/$zip"
 echo "  $files entries, $(du -h "$zip" | cut -f1)"
 echo
 echo "Upload that at https://extensions.gnome.org/upload/"
