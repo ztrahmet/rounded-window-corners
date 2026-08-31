@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+	<defs>
+		<linearGradient id="g1" x2="1" gradientUnits="userSpaceOnUse" gradientTransform="matrix(80,-80,31.654,31.654,20,100)">
+			<stop offset="0" stop-color="#ffffff" stop-opacity=".5"/>
+			<stop offset=".2" stop-color="#ffffff" stop-opacity="1"/>
+			<stop offset=".4" stop-color="#ffffff" stop-opacity=".5"/>
+			<stop offset=".9" stop-color="#ffffff" stop-opacity="0"/>
+		</linearGradient>
+	</defs>
+	<style>
+		.s0 { fill: #e4e4e4 } 
+		.s1 { fill: #434346 } 
+		.s2 { fill: #222226 } 
+		.s3 { fill: url(#g1) } 
+	</style>
+	<path id="Shape 2" fill-rule="evenodd" class="s0" d="m113 0c8.28 0 15 6.72 15 15v98c0 8.28-6.72 15-15 15h-98c-8.28 0-15-6.72-15-15v-113z"/>
+	<path id="Shape 6" fill-rule="evenodd" class="s1" d="m110 0v50c0 33.14-26.86 60-60 60h-50v-110z"/>
+	<path id="Shape 6 copy" fill-rule="evenodd" class="s2" d="m104 0v44c0 33.14-26.86 60-60 60h-44v-104z"/>
+	<path id="Shape 7" fill-rule="evenodd" class="s3" d="m84 28c0 0 0-8 8-8 8 0 8 8 8 8v17c0 31-24 55-55 55h-17c0 0-8 0-8-8 0-8 8-8 8-8h20c19 0 36-17 36-36z"/>
+</svg>
