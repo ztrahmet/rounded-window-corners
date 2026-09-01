@@ -10,9 +10,9 @@ GNOME only rounds apps built with libadwaita. GTK3, Qt, Electron, Java and most 
 stay square. This rounds them, using the radius, hairline and shadow from your real GTK
 theme rather than from a settings page.
 
-In the shots above, NVIDIA Settings and the GTK3 demo are GTK3, Chromium is on the right,
-and the Settings window is libadwaita. That last one is never touched. The corners match
-anyway.
+In the shots above, NVIDIA Settings and the GTK3 demo are GTK3, IntelliJ IDEA is Java and
+draws its own window decorations, and Chromium is bottom right. All four are rounded by
+this extension.
 
 Needs GNOME Shell 48, 49 or 50.
 
