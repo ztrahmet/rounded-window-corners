@@ -13,7 +13,7 @@
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-import {invalidateShaderCache, preloadShader} from './lib/roundedCornersEffect.js';
+import {preloadShader} from './lib/roundedCornersEffect.js';
 import {StyleResolver} from './lib/styleResolver.js';
 import {WindowTracker} from './lib/windowTracker.js';
 
@@ -58,7 +58,5 @@ export default class RoundedWindowCornersExtension extends Extension {
 
         this._styles?.destroy();
         this._styles = null;
-
-        invalidateShaderCache();
     }
 }
