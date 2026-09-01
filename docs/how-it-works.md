@@ -19,8 +19,10 @@ when the window is largest.
 Toolkit detection greps `/proc/<pid>/maps` once per window for `libadwaita-1.so`.
 Unreadable processes count as unknown and get rounded. Real maps files are 36 to 150 KB.
 
-On X11 the effect goes on the surface child, not the window actor, so mutter's frame
-shadow survives.
+On X11 the effect goes on the surface, not the window actor, so mutter's frame shadow
+survives. The surface is found by type rather than by taking the first child, because
+other extensions parent actors to a window actor too: Blur My Shell inserts its blur at
+index 0, which would otherwise take the effect and leave the window square.
 
 ## Why there is no shadow actor
 

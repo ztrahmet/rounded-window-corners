@@ -38,8 +38,11 @@ dbus-run-session -- bash -c '
 '
 ```
 
-Point clients at it with `WAYLAND_DISPLAY=rwc-test`. For XWayland, take `DISPLAY` and
-`XAUTHORITY` from the shell process or the client fails on the magic cookie.
+Point clients at it with `WAYLAND_DISPLAY=rwc-test`. For XWayland, take `DISPLAY` from
+the shell's own log line and the cookie from the newest
+`/run/user/$UID/.mutter-Xwaylandauth.*`, or the client fails on the magic cookie. The
+shell process environment is no help here: mutter writes that file after starting, so the
+value it was launched with is a stale one from an earlier run.
 
 Two traps. The isolated config persists between runs, so a `color-scheme` left over from
 an earlier session will hand you a photo wallpaper when your test expects flat colour. And
