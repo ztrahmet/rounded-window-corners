@@ -37,6 +37,12 @@ export default class RoundedWindowCornersExtension extends Extension {
 
         // Windows that exist during startup do not have usable geometry yet.
         if (Main.layoutManager._startingUp) {
+            // A disable and enable while the shader was loading can land here
+            // twice, and the second connect would strand the first handler for
+            // the rest of the session.
+            if (this._startupId)
+                return;
+
             this._startupId = Main.layoutManager.connect('startup-complete', () => {
                 Main.layoutManager.disconnect(this._startupId);
                 this._startupId = 0;
