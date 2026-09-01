@@ -27,8 +27,8 @@ actor is dirty, so the table above only happens if something really is redrawing
 everything every frame.
 
 Memory is about 2.1 MB of framebuffer per rounded window (855x655 for an 852x652 actor).
-Maximized and fullscreen windows have no effect at all, so that disappears when the window
-is largest.
+It scales with area, so a window covering a 4K monitor would want about 33 MB. Maximized
+and fullscreen windows have no effect at all, which is what keeps that from happening.
 
 ## What changed
 
@@ -45,10 +45,17 @@ when the framebuffer resizes or the window moves, and almost never otherwise, so
 A 57% cut in per-frame cost. Both sides were measured the same way and the no-effect
 baselines agree within 1% (710.3 against 717.7 us), so the comparison holds.
 
-Theme resolution was the other one. Parsing 431 KB of GTK CSS takes about 2.9ms and a
-single theme change fires several signals. It is now cached per environment and
+Theme resolution was the other one. Parsing 431 KB of GTK CSS costs about 10ms the first
+time and 4ms once the JIT has seen it, measured under gjs on libadwaita's own stylesheet,
+and a single theme change fires several signals. It is now cached per environment and
 invalidated only by events that change the source text, so a GTK theme switch re-parses
 but a dark mode toggle does not.
+
+That cache also outlives a disable. GNOME switches extensions off whenever the screen
+locks, and without this an unlock ran the whole startup again: an 80ms subprocess for the
+libadwaita probe, then the parse, on the main loop while the unlock animation was still
+going. Entries are keyed on the modification time and size of the files they came from,
+imports included, so an edit made while the extension was disabled is still picked up.
 
 ## What was left alone
 

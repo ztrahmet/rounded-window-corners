@@ -79,16 +79,18 @@ the paint volume never grows and mutter's culling stays intact. GTK3 windows car
    and failure costs nothing.
 3. A custom GTK4 theme's `gtk.css`, which in GTK replaces Adwaita rather than layering on
    it, so it replaces source 2 here too. Then `~/.config/gtk-4.0/gtk.css`, which does
-   layer. Both watched with `Gio.FileMonitor`, and `@import` is followed up to three
-   levels. adw-gtk3 is why that matters: its `gtk-4.0/gtk.css` is 69 bytes of `@import`
-   pointing at a 365 KB copy of libadwaita's stylesheet next to it, and without following
-   those the theme looks empty.
+   layer. Every file read is watched with `Gio.FileMonitor`, imports included, and
+   `@import` is followed up to three levels. adw-gtk3 is why that matters: its
+   `gtk-4.0/gtk.css` is 69 bytes of `@import` pointing at a 365 KB copy of libadwaita's
+   stylesheet next to it, and without following those the theme looks empty.
 4. A shell theme styling `.rounded-window-corners`. The shipped `stylesheet.css` declares
    the class and sets nothing, so a resolved radius of 0 means nobody has an opinion.
 
 Light, dark and high contrast are never picked here. The cascade is re-resolved against
 the current environment, because `@media` is how the stylesheets express those variants.
-Parsing is cached per environment, so toggling dark mode re-parses nothing.
+Parsing is cached per environment, so toggling dark mode re-parses nothing, and the cache
+lives as long as the shell rather than as long as one enable, which matters because GNOME
+disables extensions at every screen lock.
 
 ## The framebuffer is not the size you think
 
