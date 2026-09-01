@@ -126,11 +126,16 @@ exactly.
 
 ## Known limitation
 
-A hard border running flush into a window corner gets cut by the arc. It tapers out, the
-corner has none, and it resumes on the other side.
+A hard border thicker than the hairline, running flush into a window corner, gets cut by
+the arc. It tapers out, the corner has none, and it resumes on the other side.
 
 GTK does the same thing. Tested side by side against a libadwaita window with a 3px border
 into every corner, the two are pixel-identical apart from four antialiasing pixels.
 Adwaita apps rarely show it because they are designed for round corners; GTK3 apps were
 not. Nothing at the compositor level can fix it, because the widgets are already drawn by
 then.
+
+A border as thin as the hairline is a different case. The outline band takes its colour
+from just inside itself, so such a border is replaced rather than cut and the perimeter
+stays uniform. Apps that draw their own window frame, JetBrains IDEs and frameless
+Electron windows among them, are usually in that case.
