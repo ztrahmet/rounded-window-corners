@@ -1,0 +1,83 @@
+name: integration
+
+# Documentation and screenshots cannot change behaviour, and this matrix takes
+# minutes, so it skips pushes that touch only those.
+on:
+  push:
+    branches: ['**']
+    paths-ignore: ['docs/**', 'data/**', 'README.md', 'LICENSE']
+  pull_request:
+    paths-ignore: ['docs/**', 'data/**', 'README.md', 'LICENSE']
+  workflow_dispatch:
+  # The extension reads the live libadwaita stylesheet, and distributions update
+  # it within a release. A weekly run notices that drift without waiting for a
+  # push, which is the only way the drift canary earns its keep.
+  schedule:
+    - cron: '0 6 * * 1'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shell:
+    name: GNOME ${{ matrix.gnome }}
+    runs-on: ubuntu-latest
+    strategy:
+      # One version failing must not hide the results for the others: knowing
+      # it breaks on 48 but works on 50 is the whole point.
+      fail-fast: false
+      matrix:
+        include:
+          - {fedora: '42', gnome: '48'}
+          - {fedora: '43', gnome: '49'}
+          - {fedora: '44', gnome: '50'}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the test image
+        run: |
+          podman build -f tests/integration/Containerfile \
+            --build-arg FEDORA=${{ matrix.fedora }} \
+            -t rwc-test tests/integration/
+
+      # Mutter uses a surfaceless renderer when there is no GPU, which is what a
+      # runner looks like. No device and no extra privilege are needed.
+      - name: Functional tests
+        run: |
+          podman run --rm --user 0 \
+            -v "$PWD:/src:ro" -v "$PWD/tests:/tests:ro" \
+            rwc-test /tests/integration/entrypoint.sh
+
+      - name: libadwaita drift canary
+        run: |
+          podman run --rm -v "$PWD:/src:ro" \
+            rwc-test gjs -m /src/tests/integration/drift-canary.js
+
+  packaged:
+    name: the uploaded package runs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the test image
+        run: |
+          podman build -f tests/integration/Containerfile --build-arg FEDORA=44 \
+            -t rwc-test tests/integration/
+
+      # What gets uploaded to extensions.gnome.org is what should be tested,
+      # not only the source tree it was built from.
+      - name: Build the package and run the suite against it
+        run: |
+          podman run --rm --user 0 -v "$PWD:/src" rwc-test \
+            bash -c 'cd /src && ./scripts/package.sh'
+          mkdir -p /tmp/pkg
+          unzip -q dist/*.shell-extension.zip -d /tmp/pkg
+          podman run --rm --user 0 -e EXT_SRC=/pkg \
+            -v /tmp/pkg:/pkg:ro -v "$PWD/tests:/tests:ro" \
+            rwc-test /tests/integration/entrypoint.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension-package
+          path: dist/*.shell-extension.zip
