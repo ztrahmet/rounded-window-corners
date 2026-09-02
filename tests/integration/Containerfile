@@ -1,0 +1,16 @@
+# Image for the headless GNOME Shell tests. One GNOME version per Fedora
+# release: 42 is GNOME 48, 43 is 49, 44 is 50.
+ARG FEDORA=44
+FROM registry.fedoraproject.org/fedora:${FEDORA}
+
+RUN dnf install -y --setopt=install_weak_deps=False \
+        gnome-shell mesa-dri-drivers dbus-daemon \
+        libadwaita-demo procps-ng zip unzip \
+    && dnf clean all
+
+# GNOME Shell chooses its systemd login manager when /run/systemd/seats exists.
+# The image ships that directory but no logind, so the shell throws during
+# startup and aborts. Without it the shell uses its dummy login manager.
+RUN rm -rf /run/systemd
+
+RUN useradd -m runner
