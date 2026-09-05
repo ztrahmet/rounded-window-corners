@@ -14,7 +14,7 @@ In the shots above, NVIDIA Settings and the GTK3 demo are GTK3, IntelliJ IDEA is
 draws its own window decorations, and Chromium is bottom right. All four are rounded by
 this extension.
 
-Needs GNOME Shell 48, 49 or 50.
+Needs GNOME Shell 51. For 48, 49 and 50, use the 1.x releases.
 
 ## Recommended themes
 
@@ -36,9 +36,9 @@ states, not just hidden.
 **Patches nothing.** No GNOME Shell method is overridden, so there is nothing to break on
 the next release and nothing to fight with your dock or tiling extension.
 
-**Cheap.** 27.8 microseconds per window per frame in the worst case, roughly 1% of a
-frame. Idle windows cost nothing. Corners were checked against screenshots, not eyeballed:
-15px renders at 15.0px, at 100%, 150% and 200% scaling.
+**Cheap.** Around 1% of a frame per window in the worst case, and idle windows cost
+nothing. Corners were checked against screenshots, not eyeballed: 15px renders at 15.0px,
+at 100%, 150% and 200% scaling.
 
 ## Compared to the others
 

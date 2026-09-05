@@ -10,6 +10,17 @@ EXT_SRC=${EXT_SRC:-/src}
 ROOT=/tmp/rwc
 PASS=0; FAIL=0
 
+# This branch needs Clutter.ShaderEffect's snippet API, which arrived in GNOME
+# 51. An older shell cannot load the extension at all, so there is nothing to
+# assert. Report it rather than fail, the way the drift canary does, since the
+# image tracks rawhide and rawhide is not pinned to a GNOME version.
+MAJOR=$(gnome-shell --version | grep -oE '[0-9]+' | head -1)
+if [ "${MAJOR:-0}" -lt 51 ]; then
+  echo "$(gnome-shell --version)"
+  echo "  SKIP  this branch requires GNOME Shell 51 or newer"
+  exit 0
+fi
+
 rm -rf $ROOT; mkdir -p $ROOT/{config,cache,data/gnome-shell/extensions,log}
 ln -sfn "$EXT_SRC" $ROOT/data/gnome-shell/extensions/$UUID
 

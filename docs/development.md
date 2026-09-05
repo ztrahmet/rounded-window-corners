@@ -7,7 +7,7 @@ No build step. The source tree is the extension, so a symlink is the whole insta
 ```
 extension.js                  enable/disable, signal wiring
 lib/windowTracker.js          which windows get an effect
-lib/roundedCornersEffect.js   the Shell.GLSLEffect subclass
+lib/roundedCornersEffect.js   the Clutter.ShaderEffect subclass
 lib/styleResolver.js          the theme cascade
 lib/cssParse.js               small CSS reader, no GNOME imports
 lib/shadowProfile.js          box-shadow to uniforms, no GNOME imports
@@ -66,11 +66,14 @@ run under plain `node`. The runner copies them somewhere with a `{"type":"module
 package.json first, because the extension deliberately ships none.
 
 The integration tests start a headless GNOME Shell in a container, one per claimed
-version: Fedora 42 is GNOME 48, 43 is 49, 44 is 50. Adding a version is one line in the
-matrix in `.github/workflows/integration.yml`.
+version. A Fedora release is six behind its GNOME: 42 is GNOME 48, 43 is 49, 44 is 50.
+GNOME 51 has no release of its own yet, so it comes from rawhide, which is not pinned to
+a GNOME version: the suite reports a skip rather than failing if it lands on a shell older
+than 51. Adding a version is one line in the matrix in
+`.github/workflows/integration.yml`.
 
 ```bash
-podman build -f tests/integration/Containerfile --build-arg FEDORA=44 -t rwc-test tests/integration/
+podman build -f tests/integration/Containerfile --build-arg FEDORA=rawhide -t rwc-test tests/integration/
 podman run --rm --user 0 -v "$PWD:/src:ro,z" -v "$PWD/tests:/tests:ro,z" \
     rwc-test /tests/integration/entrypoint.sh
 ```

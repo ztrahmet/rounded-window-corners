@@ -1,6 +1,7 @@
 # Image for the headless GNOME Shell tests. One GNOME version per Fedora
-# release: 42 is GNOME 48, 43 is 49, 44 is 50.
-ARG FEDORA=44
+# release: 42 is GNOME 48, 43 is 49, 44 is 50. GNOME 51 has no release of its
+# own yet, so it comes from rawhide until Fedora 45 exists.
+ARG FEDORA=rawhide
 FROM registry.fedoraproject.org/fedora:${FEDORA}
 
 RUN dnf install -y --setopt=install_weak_deps=False \

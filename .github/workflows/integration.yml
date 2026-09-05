@@ -29,9 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {fedora: '42', gnome: '48'}
-          - {fedora: '43', gnome: '49'}
-          - {fedora: '44', gnome: '50'}
+          - {fedora: 'rawhide', gnome: '51'}
     steps:
       - uses: actions/checkout@v4
 
@@ -62,7 +60,7 @@ jobs:
 
       - name: Build the test image
         run: |
-          podman build -f tests/integration/Containerfile --build-arg FEDORA=44 \
+          podman build -f tests/integration/Containerfile --build-arg FEDORA=rawhide \
             -t rwc-test tests/integration/
 
       # What gets uploaded to extensions.gnome.org is what should be tested,
