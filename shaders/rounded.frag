@@ -4,27 +4,30 @@
 //
 // Everything derives from one signed distance field. All coordinates are
 // actor-local logical pixels.
+//
+// ClutterShaderEffect re-uploads every uniform on every paint, so values that are
+// always written together are packed into one vector and unpacked below. That
+// keeps the per-frame cost down without spreading swizzles through the code.
 
 // Window frame rect within the actor, (x1, y1, x2, y2). Not the buffer rect:
 // outside it lies the client-side-decoration margin, which holds the app's own
 // shadow and which we repaint with ours.
 uniform vec4 bounds;
 
-// Corner radius, from the theme's `--window-radius`.
-uniform float radius;
+// Corner radius, inset hairline width, and the shadow's offset. All lengths in
+// actor pixels: (radius, outlineWidth, offset.x, offset.y).
+uniform vec4 metrics;
 
-// Offscreen texture to actor pixels: actorPixel = fboOrigin + texCoord * fboSpan.
-// This is not the actor's size. ClutterOffscreenEffect sizes its framebuffer from
-// the paint volume enlarged for effects (clutter-actor-box.c,
+// Offscreen texture to actor pixels: actorPixel = fboMap.xy + texCoord * fboMap.zw.
+// The span is not the actor's size. ClutterOffscreenEffect sizes its framebuffer
+// from the paint volume enlarged for effects (clutter-actor-box.c,
 // _clutter_actor_box_enlarge_for_effects), which rounds up, pads by 3px and offsets
 // the content inside it. Assuming the texture spans the actor, which is what the
 // reference extensions do, shifts every sample and visibly shrinks the corners.
-uniform vec2 fboOrigin;
-uniform vec2 fboSpan;
+uniform vec4 fboMap;
 
 // libadwaita's `outline: 1px solid ...; outline-offset: -1px`, a hairline just
-// inside the window edge. Width 0 disables it and the sampling below with it.
-uniform float outlineWidth;
+// inside the window edge. A width of 0 disables it and the sampling below with it.
 uniform vec4 outlineColor;
 
 // Drop shadow. lib/shadowProfile.js compiles the CSS box-shadow list into up to
@@ -34,7 +37,6 @@ uniform vec4 shadowColor;
 uniform vec4 shadowSpread;
 uniform vec4 shadowSigma;
 uniform vec4 shadowAlpha;
-uniform vec2 shadowOffset;
 
 // Signed distance to a rounded rectangle at the origin: negative inside, and to a
 // good approximation the distance in pixels either way. That is what lets one
@@ -66,7 +68,11 @@ float shadowCoverage(float d) {
 }
 
 void main() {
-    vec2 p = fboOrigin + cogl_tex_coord0_in.xy * fboSpan;
+    float radius = metrics.x;
+    float outlineWidth = metrics.y;
+    vec2 shadowOffset = metrics.zw;
+
+    vec2 p = fboMap.xy + cogl_tex_coord0_in.xy * fboMap.zw;
     vec2 halfSize = (bounds.zw - bounds.xy) * 0.5;
     vec2 center = (bounds.xy + bounds.zw) * 0.5;
     float r = clamp(radius, 0.0, min(halfSize.x, halfSize.y));
@@ -89,7 +95,7 @@ void main() {
         // there is no such border both samples match and nothing changes.
         if (band > 0.0) {
             vec2 inward = -sdRoundRectNormal(p - center, halfSize, r);
-            vec2 st = cogl_tex_coord0_in.xy + inward * (outlineWidth + 0.5) / fboSpan;
+            vec2 st = cogl_tex_coord0_in.xy + inward * (outlineWidth + 0.5) / fboMap.zw;
             cogl_color_out = mix(cogl_color_out, texture2D(cogl_sampler0, st), band);
         }
 

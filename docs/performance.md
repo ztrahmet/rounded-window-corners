@@ -3,6 +3,12 @@
 Measured on GNOME Shell 50.4, headless on a real GPU (gbm on `/dev/dri/renderD129`, not
 llvmpipe), driving six GTK3 windows at 800x600.
 
+Every figure below was taken against `Shell.GLSLEffect`, before the port to
+`Clutter.ShaderEffect` that GNOME 51 required. They are kept because the method and the
+conclusions still hold, but the absolute numbers have not been retaken on 51 yet and one
+input to them has changed: uniforms are now re-uploaded every paint rather than on
+change. Treat the totals as the last known good baseline, not as a current claim.
+
 ## Cost
 
 Six windows, every one fully repainted every frame. Far worse than any real desktop.
@@ -61,6 +67,12 @@ imports included, so an edit made while the extension was disabled is still pick
 
 Uniform change-detection would skip seven of nine uploads during a resize. That is part of
 12 us on a path that runs while you drag a window edge. Not worth the state.
+
+That reasoning was written when a uniform was uploaded only when it changed.
+`Clutter.ShaderEffect` re-uploads all of them on every paint instead, and offers no way
+to opt out, so the lever that is left is how many there are. Packing the eleven into
+eight is why `metrics` and `fboMap` exist. Skipping redundant `update()` calls would not
+help here, since the cost is in the parent's paint, not in ours.
 
 A byte-level search of `/proc/<pid>/maps` would avoid decoding to a string. Real maps
 files are 36 to 150 KB, not the megabytes that idea assumed, so decoding is already cheap

@@ -1,6 +1,6 @@
 # How it works
 
-One `Shell.GLSLEffect` per window that needs it. Nothing else.
+One `Clutter.ShaderEffect` per window that needs it. Nothing else.
 
 ## Which windows
 
@@ -56,6 +56,19 @@ if (d >= -(outlineWidth + 1.0)) {
 
 Pixels well inside the window skip the branch, which is nearly all of them. Clipping to
 the frame rect also erases the app's own shadow, so the replacement goes in the same pass.
+
+## Why the uniforms are packed
+
+`ClutterShaderEffect` stores uniforms by name and re-uploads every one of them on every
+paint, with no comparison against what it sent last frame. The count is therefore a
+per-frame cost, not a one-off, which is the opposite of how `Shell.GLSLEffect` behaved.
+
+Values that are always written together share a vector because of that. The corner
+radius, the hairline width and the shadow offset are all lengths in actor pixels and all
+come from the same `update()` call, so they travel as one `metrics`. The framebuffer
+origin and span are only ever set together, so they travel as one `fboMap`. That is eight
+uniforms rather than eleven. `main` unpacks them into named locals on entry, so the body
+reads the same as it did.
 
 ## The shadow
 
