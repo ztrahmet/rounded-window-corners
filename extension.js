@@ -1,13 +1,9 @@
 /**
- * Rounded Window Corners Native
+ * Extension entry point
  *
- * Gives every window that its toolkit left square the same corners, hairline
- * outline and drop shadow that libadwaita apps already have, taking all of
- * those values from the live GTK/Adwaita theme rather than from settings.
- *
- * There is nothing to configure and nothing of GNOME Shell is patched: the
- * whole effect is one GLSL effect per window, which the shell's own clones
- * reproduce wherever a window is drawn.
+ * @author     Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>
+ * @copyright  2026 Ahmet Öztürk
+ * @license    GPL-3.0-or-later
  */
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -23,23 +19,14 @@ export default class RoundedWindowCornersExtension extends Extension {
         this._styles = new StyleResolver(this.path, () => this._tracker?.refreshAll());
         this._tracker = new WindowTracker(this._styles);
 
-        // The shader is read off the compositor thread, and no window may be
-        // given an effect before it has landed.
-        preloadShader()
-            .then(() => this._startTracking())
-            .catch(error => logError(error, 'rounded-window-corners: shader'));
+        preloadShader().then(() => this._startTracking());
     }
 
     _startTracking() {
-        // disable() may have run while the shader was loading.
         if (!this._tracker)
             return;
 
-        // Windows that exist during startup do not have usable geometry yet.
         if (Main.layoutManager._startingUp) {
-            // A disable and enable while the shader was loading can land here
-            // twice, and the second connect would strand the first handler for
-            // the rest of the session.
             if (this._startupId)
                 return;
 

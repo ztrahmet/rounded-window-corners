@@ -1,21 +1,15 @@
-// Prints libadwaita's compiled stylesheet on stdout.
-//
-// This runs as a short-lived `gjs -m` subprocess and never inside gnome-shell:
-// libadwaita is a GTK4 library, and loading GTK into the compositor process is
-// not something an extension may do. Out of process it is harmless.
-//
-// The stylesheet lives in a GResource compiled into libadwaita-1.so, so the
-// only way to read it is to have the library loaded. We do that without
-// initialising GTK and without needing a display.
-//
-// Any failure exits non-zero and the extension keeps the value it already had.
-// That covers a missing typelib, a missing libadwaita, or a renamed resource.
+/**
+ * Out-of-process Libadwaita stylesheet probe
+ *
+ * @author     Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>
+ * @copyright  2026 Ahmet Öztürk
+ * @license    GPL-3.0-or-later
+ */
 
 import Gio from 'gi://Gio';
 import Adw from 'gi://Adw?version=1';
 
-// Importing the typelib is not enough: GI dlopens the shared library lazily, on
-// first use of a symbol, and it is that dlopen which registers the GResource.
+// Force typelib symbol resolution to register the embedded GResource.
 Adw.get_major_version();
 
 const bytes = Gio.resources_lookup_data(
