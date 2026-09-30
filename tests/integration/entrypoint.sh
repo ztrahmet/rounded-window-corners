@@ -7,8 +7,7 @@ set -eu
 rm -rf /run/systemd
 mkdir -p /run/dbus && dbus-daemon --system --fork 2>/dev/null || true
 
-# XWayland needs a writable socket directory. On GNOME 48 a failed XWayland
-# start is fatal to the whole shell, so this is not optional.
+# XWayland needs a writable socket directory.
 mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
 
 mkdir -p /run/user/1000

@@ -26,7 +26,7 @@ ln -sfn "$EXT_SRC" $ROOT/data/gnome-shell/extensions/$UUID
 
 # Flips unsafe mode so the harness can drive the shell over D-Bus.
 H=$ROOT/data/gnome-shell/extensions/rwc-test-helper@local; mkdir -p $H
-printf '%s\n' '{"name":"RWC Test Helper","description":"Test only.","uuid":"rwc-test-helper@local","shell-version":["48","49","50","51","52"]}' > $H/metadata.json
+printf '%s\n' '{"name":"RWC Test Helper","description":"Test only.","uuid":"rwc-test-helper@local","shell-version":["51"]}' > $H/metadata.json
 cat > $H/extension.js <<'JS'
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 export default class TestHelper extends Extension {

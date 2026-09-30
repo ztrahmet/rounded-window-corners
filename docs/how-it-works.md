@@ -59,9 +59,8 @@ the frame rect also erases the app's own shadow, so the replacement goes in the 
 
 ## Why the uniforms are packed
 
-`ClutterShaderEffect` stores uniforms by name and re-uploads every one of them on every
-paint, with no comparison against what it sent last frame. The count is therefore a
-per-frame cost, not a one-off, which is the opposite of how `Shell.GLSLEffect` behaved.
+`Clutter.ShaderEffect` stores uniforms by name and re-uploads every one of them on every
+paint, making uniform count a direct per-frame cost.
 
 Values that are always written together share a vector because of that. The corner
 radius, the hairline width and the shadow offset are all lengths in actor pixels and all

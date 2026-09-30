@@ -14,13 +14,13 @@ In the shots above, NVIDIA Settings and the GTK3 demo are GTK3, IntelliJ IDEA is
 draws its own window decorations, and Chromium is bottom right. All four are rounded by
 this extension.
 
-Needs GNOME Shell 51. For 48, 49 and 50, use the 1.x releases.
+Requires GNOME Shell 51.
 
 ## Recommended themes
 
 [adw-gtk3](https://github.com/lassekongo83/adw-gtk3) for GTK3 apps, or
 [Monolith](https://github.com/ztrahmet/gnome-theme-monolith), a monochrome GTK and shell
-theme for GNOME 48 and up that includes adw-gtk3.
+theme that includes adw-gtk3.
 
 ## What it gets right
 

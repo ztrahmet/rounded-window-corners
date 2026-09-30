@@ -24,7 +24,7 @@ data/                         icon and screenshots, never loaded at runtime
 
 ## A shell you can break safely
 
-GNOME 49 dropped `--nested`, so run headless with a virtual monitor. Its own
+Run headless with a virtual monitor. Its own
 `XDG_CONFIG_HOME` and `XDG_DATA_HOME` isolate it from your session, which matters on
 Wayland where a shell crash logs you out.
 
@@ -65,12 +65,7 @@ tests/integration/                       # a real shell per GNOME version
 run under plain `node`. The runner copies them somewhere with a `{"type":"module"}`
 package.json first, because the extension deliberately ships none.
 
-The integration tests start a headless GNOME Shell in a container, one per claimed
-version. A Fedora release is six behind its GNOME: 42 is GNOME 48, 43 is 49, 44 is 50.
-GNOME 51 has no release of its own yet, so it comes from rawhide, which is not pinned to
-a GNOME version: the suite reports a skip rather than failing if it lands on a shell older
-than 51. Adding a version is one line in the matrix in
-`.github/workflows/integration.yml`.
+The integration tests run a headless GNOME Shell in a Fedora rawhide container targeting GNOME 51.
 
 ```bash
 podman build -f tests/integration/Containerfile --build-arg FEDORA=rawhide -t rwc-test tests/integration/
@@ -78,12 +73,10 @@ podman run --rm --user 0 -v "$PWD:/src:ro,z" -v "$PWD/tests:/tests:ro,z" \
     rwc-test /tests/integration/entrypoint.sh
 ```
 
-Three things about that container are not obvious, and each one costs an afternoon to
-rediscover. The image ships `/run/systemd/seats` but no logind, so the shell picks its
-systemd login manager and aborts during startup; deleting `/run/systemd` makes it use the
-dummy one. XWayland needs `/tmp/.X11-unix` at mode 1777, and on GNOME 48 a failed
-XWayland start is fatal to the whole shell rather than a warning. And a system bus has to
-run alongside the session bus from `dbus-run-session`.
+A few setup details about that container:
+- Deleting `/run/systemd` forces GNOME Shell to use its internal dummy login manager instead of failing on a missing logind.
+- XWayland requires `/tmp/.X11-unix` with mode `1777`.
+- A system D-Bus daemon runs alongside the session bus started by `dbus-run-session`.
 
 Mutter needs no GPU: with no `/dev/dri` it says `Created surfaceless renderer without GPU`
 and carries on. Nothing has to be privileged.
