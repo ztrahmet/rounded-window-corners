@@ -13,7 +13,6 @@ lib/cssParse.js               small CSS reader, no GNOME imports
 lib/shadowProfile.js          box-shadow to uniforms, no GNOME imports
 lib/toolkitProbe.js           /proc/<pid>/maps sniff
 shaders/rounded.frag          the fragment shader
-stylesheet.css                empty hook for shell themes
 tools/adw-probe.js            subprocess that dumps libadwaita's stylesheet
 scripts/package.sh            builds the upload archive, never shipped
 tests/unit/                   node tests for the two GNOME-free modules
@@ -114,8 +113,8 @@ black, so it does not interfere. Blue window, green background works.
 
 Builds the upload archive into `dist/`, which is gitignored.
 
-`gnome-extensions pack` with no arguments ships `metadata.json`, `extension.js` and
-`stylesheet.css` and nothing else, silently dropping `lib/`, `shaders/` and `tools/`. The
+`gnome-extensions pack` with no arguments ships `metadata.json` and `extension.js`
+and nothing else, silently dropping `lib/`, `shaders/` and `tools/`. The
 result installs, enables, and does nothing. The script names every source and then checks
 the archive actually contains each runtime file, so that failure cannot come back.
 

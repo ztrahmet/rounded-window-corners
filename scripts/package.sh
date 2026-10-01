@@ -14,7 +14,7 @@ set -euo pipefail
 
 # Everything the extension needs at runtime. Anything added here must also be
 # added to the pack invocation below.
-RUNTIME=(extension.js metadata.json stylesheet.css lib shaders tools)
+RUNTIME=(extension.js metadata.json lib shaders tools)
 
 OUT=dist
 

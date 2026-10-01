@@ -97,8 +97,8 @@ the paint volume never grows and mutter's culling stays intact. GTK3 windows car
    `@import` is followed up to three levels. adw-gtk3 is why that matters: its
    `gtk-4.0/gtk.css` is 69 bytes of `@import` pointing at a 365 KB copy of libadwaita's
    stylesheet next to it, and without following those the theme looks empty.
-4. A shell theme styling `.rounded-window-corners`. The shipped `stylesheet.css` declares
-   the class and sets nothing, so a resolved radius of 0 means nobody has an opinion.
+4. A GNOME Shell theme styling `.rounded-window-corners` (if declared in its
+   own `gnome-shell.css`). A resolved radius of 0 means no override was specified.
 
 Light, dark and high contrast are never picked here. The cascade is re-resolved against
 the current environment, because `@media` is how the stylesheets express those variants.
