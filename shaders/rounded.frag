@@ -39,6 +39,9 @@ float shadowCoverage(float d) {
     return 1.0 - inv.x * inv.y * inv.z * inv.w;
 }
 
+// Width of the app's native border to neutralize (in actor pixels).
+const float borderRemovalWidth = 1.0;
+
 void main() {
     float radius = metrics.x;
     float outlineWidth = metrics.y;
@@ -51,20 +54,25 @@ void main() {
 
     float d = sdRoundRect(p - center, halfSize, r);
 
-    // Fast path: skip interior pixels.
-    if (d >= -(outlineWidth + 1.0)) {
+    // Skip interior pixels deeper than outline and border removal.
+    float maxBand = max(outlineWidth, borderRemovalWidth);
+    if (d >= -(maxBand + 1.0)) {
         float content = clamp(0.5 - d, 0.0, 1.0);
-        float band = content - clamp(0.5 - d - outlineWidth, 0.0, 1.0);
 
-        if (band > 0.0) {
+        // Replace the app's native border with interior pixels.
+        float removalBand = content - clamp(0.5 - d - borderRemovalWidth, 0.0, 1.0);
+        if (removalBand > 0.0) {
             vec2 inward = -sdRoundRectNormal(p - center, halfSize, r);
-            vec2 st = cogl_tex_coord0_in.xy + inward * (outlineWidth + 0.5) / fboMap.zw;
-            cogl_color_out = mix(cogl_color_out, texture2D(cogl_sampler0, st), band);
+            float sampleOffset = max(borderRemovalWidth + 0.5 + d, 0.0);
+            vec2 st = cogl_tex_coord0_in.xy + inward * sampleOffset / fboMap.zw;
+            cogl_color_out = mix(cogl_color_out, texture2D(cogl_sampler0, st), removalBand);
         }
 
         cogl_color_out *= content;
 
-        float oa = band * outlineColor.a;
+        // Inset hairline outline.
+        float outlineBand = content - clamp(0.5 - d - outlineWidth, 0.0, 1.0);
+        float oa = outlineBand * outlineColor.a;
         cogl_color_out = cogl_color_out * (1.0 - oa) + vec4(outlineColor.rgb, 1.0) * oa;
 
         // Outer shadow.
