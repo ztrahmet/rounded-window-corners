@@ -47,6 +47,9 @@ void main() {
     float outlineWidth = metrics.y;
     vec2 shadowOffset = metrics.zw;
 
+    // Paint opacity, already applied to cogl_color_out but not to what we add.
+    float opacity = cogl_color_in.a;
+
     vec2 p = fboMap.xy + cogl_tex_coord0_in.xy * fboMap.zw;
     vec2 halfSize = (bounds.zw - bounds.xy) * 0.5;
     vec2 center = (bounds.xy + bounds.zw) * 0.5;
@@ -65,7 +68,7 @@ void main() {
             vec2 inward = -sdRoundRectNormal(p - center, halfSize, r);
             float sampleOffset = max(borderRemovalWidth + 0.5 + d, 0.0);
             vec2 st = cogl_tex_coord0_in.xy + inward * sampleOffset / fboMap.zw;
-            cogl_color_out = mix(cogl_color_out, texture2D(cogl_sampler0, st), removalBand);
+            cogl_color_out = mix(cogl_color_out, texture2D(cogl_sampler0, st) * opacity, removalBand);
         }
 
         cogl_color_out *= content;
@@ -73,13 +76,13 @@ void main() {
         // Inset hairline outline.
         float outlineBand = content - clamp(0.5 - d - outlineWidth, 0.0, 1.0);
         float oa = outlineBand * outlineColor.a;
-        cogl_color_out = cogl_color_out * (1.0 - oa) + vec4(outlineColor.rgb, 1.0) * oa;
+        cogl_color_out = cogl_color_out * (1.0 - oa) + vec4(outlineColor.rgb, 1.0) * oa * opacity;
 
         // Outer shadow.
         if (d > -0.5) {
             float sd = sdRoundRect(p - center - shadowOffset, halfSize, r);
             float s = shadowCoverage(sd) * shadowColor.a * (1.0 - content);
-            cogl_color_out += vec4(shadowColor.rgb, 1.0) * s;
+            cogl_color_out += vec4(shadowColor.rgb, 1.0) * s * opacity;
         }
     }
 }
