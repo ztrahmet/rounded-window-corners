@@ -42,6 +42,18 @@ float shadowCoverage(float d) {
 // Width of the app's native border to neutralize (in actor pixels).
 const float borderRemovalWidth = 1.0;
 
+// Direction to sample the border replacement from.
+vec2 removalDirection(vec2 p, vec2 halfSize, float r, vec2 inward) {
+    vec2 q = abs(p) - halfSize + r;
+    if (q.x <= 0.0 || q.y <= 0.0)
+        return inward;
+
+    vec2 edge = halfSize - abs(p);
+    bool alongY = edge.x >= borderRemovalWidth &&
+        (edge.y < borderRemovalWidth || edge.x < edge.y);
+    return alongY ? vec2(0.0, -sign(p.y)) : vec2(-sign(p.x), 0.0);
+}
+
 void main() {
     float radius = metrics.x;
     float outlineWidth = metrics.y;
@@ -66,8 +78,11 @@ void main() {
         float removalBand = content - clamp(0.5 - d - borderRemovalWidth, 0.0, 1.0);
         if (removalBand > 0.0) {
             vec2 inward = -sdRoundRectNormal(p - center, halfSize, r);
-            float sampleOffset = max(borderRemovalWidth + 0.5 + d, 0.0);
-            vec2 st = cogl_tex_coord0_in.xy + inward * sampleOffset / fboMap.zw;
+            vec2 dir = removalDirection(p - center, halfSize, r, inward);
+
+            float depth = max(borderRemovalWidth + 0.5 + d, 0.0);
+            float sampleOffset = depth / max(dot(dir, inward), 0.25);
+            vec2 st = cogl_tex_coord0_in.xy + dir * sampleOffset / fboMap.zw;
             cogl_color_out = mix(cogl_color_out, texture2D(cogl_sampler0, st) * opacity, removalBand);
         }
 
