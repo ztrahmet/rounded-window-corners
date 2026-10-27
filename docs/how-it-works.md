@@ -1,155 +1,59 @@
 # How it works
 
-One `Clutter.ShaderEffect` per window that needs it. Nothing else.
+One shader effect per window that needs it. Nothing else.
 
 ## Which windows
 
-| Toolkit | Ships with | Gets |
-| --- | --- | --- |
-| GTK4 + libadwaita | 15px, all four | nothing, already right |
-| GTK3, libhandy | `8px 8px 0 0` | corners, outline, new shadow |
-| GTK4 without libadwaita | `8px 8px 0 0` | corners, outline, new shadow |
-| Qt, Electron, Java, terminals | square | corners, outline, new shadow |
-| X11 server-side frame | top only | corners and outline, mutter's shadow kept |
+Normal windows and dialogs of apps that don't use libadwaita. Whether an app uses
+libadwaita is found by looking at the libraries its process has loaded. libadwaita apps
+are left alone, since they already round themselves.
 
-Skipped when the window is maximized, tiled or fullscreen, since libadwaita squares its
-own corners there too. The effect is removed, not disabled, which returns its framebuffer
-when the window is largest.
+A window is left square while it is maximized, tiled or fullscreen, and when the radius is
+0. The effect is removed in those states, not just hidden.
 
-Toolkit detection greps `/proc/<pid>/maps` once per window for `libadwaita-1.so`.
-Unreadable processes count as unknown and get rounded. Real maps files are 36 to 150 KB.
-
-On X11 the effect goes on the surface, not the window actor, so mutter's frame shadow
-survives. The surface is found by type rather than by taking the first child, because
-other extensions parent actors to a window actor too: Blur My Shell inserts its blur at
-index 0, which would otherwise take the effect and leave the window square.
-
-## Why there is no shadow actor
-
-Clipping the corners destroys the shadow the app drew, so something has to replace it.
-
-The usual answer is a second actor behind the window with a CSS `box-shadow`. That drags
-a lot along: it must sit below its window in `global.windowGroup`, so restacks need
-intercepting; it needs bind constraints and property bindings; and since it is a sibling,
-`ClutterClone` ignores it, so the overview and workspace switcher need patching to clone
-it separately.
-
-Drawing the shadow in the same shader removes all of that. `ClutterClone` paints its
-source through `clutter_actor_paint()`, which runs the effect chain, so the effect appears
-in the overview, alt-tab, workspace switching and screenshots for free.
-
-No shell method is patched anywhere in this codebase.
-
-## The shader
-
-`shaders/rounded.frag` runs on one signed distance field.
-
-```glsl
-float d = sdRoundRect(p - center, halfSize, r);   // negative inside
-
-if (d >= -(outlineWidth + 1.0)) {
-    float content = clamp(0.5 - d, 0.0, 1.0);
-    cogl_color_out *= content;                    // clip, and erase the app's shadow
-    ...                                           // hairline, then drop shadow
-}
-```
-
-Pixels well inside the window skip the branch, which is nearly all of them. Clipping to
-the frame rect also erases the app's own shadow, so the replacement goes in the same pass.
-
-## Why the uniforms are packed
-
-`Clutter.ShaderEffect` stores uniforms by name and re-uploads every one of them on every
-paint, making uniform count a direct per-frame cost.
-
-Values that are always written together share a vector because of that. The corner
-radius, the hairline width and the shadow offset are all lengths in actor pixels and all
-come from the same `update()` call, so they travel as one `metrics`. The framebuffer
-origin and span are only ever set together, so they travel as one `fboMap`. That is eight
-uniforms rather than eleven. `main` unpacks them into named locals on entry, so the body
-reads the same as it did.
-
-## The shadow
-
-A CSS shadow layer is a rounded box, grown by its spread, blurred by a Gaussian of
-`blur / 2`. Its coverage depends only on distance to that box, which the shader already
-has.
-
-`lib/shadowProfile.js` compiles the `box-shadow` list into four `(spread, sigma, alpha)`
-triples and a colour. Per pixel that is one `exp` per layer, inside the border band only.
-
-The shadow is scaled to fit the client-side-decoration margin the buffer already has, so
-the paint volume never grows and mutter's culling stays intact. GTK3 windows carry 23 to
-26px, nearly enough for libadwaita's shadow at full size. Under 4px it is dropped.
+On X11 (XWayland) the effect goes on the window's surface rather than the whole window, so
+mutter's own frame and shadow on server-side decorated windows are kept. The surface is
+found by its type, because other extensions, such as Blur My Shell, add actors to windows
+too.
 
 ## Where the values come from
 
-`lib/styleResolver.js`, later sources winning:
+The extension works out the window style the way GTK does for a libadwaita window:
+libadwaita's stylesheet first, then your `~/.config/gtk-4.0/gtk.css` on top, with GTK's
+rules for which declaration wins. Light, dark and high contrast are picked by the same
+media queries libadwaita uses.
 
-1. Built-in constants matching libadwaita 1.7 to 1.9. Last resort.
-2. libadwaita's compiled stylesheet. It sits in a GResource inside `libadwaita-1.so`, and
-   reading it needs the library loaded, which cannot happen in gnome-shell without pulling
-   in GTK4. So `tools/adw-probe.js` runs as a short `gjs` subprocess and prints it. Async,
-   and failure costs nothing.
-3. A custom GTK4 theme's `gtk.css`, which in GTK replaces Adwaita rather than layering on
-   it, so it replaces source 2 here too. Then `~/.config/gtk-4.0/gtk.css`, which does
-   layer. Every file read is watched with `Gio.FileMonitor`, imports included, and
-   `@import` is followed up to three levels. adw-gtk3 is why that matters: its
-   `gtk-4.0/gtk.css` is 69 bytes of `@import` pointing at a 365 KB copy of libadwaita's
-   stylesheet next to it, and without following those the theme looks empty.
-4. A GNOME Shell theme styling `.rounded-window-corners` (if declared in its
-   own `gnome-shell.css`). A resolved radius of 0 means no override was specified.
+GNOME Shell can't load libadwaita, so a short `gjs` helper in `tools/` reads its stylesheet.
+If that fails, a built-in copy of libadwaita's window rules is used instead. A weekly CI
+check notices when libadwaita changes them.
 
-Light, dark and high contrast are never picked here. The cascade is re-resolved against
-the current environment, because `@media` is how the stylesheets express those variants.
-Parsing is cached per environment, so toggling dark mode re-parses nothing, and the cache
-lives as long as the shell rather than as long as one enable, which matters because GNOME
-disables extensions at every screen lock.
+Like GTK, anything the extension can't read is skipped rather than guessed. It reads pixel
+lengths and the usual colour syntaxes. Each corner can have its own radius; an elliptical
+corner is drawn as a circle.
 
-## The framebuffer is not the size you think
+Edits to `gtk.css`, and to files it imports, apply live.
 
-`ClutterOffscreenEffect` does not render an actor into a texture the actor's size. It
-takes the paint volume, enlarges it, scales by the ceiled resource scale and rounds up.
-From `clutter/clutter/clutter-actor-box.c`:
+## Drawing
 
-```c
-box->x2 = ceilf (box->x2 + 0.75f);
-box->x1 = box->x2 - width - 3;
-```
+The shader clips the window to its rounded shape and replaces the app's own thin border
+just inside the edge, so only one outline is left. It then draws the shadow outside and
+the outline on top, in the same order GTK does.
 
-A 652x452 actor gets a 655x455 texture with its content offset inside.
+The shadow is fitted into the space the app already leaves around its window, so nothing
+is drawn beyond what the window covers anyway. Edges are drawn at the screen's pixel
+density, so at 200% they are as crisp as libadwaita's.
 
-So `textureCoord * actorSize`, the obvious way to get a pixel coordinate, is wrong. Every
-sample lands off, and the error grows across the actor. With that formula in place here, a
-configured 15px radius rendered at 10.1px and 8px at 3.3px. Both existing extensions use
-it.
+Because the outline and shadow are part of the same effect, the overview, alt-tab and
+screenshots show them without any patching.
 
-The fix takes the span from `get_target_size()` and reconstructs the origin from Clutter's
-own formula. If Clutter changes the padding it degrades to a sub-pixel error. Measured by
-screenshot, 15px now renders at 15.0px.
+## Cost
 
-## Fractional scaling
+Each rounded window is drawn through an offscreen buffer about its own size, and the
+shader runs as the window repaints. Windows that aren't repainting cost nothing, and
+maximized and fullscreen windows have no effect at all.
 
-Theme values are logical pixels, the shader works in actor pixels, and those diverge under
-fractional scaling. Everything is derived from the actor-to-buffer ratio instead of mixing
-the two.
+## Enable and disable
 
-Checked at 100%, 150% and 200%: 15.0 logical pixels in all three. At 150% the paint volume
-goes non-integer (452 x 352.333) and the origin reconstruction still matches Clutter
-exactly.
-
-## Known limitation
-
-A hard border thicker than the hairline, running flush into a window corner, gets cut by
-the arc. It tapers out, the corner has none, and it resumes on the other side.
-
-GTK does the same thing. Tested side by side against a libadwaita window with a 3px border
-into every corner, the two are pixel-identical apart from four antialiasing pixels.
-Adwaita apps rarely show it because they are designed for round corners; GTK3 apps were
-not. Nothing at the compositor level can fix it, because the widgets are already drawn by
-then.
-
-A border as thin as the hairline is a different case. The outline band takes its colour
-from just inside itself, so such a border is replaced rather than cut and the perimeter
-stays uniform. Apps that draw their own window frame, JetBrains IDEs and frameless
-Electron windows among them, are usually in that case.
+Everything is created in `enable()` and destroyed in `disable()`, including what was read
+from the stylesheets. GNOME disables extensions while the screen is locked, so everything
+is set up again after unlocking.
