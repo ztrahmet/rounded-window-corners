@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Functional tests against a real GNOME Shell, headless and without a GPU.
 #
-# There is no framebuffer readback under the surfaceless renderer, so these
-# assert the state and geometry the shader is fed rather than the pixels it
-# produces. Rendering itself is checked by hand on real hardware.
+# These check the state and geometry each effect is given, not the pixels the
+# shader draws: encoding a screenshot needs a privileged container, which CI
+# does not use. The checks that run inside the shell are in helpers.js.
 set -u
 UUID=rounded-window-corners@ztrahmet.github.io
 EXT_SRC=${EXT_SRC:-/src}
+HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=/tmp/rwc
 PASS=0; FAIL=0
 
@@ -64,75 +65,153 @@ ev() { DBUS_SESSION_BUS_ADDRESS=$BUS gdbus call --session --dest org.gnome.Shell
 val() { ev "$1" | sed 's/^(true, .//; s/.)$//; s/^"//; s/"$//'; }
 chk() { if [ "$2" = "$3" ]; then echo "  PASS  $1"; PASS=$((PASS+1));
         else echo "  FAIL  $1 (want '$2' got '$3')"; FAIL=$((FAIL+1)); fi; }
+# Polls a JS expression until it gives the wanted value, for up to 15s, and
+# prints the last value it gave.
+wait_for() {
+  local want=$1 expr=$2 got=
+  for _ in $(seq 75); do
+    got=$(val "$expr")
+    [ "$got" = "$want" ] && break
+    sleep 0.2
+  done
+  printf '%s' "$got"
+}
+
 # A window of the given client type: 1 is X11, anything else Wayland.
 wl='global.get_window_actors().find(a=>a.metaWindow.get_client_type()!==Meta.WindowClientType.X11 && /rwc|gjs/i.test(a.metaWindow.get_wm_class()||""))'
 x11='global.get_window_actors().find(a=>a.metaWindow.get_client_type()===Meta.WindowClientType.X11)'
 adw='global.get_window_actors().find(a=>/adwaita/i.test(a.metaWindow.get_wm_class()||""))'
+windows='""+global.get_window_actors().length'
+rounded() { echo "\"\"+!!rwcTest.effect(rwcTest.target($1))"; }
 
 echo "$(gnome-shell --version)"
+ev "$(cat "$HERE/helpers.js"); 0" >/dev/null
+if [ "$(val 'typeof rwcTest')" != "object" ]; then
+  echo "FATAL: helpers.js did not load"; exit 1
+fi
 chk "extension enables cleanly" "1|none" \
-  "$(val "const e=Main.extensionManager.lookup('$UUID'); \`\${e.state}|\${e.error||'none'}\`")"
+  "$(wait_for '1|none' "const e=Main.extensionManager.lookup('$UUID'); \`\${e.state}|\${e.error||'none'}\`")"
+
+# Re-sync from inside window-created, while the extension is still probing the
+# new window's toolkit, the way a theme change can.
+ev "globalThis.rwcCreated = [];
+    globalThis.rwcHook = global.display.connect('window-created', (d, w) => {
+      const a = w.get_compositor_private();
+      if (!a) return;
+      rwcTest.tracker().refreshAll();
+      rwcCreated.push([a, !!rwcTest.effect(a)]);
+    }); 0" >/dev/null
 
 CLIENT=/tests/integration/clients/bordered-gtk3.js
-WAYLAND_DISPLAY=rwc-ci GDK_BACKEND=wayland gjs $CLIENT >/dev/null 2>&1 &
+open_wl() { WAYLAND_DISPLAY=rwc-ci GDK_BACKEND=wayland gjs $CLIENT >/dev/null 2>&1 & }
+open_wl
 WAYLAND_DISPLAY=rwc-ci GDK_BACKEND=wayland adwaita-1-demo >/dev/null 2>&1 &
 XDISPLAY=$(grep -oE 'public X11 display :[0-9]+' $ROOT/log/shell.log | tail -1 | grep -oE ':[0-9]+')
 XAUTH=$(ls -t /run/user/1000/.mutter-Xwaylandauth.* 2>/dev/null | head -1)
-DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH GDK_BACKEND=x11 gjs $CLIENT >/dev/null 2>&1 &
-sleep 10
-ev 'Main.overview.hide(); 0' >/dev/null; sleep 1
+open_x11() { DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH GDK_BACKEND=x11 gjs $CLIENT >/dev/null 2>&1 & }
+open_x11
+chk "the test windows opened" "3" "$(wait_for 3 "$windows")"
+ev 'global.display.disconnect(rwcHook); Main.overview.hide(); 0' >/dev/null
 echo "  windows: $(val 'global.get_window_actors().map(a=>a.metaWindow.get_wm_class()+"/"+(a.metaWindow.get_client_type()===Meta.WindowClientType.X11?"x11":"wl")).join(" ")')"
 
-chk "non-libadwaita window is rounded" "true" "$(val "const a=$wl; a?\"\"+!!a.get_effect('rounded-window-corners'):'no-window'")"
-chk "libadwaita window is left alone" "false" "$(val "const a=$adw; a?\"\"+!!a.get_effect('rounded-window-corners'):'no-window'")"
+chk "non-libadwaita window is rounded" "true" "$(wait_for true "$(rounded "$wl")")"
+chk "X11 window is rounded" "true" "$(wait_for true "$(rounded "$x11")")"
+# Nothing to wait for when the answer is "never", so let the probes settle.
+sleep 1
+chk "libadwaita window is left alone" "false" "$(val "$(rounded "$adw")")"
+chk "a re-sync while probing does not round a libadwaita window" "false" \
+  "$(val 'rwcCreated.filter(([a]) => rwcTest.isAdwaita(a)).map(([, e]) => e).join()')"
+
+ev "rwcTest.spy(rwcTest.effect($wl)); rwcTest.tracker().refreshAll(); 0" >/dev/null
+chk "Wayland: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
+chk "X11: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
 chk "X11: effect on the surface, not the window actor" "false|true" \
-  "$(val "const a=$x11; const s=a.get_children().find(c=>c.constructor.\$gtype.name.startsWith('MetaSurfaceActor'));
-     \`\${!!a.get_effect('rounded-window-corners')}|\${!!(s&&s.get_effect('rounded-window-corners'))}\`")"
+  "$(val "const a=$x11; \`\${!!rwcTest.effect(a)}|\${!!rwcTest.effect(rwcTest.surface(a))}\`")"
 
 # Blur My Shell parents its blur to the window actor at index 0. The surface
 # must still be found by type rather than by position.
 ev "const C=imports.gi.Clutter; const a=$x11;
     a.insert_child_at_index(new C.Actor({width:1400,height:900,name:'foreign-blur'}),0);
     a.metaWindow.focus(global.get_current_time()); 0" >/dev/null
-sleep 2
 chk "a foreign actor at index 0 does not steal the effect" "false|true" \
-  "$(val "const a=$x11; const f=a.get_children().find(c=>c.name==='foreign-blur');
-     const s=a.get_children().find(c=>c.constructor.\$gtype.name.startsWith('MetaSurfaceActor'));
-     \`\${!!(f&&f.get_effect('rounded-window-corners'))}|\${!!(s&&s.get_effect('rounded-window-corners'))}\`")"
+  "$(wait_for 'false|true' "const a=$x11; const f=a.get_children().find(c=>c.name==='foreign-blur');
+     \`\${!!(f&&rwcTest.effect(f))}|\${!!rwcTest.effect(rwcTest.surface(a))}\`")"
 
-ev "const a=$wl; a.metaWindow.maximize(Meta.MaximizeFlags.BOTH); 0" >/dev/null; sleep 2
-chk "maximized: effect removed" "false" "$(val "const a=$wl; \"\"+!!a.get_effect('rounded-window-corners')")"
-ev "const a=$wl; a.metaWindow.unmaximize(Meta.MaximizeFlags.BOTH); 0" >/dev/null; sleep 2
-chk "unmaximized: effect restored" "true" "$(val "const a=$wl; \"\"+!!a.get_effect('rounded-window-corners')")"
-ev "const a=$wl; a.metaWindow.make_fullscreen(); 0" >/dev/null; sleep 2
-chk "fullscreen: effect removed" "false" "$(val "const a=$wl; \"\"+!!a.get_effect('rounded-window-corners')")"
-ev "const a=$wl; a.metaWindow.unmake_fullscreen(); 0" >/dev/null; sleep 2
-chk "unfullscreen: effect restored" "true" "$(val "const a=$wl; \"\"+!!a.get_effect('rounded-window-corners')")"
+ev "$wl.metaWindow.maximize(); 0" >/dev/null
+chk "maximized: effect removed" "false" "$(wait_for false "$(rounded "$wl")")"
+ev "$wl.metaWindow.unmaximize(); 0" >/dev/null
+chk "unmaximized: effect restored" "true" "$(wait_for true "$(rounded "$wl")")"
+ev "$wl.metaWindow.make_fullscreen(); 0" >/dev/null
+chk "fullscreen: effect removed" "false" "$(wait_for false "$(rounded "$wl")")"
+ev "$wl.metaWindow.unmake_fullscreen(); 0" >/dev/null
+chk "unfullscreen: effect restored" "true" "$(wait_for true "$(rounded "$wl")")"
+
+for size in "700 500" "900 650" "800 600"; do
+  ev "$x11.metaWindow.move_resize_frame(true, 100, 100, ${size% *}, ${size#* }); 0" >/dev/null; sleep 0.3
+done
+chk "X11: bounds follow every resize" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
+# On X11 the surface can take its new size after the window actor, so a sync
+# at that moment measures the old size. Whether a resize hits that depends on
+# client timing, so check the fix directly: spoil the bounds, then let only
+# the surface report a size change. It must re-sync.
+ev "const s=rwcTest.surface($x11); const e=rwcTest.effect(s);
+    e.update([0, 0, 1, 1], ...e.rwcArgs.slice(1)); s.notify('size'); 0" >/dev/null
+chk "X11: a late surface resize re-syncs the bounds" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
+ev "$wl.metaWindow.move_resize_frame(true, 300, 200, 640, 480); 0" >/dev/null
+chk "Wayland: bounds follow a resize" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
 
 # The offscreen framebuffer is the paint volume enlarged by Clutter. If that
 # padding ever changes, every sampled pixel shifts and the corners shrink.
 chk "offscreen padding is still +3, and the effect has painted" "true|true" \
-  "$(val "const a=$wl; const e=a.get_effect('rounded-window-corners'); const r=e.get_target_size();
+  "$(wait_for 'true|true' "const a=$wl; const r=rwcTest.effect(a).get_target_size();
      const s=Math.max(Math.ceil(a.get_resource_scale()),1);
      \`\${r[0]}|\${r[1]===(Math.round(a.width)+3)*s && r[2]===(Math.round(a.height)+3)*s}\`")"
 
-# A theme saying windows are square must be obeyed, live.
+# The theme's values must reach the effect live, including "square".
 mkdir -p $ROOT/config/gtk-4.0
 printf 'window.csd { border-radius: 0px; }\n' > $ROOT/config/gtk-4.0/gtk.css
-sleep 5
-chk "a live gtk.css with radius 0 removes the effect" "false" "$(val "const a=$wl; \"\"+!!a.get_effect('rounded-window-corners')")"
+chk "a live gtk.css with radius 0 removes the effect" "false" "$(wait_for false "$(rounded "$wl")")"
+printf 'window.csd { border-radius: 7px; }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "a live gtk.css radius reaches the effect" "7" "$(wait_for 7 "\"\"+rwcTest.effect($wl).rwcArgs[1]")"
 rm -f $ROOT/config/gtk-4.0/gtk.css
-sleep 5
-chk "removing it restores the effect" "true" "$(val "const a=$wl; \"\"+!!a.get_effect('rounded-window-corners')")"
+chk "removing it restores the theme's radius" "15" "$(wait_for 15 "\"\"+rwcTest.effect($wl).rwcArgs[1]")"
 
-ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null; sleep 3
+# Stress: churn windows, states, the theme and the extension itself without
+# waiting in between, then check that everything ended up where it should.
+open_wl; open_wl; open_x11
+chk "stress: three more windows opened" "6" "$(wait_for 6 "$windows")"
+for _ in $(seq 10); do
+  ev 'for (const a of global.get_window_actors()) { a.metaWindow.maximize(); a.metaWindow.unmaximize(); } 0' >/dev/null
+done
+for i in $(seq 10); do
+  ev "for (const a of global.get_window_actors().filter(rwcTest.isX11)) a.metaWindow.move_resize_frame(true, 100, 100, $((500 + i * 30)), $((400 + i * 20))); 0" >/dev/null
+done
+ev 'for (const a of global.get_window_actors().filter(a => !rwcTest.isAdwaita(a)).slice(0, 2)) a.metaWindow.delete(global.get_current_time()); 0' >/dev/null
+chk "stress: two windows closed" "4" "$(wait_for 4 "$windows")"
+open_wl; open_x11
+chk "stress: two windows reopened" "6" "$(wait_for 6 "$windows")"
+for _ in $(seq 3); do
+  ev 'Main.overview.show(); Main.overview.hide(); 0' >/dev/null
+  printf 'window.csd { border-radius: 0px; }\n' > $ROOT/config/gtk-4.0/gtk.css; sleep 0.3
+  rm -f $ROOT/config/gtk-4.0/gtk.css; sleep 0.3
+done
+for _ in $(seq 5); do
+  ev "Main.extensionManager.disableExtension('$UUID'); Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
+done
+chk "after the stress, every window is in the right state" "ok" "$(wait_for ok 'rwcTest.audit()')"
+
+ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
 chk "disable leaves no effects behind" "0" \
-  "$(val 'let n=0; const walk=a=>{if(a.get_effect&&a.get_effect("rounded-window-corners"))n++;a.get_children().forEach(walk);};
+  "$(wait_for 0 'let n=0; const walk=a=>{if(a.get_effect&&rwcTest.effect(a))n++;a.get_children().forEach(walk);};
      global.get_window_actors().forEach(walk); ""+n')"
 chk "disable leaves no style probe on the stage" "0" \
   "$(val 'let n=0; const walk=a=>{if(a.style_class==="rounded-window-corners")n++;a.get_children().forEach(walk);};
      walk(global.stage); ""+n')"
-chk "no errors logged by the extension" "0" "$(grep -c 'rounded-window-corners:\|JS ERROR' $ROOT/log/shell.log)"
+ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
+chk "enabling again restores every effect" "ok" "$(wait_for ok 'rwcTest.audit()')"
+
+chk "no errors or warnings logged by the extension" "0" \
+  "$(grep -cE "rounded-window-corners:|JS ERROR|JS WARNING: [^ ]*$UUID" $ROOT/log/shell.log)"
 
 echo; echo "  RESULT: $PASS passed, $FAIL failed"
 kill $SPID 2>/dev/null
