@@ -10,14 +10,13 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=/tmp/rwc
 PASS=0; FAIL=0
 
-# This branch needs Clutter.ShaderEffect's snippet API, which arrived in GNOME
-# 51. An older shell cannot load the extension at all, so there is nothing to
-# assert. Report it rather than fail, the way the drift canary does, since the
-# image tracks rawhide and rawhide is not pinned to a GNOME version.
+# The extension needs the Clutter.ShaderEffect snippet API of GNOME 51. The
+# image tracks rawhide, which is not pinned to a release, so an older shell is
+# reported rather than failed.
 MAJOR=$(gnome-shell --version | grep -oE '[0-9]+' | head -1)
 if [ "${MAJOR:-0}" -lt 51 ]; then
   echo "$(gnome-shell --version)"
-  echo "  SKIP  this branch requires GNOME Shell 51 or newer"
+  echo "  SKIP  the extension requires GNOME Shell 51 or newer"
   exit 0
 fi
 
@@ -97,7 +96,7 @@ ev "globalThis.rwcCreated = [];
     globalThis.rwcHook = global.display.connect('window-created', (d, w) => {
       const a = w.get_compositor_private();
       if (!a) return;
-      rwcTest.tracker().refreshAll();
+      rwcTest.tracker()._syncAll();
       rwcCreated.push([a, !!rwcTest.effect(a)]);
     }); 0" >/dev/null
 
@@ -121,7 +120,7 @@ chk "libadwaita window is left alone" "false" "$(val "$(rounded "$adw")")"
 chk "a re-sync while probing does not round a libadwaita window" "false" \
   "$(val 'rwcCreated.filter(([a]) => rwcTest.isAdwaita(a)).map(([, e]) => e).join()')"
 
-ev "rwcTest.spy(rwcTest.effect($wl)); rwcTest.tracker().refreshAll(); 0" >/dev/null
+ev "rwcTest.spy(rwcTest.effect($wl)); rwcTest.tracker()._syncAll(); 0" >/dev/null
 chk "Wayland: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
 chk "X11: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
 chk "X11: effect on the surface, not the window actor" "false|true" \
@@ -168,9 +167,50 @@ mkdir -p $ROOT/config/gtk-4.0
 printf 'window.csd { border-radius: 0px; }\n' > $ROOT/config/gtk-4.0/gtk.css
 chk "a live gtk.css with radius 0 removes the effect" "false" "$(wait_for false "$(rounded "$wl")")"
 printf 'window.csd { border-radius: 7px; }\n' > $ROOT/config/gtk-4.0/gtk.css
-chk "a live gtk.css radius reaches the effect" "7" "$(wait_for 7 "\"\"+rwcTest.effect($wl).rwcArgs[1]")"
+radii="\"\"+rwcTest.effect($wl).rwcArgs[1]"
+chk "a live gtk.css radius reaches the effect" "7,7,7,7" "$(wait_for 7,7,7,7 "$radii")"
+printf 'window.csd { border-radius: 20px 20px 0 0; }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "each corner keeps its own radius" "20,20,0,0" "$(wait_for 20,20,0,0 "$radii")"
+printf 'window.csd { border-radius: 0 !important; }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "a declaration GTK rejects is ignored" "15,15,15,15" "$(wait_for 15,15,15,15 "$radii")"
 rm -f $ROOT/config/gtk-4.0/gtk.css
-chk "removing it restores the theme's radius" "15" "$(wait_for 15 "\"\"+rwcTest.effect($wl).rwcArgs[1]")"
+chk "removing it restores libadwaita's radius" "15,15,15,15" "$(wait_for 15,15,15,15 "$radii")"
+
+# libadwaita's own values, per mode, as the effect is given them.
+outline="const a=rwcTest.effect($wl).rwcArgs; \`\${a[1][0]}|\${a[2]}|\${a[3]}|\${a[4].map(v=>v.toFixed(2))}\`"
+chk "libadwaita: radius, outline and offset" "15|1|-1|1.00,1.00,1.00,0.07" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.07' "$outline")"
+DBUS_SESSION_BUS_ADDRESS=$BUS gsettings set org.gnome.desktop.a11y.interface high-contrast true
+chk "libadwaita high contrast: outline" "15|1|-1|1.00,1.00,1.00,0.30" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.30' "$outline")"
+DBUS_SESSION_BUS_ADDRESS=$BUS gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+chk "libadwaita dark high contrast: outline" "15|1|-1|1.00,1.00,1.00,0.30" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.30' "$outline")"
+DBUS_SESSION_BUS_ADDRESS=$BUS gsettings set org.gnome.desktop.a11y.interface high-contrast false
+chk "libadwaita dark: outline" "15|1|-1|1.00,1.00,1.00,0.07" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.07' "$outline")"
+DBUS_SESSION_BUS_ADDRESS=$BUS gsettings set org.gnome.desktop.interface color-scheme default
+
+# The fallback has the same values as libadwaita, so only a variable that
+# libadwaita alone defines shows its stylesheet was read.
+printf 'window { outline-color: var(--accent-blue); }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "libadwaita's own stylesheet is read" "15|1|-1|0.21,0.52,0.89,1.00" "$(wait_for '15|1|-1|0.21,0.52,0.89,1.00' "$outline")"
+
+# Selectors GTK also matches to the window, and an outline drawn inset.
+printf 'window, .csd, decoration {\n    outline: 8px solid #3584e4;\n    outline-offset: -8px;\n}\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "a gtk.css outline on window and .csd reaches the effect" "15|8|-8|0.21,0.52,0.89,1.00" \
+  "$(wait_for '15|8|-8|0.21,0.52,0.89,1.00' "$outline")"
+
+# libadwaita ignores the GTK theme, so the windows rounded to match it must
+# too. Each switch is followed by a gtk.css edit, which forces a re-read.
+width=2
+for theme in Yaru Arc-Dark Breeze; do
+  if [ ! -e /usr/share/themes/$theme/gtk-4.0/gtk.css ]; then
+    echo "  SKIP  theme $theme is not installed"; continue
+  fi
+  DBUS_SESSION_BUS_ADDRESS=$BUS gsettings set org.gnome.desktop.interface gtk-theme $theme
+  printf 'window { outline-width: %dpx; }\n' $width > $ROOT/config/gtk-4.0/gtk.css
+  chk "theme $theme is ignored" "15|$width" "$(wait_for "15|$width" "const a=rwcTest.effect($wl).rwcArgs; a[1][0]+'|'+a[2]")"
+  width=$((width + 1))
+done
+DBUS_SESSION_BUS_ADDRESS=$BUS gsettings reset org.gnome.desktop.interface gtk-theme
+rm -f $ROOT/config/gtk-4.0/gtk.css
 
 # Stress: churn windows, states, the theme and the extension itself, then
 # check that everything ended up where it should.
@@ -205,14 +245,11 @@ ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
 chk "disable leaves no effects behind" "0" \
   "$(wait_for 0 'let n=0; const walk=a=>{if(a.get_effect&&rwcTest.effect(a))n++;a.get_children().forEach(walk);};
      global.get_window_actors().forEach(walk); ""+n')"
-chk "disable leaves no style probe on the stage" "0" \
-  "$(val 'let n=0; const walk=a=>{if(a.style_class==="rounded-window-corners")n++;a.get_children().forEach(walk);};
-     walk(global.stage); ""+n')"
 ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
 chk "enabling again restores every effect" "ok" "$(wait_for ok 'rwcTest.audit()')"
 
 chk "no errors or warnings logged by the extension" "0" \
-  "$(grep -cE "rounded-window-corners:|JS ERROR|JS WARNING: [^ ]*$UUID" $ROOT/log/shell.log)"
+  "$(grep -cE "rounded-window-corners:|JS ERROR|JS WARNING: [^ ]*$UUID|Unhandled promise rejection" $ROOT/log/shell.log)"
 
 echo; echo "  RESULT: $PASS passed, $FAIL failed"
 kill $SPID 2>/dev/null

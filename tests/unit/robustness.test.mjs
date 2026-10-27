@@ -15,10 +15,19 @@ function random(seed) {
     };
 }
 
-const SELECTORS = ['window.csd', 'window.csd:backdrop', ':root', 'window', '*', 'window.csd.maximized', 'headerbar'];
-const PROPERTIES = ['border-radius', 'outline', 'outline-width', 'outline-color', 'box-shadow', '--window-radius', '--x'];
+const SELECTORS = [
+    'window.csd', 'window.csd:backdrop', ':root', 'window', '*', 'window.csd.maximized', 'headerbar', '.csd',
+    'window:not(.solid-csd)', 'window:not(', 'window > .csd', ':not(:backdrop)', 'window.csd, headerbar',
+    'window:not(headerbar)', 'window:not(:not(.csd))',
+];
+const PROPERTIES = [
+    'border-radius', 'border-top-left-radius', 'outline', 'outline-width', 'outline-color', 'outline-offset',
+    'outline-style', 'box-shadow', '--window-radius', '--x',
+];
 const VALUES = [
     'var(--window-radius)', 'var(--x, 3px)', 'var(--x)', 'none', 'inset', 'solid', '!important', 'calc(1px + 2px)',
+    'currentColor', '/',
+    'thin', 'thick', 'hidden', 'NONE', '1px / 2px', 'constructor', '__proto__', 'toString',
     '0', '1px', '-3px', '12.5px', '1e9px', '50%', '999', 'NaN', 'Infinity',
     'rgba(0, 0, 0, 0.2)', 'rgba(0,0,0,5)', 'rgb(300 -20 0 / 150%)', 'RGB(255 255 255/7%)', '#fff', '#12345678', '#zz',
     'transparent', 'white', 'color-mix(in srgb, white 700%, transparent)', 'alpha(@x, 0.5)', ',',
@@ -51,12 +60,13 @@ test('malformed stylesheets never throw and only give sane values', () => {
     for (let i = 0; i < 3000; i++) {
         const css = stylesheet(next);
         for (const env of [{dark: false, highContrast: false}, {dark: true, highContrast: true}]) {
-            const s = readWindowStyle(css, env);
-            assert.ok(s.radius === null || Number.isFinite(s.radius), css);
-            assert.ok(s.outlineWidth === null || Number.isFinite(s.outlineWidth), css);
-            assert.ok(s.outlineColor === null || inUnitRange(s.outlineColor), css);
+            const s = readWindowStyle([css, stylesheet(next)], env);
+            assert.ok(s.radii.length === 4 && s.radii.every(r => r === undefined || (Number.isFinite(r) && r >= 0)), css);
+            assert.ok(s.outlineWidth === undefined || (Number.isFinite(s.outlineWidth) && s.outlineWidth >= 0), css);
+            assert.ok(s.outlineOffset === undefined || Number.isFinite(s.outlineOffset), css);
+            assert.ok(s.outlineColor === undefined || inUnitRange(s.outlineColor), css);
             for (const layers of [s.shadow, s.shadowBackdrop]) {
-                assert.ok(layers === null || Array.isArray(layers), css);
+                assert.ok(layers === undefined || Array.isArray(layers), css);
                 for (const l of layers ?? []) {
                     assert.ok([l.dx, l.dy, l.blur, l.spread].every(Number.isFinite), css);
                     assert.ok(l.blur >= 0 && inUnitRange(l.color), css);
@@ -94,8 +104,8 @@ test('a large stylesheet still parses quickly', () => {
         .card > row:selected label { color: #3584e4; }`;
     const css = rule.repeat(40000);
     const start = performance.now();
-    const s = readWindowStyle(css, {dark: true, highContrast: false});
+    const s = readWindowStyle([css], {dark: true, highContrast: false});
     const ms = performance.now() - start;
-    assert.equal(s.radius, 15);
+    assert.deepEqual(s.radii, [15, 15, 15, 15]);
     assert.ok(ms < 3000, `took ${ms.toFixed(0)}ms for ${(css.length / 1e6).toFixed(1)} MB`);
 });

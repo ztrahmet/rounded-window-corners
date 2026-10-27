@@ -10,7 +10,6 @@ const adwaita = [
 
 test('no layers, or no room to draw them, disables the shadow', () => {
     assert.equal(compileShadow([], 24).color[3], 0);
-    assert.equal(compileShadow(null, 24).color[3], 0);
     assert.equal(compileShadow(adwaita, 0).color[3], 0, 'margin 0 must disable');
     assert.equal(compileShadow(adwaita, 3).color[3], 0, 'under MIN_MARGIN must disable');
 });

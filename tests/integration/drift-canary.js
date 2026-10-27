@@ -1,59 +1,27 @@
-// Compares the live libadwaita stylesheet against the fallback constants in
-// lib/styleResolver.js; fails when Adwaita changes them.
+// Fails when libadwaita's window style no longer matches FALLBACK_CSS in
+// lib/cssParse.js.
 //
 // Run with: gjs -m tests/integration/drift-canary.js
 
 import Gio from 'gi://Gio';
 import Adw from 'gi://Adw?version=1';
 
-import {readWindowStyle} from '../../lib/cssParse.js';
+import {FALLBACK_CSS, readWindowStyle} from '../../lib/cssParse.js';
 
-// Mirrors FALLBACK and FALLBACK_HIGH_CONTRAST in lib/styleResolver.js.
-const EXPECTED = {
-    normal: {
-        radius: 15, outlineWidth: 1, outlineColor: [1, 1, 1, 0.07],
-        shadow: [
-            {dx: 0, dy: 0, blur: 14, spread: 5, color: [0, 0, 0, 0.15]},
-            {dx: 0, dy: 0, blur: 5, spread: 2, color: [0, 0, 0, 0.10]},
-            {dx: 0, dy: 0, blur: 0, spread: 1, color: [0, 0, 0, 0.05]},
-        ],
-        shadowBackdrop: [
-            {dx: 0, dy: 0, blur: 10, spread: 5, color: [0, 0, 0, 0.08]},
-            {dx: 0, dy: 0, blur: 0, spread: 1, color: [0, 0, 0, 0.05]},
-        ],
-    },
-    highContrast: {
-        radius: 15, outlineWidth: 1, outlineColor: [1, 1, 1, 0.30],
-        shadow: [
-            {dx: 0, dy: 0, blur: 14, spread: 5, color: [0, 0, 0, 0.15]},
-            {dx: 0, dy: 0, blur: 5, spread: 2, color: [0, 0, 0, 0.10]},
-            {dx: 0, dy: 0, blur: 0, spread: 1, color: [0, 0, 0, 0.80]},
-        ],
-        shadowBackdrop: [
-            {dx: 0, dy: 0, blur: 10, spread: 5, color: [0, 0, 0, 0.08]},
-            {dx: 0, dy: 0, blur: 0, spread: 1, color: [0, 0, 0, 0.80]},
-        ],
-    },
-};
-
-// GI dlopens the library lazily, and it is that dlopen which registers the
-// GResource holding the stylesheet.
-Adw.get_major_version();
+// The first call loads the library, which registers its resources.
 const version = `${Adw.get_major_version()}.${Adw.get_minor_version()}.${Adw.get_micro_version()}`;
 
-// The path tools/adw-probe.js reads. libadwaita has reorganised these
-// resources more than once, so report rather than assume.
+// The path tools/adw-probe.js reads. libadwaita has moved its resources
+// before, so report rather than assume.
 const RESOURCE = '/org/gnome/Adwaita/styles/gtk.css';
-let bytes = null;
+let bytes;
 try {
     bytes = Gio.resources_lookup_data(RESOURCE, Gio.ResourceLookupFlags.NONE);
 } catch {
     const available = Gio.resources_enumerate_children(
         '/org/gnome/Adwaita/styles/', Gio.ResourceLookupFlags.NONE).join(', ');
     print(`libadwaita ${version}`);
-    print(`  SKIP  ${RESOURCE} does not exist in this libadwaita.`);
-    print('        tools/adw-probe.js therefore returns nothing and the extension');
-    print('        falls back to the constants in lib/styleResolver.js.');
+    print(`  SKIP  ${RESOURCE} does not exist, so the extension uses FALLBACK_CSS.`);
     print(`        Available here: ${available}`);
     imports.system.exit(0);
 }
@@ -63,19 +31,20 @@ print(`libadwaita ${version}, ${(css.length / 1024).toFixed(0)} KB`);
 let failed = 0;
 for (const dark of [false, true]) {
     for (const highContrast of [false, true]) {
-        const got = readWindowStyle(css, {dark, highContrast});
-        const want = highContrast ? EXPECTED.highContrast : EXPECTED.normal;
+        const env = {dark, highContrast};
+        const got = JSON.stringify(readWindowStyle([css], env));
+        const want = JSON.stringify(readWindowStyle([FALLBACK_CSS], env));
         const label = `dark=${dark} highContrast=${highContrast}`;
-        if (JSON.stringify(got) === JSON.stringify(want)) {
+        if (got === want) {
             print(`  PASS  ${label}`);
         } else {
             failed++;
             print(`  FAIL  ${label}`);
-            print(`        want ${JSON.stringify(want)}`);
-            print(`        got  ${JSON.stringify(got)}`);
+            print(`        want ${want}`);
+            print(`        got  ${got}`);
         }
     }
 }
 if (failed > 0)
-    printerr(`${failed} environment(s) drifted from the constants in lib/styleResolver.js`);
+    printerr(`${failed} environment(s) drifted from FALLBACK_CSS in lib/cssParse.js`);
 imports.system.exit(failed === 0 ? 0 : 1);
