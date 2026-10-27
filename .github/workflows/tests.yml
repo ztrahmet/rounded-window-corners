@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       # lib/cssParse.js and lib/shadowProfile.js import nothing from GNOME, so
       # they run under plain node without a shell.
       - run: ./tests/unit/run.sh
