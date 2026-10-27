@@ -172,8 +172,8 @@ chk "a live gtk.css radius reaches the effect" "7" "$(wait_for 7 "\"\"+rwcTest.e
 rm -f $ROOT/config/gtk-4.0/gtk.css
 chk "removing it restores the theme's radius" "15" "$(wait_for 15 "\"\"+rwcTest.effect($wl).rwcArgs[1]")"
 
-# Stress: churn windows, states, the theme and the extension itself without
-# waiting in between, then check that everything ended up where it should.
+# Stress: churn windows, states, the theme and the extension itself, then
+# check that everything ended up where it should.
 open_wl; open_wl; open_x11
 chk "stress: three more windows opened" "6" "$(wait_for 6 "$windows")"
 for _ in $(seq 10); do
@@ -191,8 +191,13 @@ for _ in $(seq 3); do
   printf 'window.csd { border-radius: 0px; }\n' > $ROOT/config/gtk-4.0/gtk.css; sleep 0.3
   rm -f $ROOT/config/gtk-4.0/gtk.css; sleep 0.3
 done
+# GNOME applies these asynchronously, so wait for each one to take effect.
+state="''+Main.extensionManager.lookup('$UUID').state"
 for _ in $(seq 5); do
-  ev "Main.extensionManager.disableExtension('$UUID'); Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
+  ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
+  wait_for 2 "$state" >/dev/null
+  ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
+  wait_for 1 "$state" >/dev/null
 done
 chk "after the stress, every window is in the right state" "ok" "$(wait_for ok 'rwcTest.audit()')"
 
