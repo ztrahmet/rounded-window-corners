@@ -6,50 +6,17 @@
  * @license    GPL-3.0-or-later
  */
 
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-import {preloadShader} from './lib/roundedCornersEffect.js';
-import {StyleResolver} from './lib/styleResolver.js';
 import {WindowTracker} from './lib/windowTracker.js';
 
 export default class RoundedWindowCornersExtension extends Extension {
     enable() {
-        this._startupId = 0;
-        this._styles = new StyleResolver(this.path, () => this._tracker.refreshAll());
-        this._tracker = new WindowTracker(this._styles);
-
-        // The shader loads asynchronously; skip it if disabled meanwhile.
-        const tracker = this._tracker;
-        preloadShader().then(() => {
-            if (this._tracker === tracker)
-                this._startTracking();
-        });
+        this._tracker = new WindowTracker(this.path);
     }
 
     disable() {
-        if (this._startupId) {
-            Main.layoutManager.disconnect(this._startupId);
-            this._startupId = 0;
-        }
-
         this._tracker.destroy();
         this._tracker = null;
-
-        this._styles.destroy();
-        this._styles = null;
-    }
-
-    _startTracking() {
-        if (!Main.layoutManager._startingUp) {
-            this._tracker.enable();
-            return;
-        }
-
-        this._startupId = Main.layoutManager.connect('startup-complete', () => {
-            Main.layoutManager.disconnect(this._startupId);
-            this._startupId = 0;
-            this._tracker.enable();
-        });
     }
 }
