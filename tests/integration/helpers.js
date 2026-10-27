@@ -18,8 +18,7 @@ const rwcTest = {
     },
 
     // Records what each effect was last given, so the tests can compare it
-    // with the window it belongs to. Patches the class once; it survives
-    // disable and enable because the module stays loaded.
+    // with the window it belongs to.
     spy(effect) {
         const proto = Object.getPrototypeOf(effect);
         if (proto.rwcSpied)

@@ -2,10 +2,8 @@
 #
 # Builds the extensions.gnome.org upload package into dist/.
 #
-# gnome-extensions pack only includes metadata.json, extension.js and
-# stylesheet.css unless every other source is named explicitly. Miss one and it
-# produces a package that installs, enables, and then silently does nothing.
-# The check at the end exists so that failure mode cannot come back.
+# gnome-extensions pack only includes metadata.json and extension.js unless
+# other sources are named; the check at the end catches a missed one.
 
 # Bash arrays and herestrings are used below, so re-exec if invoked as `sh`.
 [ -n "${BASH_VERSION:-}" ] || exec bash "$0" "$@"
@@ -32,8 +30,7 @@ find_root() {
 }
 
 # Resolve the script's own location through any symlinks, so this still works
-# when it is linked onto PATH rather than run from the checkout. readlink -f
-# would be shorter but is not portable to BSD.
+# when it is linked onto PATH rather than run from the checkout.
 self=$0
 while [ -L "$self" ]; do
     link=$(readlink "$self")

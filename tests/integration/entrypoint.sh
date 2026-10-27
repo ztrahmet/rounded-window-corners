@@ -2,8 +2,6 @@
 # Root-side setup for the container, then hand over to an unprivileged user.
 set -eu
 
-# Mutter renders through a surfaceless renderer when there is no GPU, which is
-# the case on a CI runner. Nothing extra is needed for that.
 rm -rf /run/systemd
 mkdir -p /run/dbus && dbus-daemon --system --fork 2>/dev/null || true
 

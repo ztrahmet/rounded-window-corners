@@ -1,7 +1,5 @@
-// Compares the live libadwaita stylesheet against the constants that
-// lib/styleResolver.js falls back to. Those constants are only a last resort,
-// but they are also this project's claim about what Adwaita looks like. When
-// Adwaita changes them, this fails, which is the moment to revisit them.
+// Compares the live libadwaita stylesheet against the fallback constants in
+// lib/styleResolver.js; fails when Adwaita changes them.
 //
 // Run with: gjs -m tests/integration/drift-canary.js
 

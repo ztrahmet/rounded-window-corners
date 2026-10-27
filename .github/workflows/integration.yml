@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
   # The extension reads the live libadwaita stylesheet, and distributions update
   # it within a release. A weekly run notices that drift without waiting for a
-  # push, which is the only way the drift canary earns its keep.
+  # push.
   schedule:
     - cron: '0 6 * * 1'
 
@@ -24,8 +24,7 @@ jobs:
     name: GNOME ${{ matrix.gnome }}
     runs-on: ubuntu-latest
     strategy:
-      # One version failing must not hide the results for the others: knowing
-      # it breaks on 48 but works on 50 is the whole point.
+      # One version failing must not hide the others.
       fail-fast: false
       matrix:
         include:
@@ -40,7 +39,7 @@ jobs:
             -t rwc-test tests/integration/
 
       # Mutter uses a surfaceless renderer when there is no GPU, which is what a
-      # runner looks like. No device and no extra privilege are needed.
+      # runner looks like.
       - name: Functional tests
         run: |
           podman run --rm --user 0 \

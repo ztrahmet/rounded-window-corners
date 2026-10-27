@@ -2,8 +2,7 @@
 # Functional tests against a real GNOME Shell, headless and without a GPU.
 #
 # These check the state and geometry each effect is given, not the pixels the
-# shader draws: encoding a screenshot needs a privileged container, which CI
-# does not use. The checks that run inside the shell are in helpers.js.
+# shader draws. The checks that run inside the shell are in helpers.js.
 set -u
 UUID=rounded-window-corners@ztrahmet.github.io
 EXT_SRC=${EXT_SRC:-/src}
@@ -77,7 +76,7 @@ wait_for() {
   printf '%s' "$got"
 }
 
-# A window of the given client type: 1 is X11, anything else Wayland.
+# Test windows: Wayland GTK3, XWayland GTK3, libadwaita.
 wl='global.get_window_actors().find(a=>a.metaWindow.get_client_type()!==Meta.WindowClientType.X11 && /rwc|gjs/i.test(a.metaWindow.get_wm_class()||""))'
 x11='global.get_window_actors().find(a=>a.metaWindow.get_client_type()===Meta.WindowClientType.X11)'
 adw='global.get_window_actors().find(a=>/adwaita/i.test(a.metaWindow.get_wm_class()||""))'
@@ -150,10 +149,7 @@ for size in "700 500" "900 650" "800 600"; do
   ev "$x11.metaWindow.move_resize_frame(true, 100, 100, ${size% *}, ${size#* }); 0" >/dev/null; sleep 0.3
 done
 chk "X11: bounds follow every resize" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
-# On X11 the surface can take its new size after the window actor, so a sync
-# at that moment measures the old size. Whether a resize hits that depends on
-# client timing, so check the fix directly: spoil the bounds, then let only
-# the surface report a size change. It must re-sync.
+# Spoil the bounds, then let only the surface report a new size: it must re-sync.
 ev "const s=rwcTest.surface($x11); const e=rwcTest.effect(s);
     e.update([0, 0, 1, 1], ...e.rwcArgs.slice(1)); s.notify('size'); 0" >/dev/null
 chk "X11: a late surface resize re-syncs the bounds" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
