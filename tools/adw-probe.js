@@ -1,6 +1,6 @@
 #!@GJS@ -m
 /**
- * Out-of-process Libadwaita stylesheet probe
+ * Prints libadwaita's stylesheet
  *
  * @author     Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>
  * @copyright  2026 Ahmet Öztürk
@@ -10,7 +10,7 @@
 import Gio from 'gi://Gio';
 import Adw from 'gi://Adw?version=1';
 
-// Force typelib symbol resolution to register the embedded GResource.
+// The first call loads the library, which registers its resources.
 Adw.get_major_version();
 
 const bytes = Gio.resources_lookup_data(
