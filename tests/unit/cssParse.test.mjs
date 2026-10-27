@@ -30,6 +30,14 @@ test('colours: the syntaxes GTK and libadwaita emit', () => {
         assert.equal(parseColor(v), null, `${v} should not parse`);
 });
 
+test('colours: out-of-range channels and alpha are clamped, as GTK does', () => {
+    assert.deepEqual(parseColor('rgb(300, -20, 0)'), [1, 0, 0, 1]);
+    assert.deepEqual(parseColor('rgba(0, 0, 0, 3)'), [0, 0, 0, 1]);
+    assert.deepEqual(parseColor('rgba(0, 0, 0, -1)'), [0, 0, 0, 0]);
+    assert.deepEqual(parseColor('rgb(0 0 0 / 150%)'), [0, 0, 0, 1]);
+    assert.deepEqual(parseColor('color-mix(in srgb, white 200%, transparent)'), [1, 1, 1, 1]);
+});
+
 test('box-shadow: an unreadable colour invalidates the value rather than guessing black', () => {
     assert.deepEqual(parseBoxShadow('0 4px 8px rgba(0,0,0,0.2)'),
         [{dx: 0, dy: 4, blur: 8, spread: 0, color: [0, 0, 0, 0.2]}]);
