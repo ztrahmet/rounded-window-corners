@@ -54,8 +54,8 @@ try {
         '/org/gnome/Adwaita/styles/', Gio.ResourceLookupFlags.NONE).join(', ');
     print(`libadwaita ${version}`);
     print(`  SKIP  ${RESOURCE} does not exist in this libadwaita.`);
-    print(`        tools/adw-probe.js therefore returns nothing and the extension`);
-    print(`        falls back to the constants in lib/styleResolver.js.`);
+    print('        tools/adw-probe.js therefore returns nothing and the extension');
+    print('        falls back to the constants in lib/styleResolver.js.');
     print(`        Available here: ${available}`);
     imports.system.exit(0);
 }

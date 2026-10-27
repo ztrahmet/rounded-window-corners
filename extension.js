@@ -16,28 +16,15 @@ import {WindowTracker} from './lib/windowTracker.js';
 export default class RoundedWindowCornersExtension extends Extension {
     enable() {
         this._startupId = 0;
-        this._styles = new StyleResolver(this.path, () => this._tracker?.refreshAll());
+        this._styles = new StyleResolver(this.path, () => this._tracker.refreshAll());
         this._tracker = new WindowTracker(this._styles);
 
-        preloadShader().then(() => this._startTracking());
-    }
-
-    _startTracking() {
-        if (!this._tracker)
-            return;
-
-        if (Main.layoutManager._startingUp) {
-            if (this._startupId)
-                return;
-
-            this._startupId = Main.layoutManager.connect('startup-complete', () => {
-                Main.layoutManager.disconnect(this._startupId);
-                this._startupId = 0;
-                this._tracker?.enable();
-            });
-        } else {
-            this._tracker.enable();
-        }
+        // The shader loads asynchronously; skip it if disabled meanwhile.
+        const tracker = this._tracker;
+        preloadShader().then(() => {
+            if (this._tracker === tracker)
+                this._startTracking();
+        });
     }
 
     disable() {
@@ -46,10 +33,23 @@ export default class RoundedWindowCornersExtension extends Extension {
             this._startupId = 0;
         }
 
-        this._tracker?.destroy();
+        this._tracker.destroy();
         this._tracker = null;
 
-        this._styles?.destroy();
+        this._styles.destroy();
         this._styles = null;
+    }
+
+    _startTracking() {
+        if (!Main.layoutManager._startingUp) {
+            this._tracker.enable();
+            return;
+        }
+
+        this._startupId = Main.layoutManager.connect('startup-complete', () => {
+            Main.layoutManager.disconnect(this._startupId);
+            this._startupId = 0;
+            this._tracker.enable();
+        });
     }
 }

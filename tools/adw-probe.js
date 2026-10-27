@@ -1,3 +1,4 @@
+#!@GJS@ -m
 /**
  * Out-of-process Libadwaita stylesheet probe
  *

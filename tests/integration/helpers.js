@@ -3,13 +3,13 @@
 const UUID = 'rounded-window-corners@ztrahmet.github.io';
 const NAME = 'rounded-window-corners';
 
-globalThis.rwcTest = {
+const rwcTest = {
     tracker: () => Main.extensionManager.lookup(UUID).stateObj._tracker,
     effect: actor => actor.get_effect(NAME),
     surface: actor => actor.get_children().find(c => c.constructor.$gtype.name.startsWith('MetaSurfaceActor')),
     isX11: actor => actor.metaWindow.get_client_type() === Meta.WindowClientType.X11,
     isAdwaita: actor => /adwaita/i.test(actor.metaWindow.get_wm_class() || ''),
-    target: actor => (rwcTest.isX11(actor) ? rwcTest.surface(actor) : actor),
+    target: actor => rwcTest.isX11(actor) ? rwcTest.surface(actor) : actor,
 
     shouldRound(actor) {
         const win = actor.metaWindow;
@@ -75,3 +75,4 @@ globalThis.rwcTest = {
         return problems.join('; ') || 'ok';
     },
 };
+globalThis.rwcTest = rwcTest;
