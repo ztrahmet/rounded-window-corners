@@ -45,7 +45,7 @@ learned from both.
 | Border colour | from libadwaita and your gtk.css | you pick it |
 | Light / dark / contrast | automatic | one colour serves both |
 | Shell methods patched | none | three |
-| Actors per window | one effect | effect, shadow widget, constraints |
+| Actors per window | two effects | effect, shadow widget, constraints |
 
 Use theirs if you want squircles or different corners for one app. Use this one if you
 would rather it match the rest of GNOME and never think about it.

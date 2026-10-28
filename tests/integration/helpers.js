@@ -6,6 +6,7 @@ const NAME = 'rounded-window-corners';
 const rwcTest = {
     tracker: () => Main.extensionManager.lookup(UUID).stateObj._tracker,
     effect: actor => actor.get_effect(NAME),
+    ours: actor => actor.get_effects().filter(e => e.get_name().startsWith(NAME)).length,
     surface: actor => actor.get_children().find(c => c.constructor.$gtype.name.startsWith('MetaSurfaceActor')),
     isX11: actor => actor.metaWindow.get_client_type() === Meta.WindowClientType.X11,
     isAdwaita: actor => /adwaita/i.test(actor.metaWindow.get_wm_class() || ''),
@@ -84,23 +85,17 @@ const rwcTest = {
 
     // Worst (R - G) / 255 of the app's red border at the edges and bottom corners.
     borderShowing(actor) {
-        const shot = rwcTest.shot;
-        if (shot === null)
-            return 'pending';
-        if (!(shot instanceof imports.gi.GdkPixbuf.Pixbuf))
-            return 'unsupported';
+        const pixel = rwcTest.pixels();
+        if (typeof pixel === 'string')
+            return pixel;
 
         const s = rwcTest.shotScale;
         const f = actor.metaWindow.get_frame_rect();
-        const pixels = shot.read_pixel_bytes().toArray();
-        const stride = shot.get_rowstride();
-        const channels = shot.get_n_channels();
         let worst = 0;
         const look = (x0, y0, w, h) => {
             for (let y = y0; y < y0 + h; y++) {
                 for (let x = x0; x < x0 + w; x++) {
-                    const i = y * stride + x * channels;
-                    const [r, g, b] = [pixels[i], pixels[i + 1], pixels[i + 2]];
+                    const [r, g, b] = pixel(x, y);
                     if (r + b > 127)
                         worst = Math.max(worst, (r - g) / 255);
                 }
@@ -118,18 +113,66 @@ const rwcTest = {
         return worst.toFixed(2);
     },
 
+    // How much the shadow darkens the background 3 px left of the window.
+    shadowShowing(actor) {
+        const pixel = rwcTest.pixels();
+        if (typeof pixel === 'string')
+            return pixel;
+
+        const s = rwcTest.shotScale;
+        const f = actor.metaWindow.get_frame_rect();
+        const y = Math.round((f.y + f.height / 2) * s);
+        const light = x => pixel(x, y).reduce((sum, v) => sum + v, 0);
+        const near = light(Math.floor((f.x - 3) * s));
+        const far = light(Math.floor((f.x - 45) * s));
+        return ((far - near) / far).toFixed(2);
+    },
+
+    // The last capture as pixel(x, y) => [r, g, b], or why there is none.
+    pixels() {
+        const shot = rwcTest.shot;
+        if (shot === null)
+            return 'pending';
+        if (!(shot instanceof imports.gi.GdkPixbuf.Pixbuf))
+            return 'unsupported';
+        const data = shot.read_pixel_bytes().toArray();
+        const stride = shot.get_rowstride();
+        const channels = shot.get_n_channels();
+        return (x, y) => {
+            const i = y * stride + x * channels;
+            return [data[i], data[i + 1], data[i + 2]];
+        };
+    },
+
+    // The room must come just before the effect, or its framebuffer lacks it.
+    roomError(target) {
+        const names = target.get_effects().map(e => e.get_name());
+        return names.indexOf(NAME) === names.indexOf(`${NAME}-room`) + 1 ? '' : `effects ${names}`;
+    },
+
+    // The least room the window's paint box leaves past its frame.
+    room(actor) {
+        const f = actor.metaWindow.get_frame_rect();
+        const [ok, b] = actor.get_paint_box();
+        if (!ok)
+            return -1;
+        return Math.round(Math.min(f.x - b.x1, f.y - b.y1, b.x2 - f.x - f.width, b.y2 - f.y - f.height));
+    },
+
     // Checks every window against what the extension should be doing to it.
     audit() {
         const actors = global.get_window_actors();
         const problems = [];
         for (const actor of actors) {
             const name = actor.metaWindow.get_wm_class() || '?';
-            const rounded = [actor, ...actor.get_children()].filter(a => rwcTest.effect(a));
+            const rounded = [actor, ...actor.get_children()].filter(a => rwcTest.ours(a));
             if (!rwcTest.shouldRound(actor)) {
                 if (rounded.length)
                     problems.push(`${name} should not be rounded`);
             } else if (rounded.length !== 1 || rounded[0] !== rwcTest.target(actor)) {
                 problems.push(`${name} has the effect on ${rounded.length} actors`);
+            } else if (rwcTest.roomError(rounded[0])) {
+                problems.push(`${name} ${rwcTest.roomError(rounded[0])}`);
             } else {
                 const error = rwcTest.boundsError(actor);
                 if (error)
