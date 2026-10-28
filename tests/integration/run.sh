@@ -169,8 +169,8 @@ chk "Wayland: bounds follow a resize" "ok" "$(wait_for ok "rwcTest.boundsError($
 # padding ever changes, every sampled pixel shifts and the corners shrink.
 chk "offscreen padding is still +3, and the effect has painted" "true|true" \
   "$(wait_for 'true|true' "const a=$wl; const r=rwcTest.effect(a).get_target_size();
-     const s=Math.max(Math.ceil(a.get_resource_scale()),1);
-     \`\${r[0]}|\${r[1]===(Math.round(a.width)+3)*s && r[2]===(Math.round(a.height)+3)*s}\`")"
+     const v=a.get_paint_volume(); const s=Math.max(Math.ceil(a.get_resource_scale()),1);
+     \`\${r[0]}|\${r[1]===(Math.round(v.get_width())+3)*s && r[2]===(Math.round(v.get_height())+3)*s}\`")"
 
 # The theme's values must reach the effect live, including "square".
 mkdir -p $ROOT/config/gtk-4.0
@@ -255,6 +255,38 @@ ev "rwcTest.setScale(1); 0" >/dev/null
 wait_for 1 "$monitor_scale" >/dev/null
 chk "back at 100%: smear handling is off" "0" "$(wait_for 0 "$smear")"
 
+# An app that leaves no room around itself still gets libadwaita's whole
+# shadow (#14), which reaches 26 px, plus one for antialiasing.
+RWC_BARE=1 WAYLAND_DISPLAY=rwc-ci GDK_BACKEND=wayland gjs $CLIENT >/dev/null 2>&1 &
+RWC_BARE=1 DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH GDK_BACKEND=x11 gjs $CLIENT >/dev/null 2>&1 &
+bare='global.get_window_actors().filter(a=>a.metaWindow.get_title()==="rwc-bare")'
+bare_wl="$bare.find(a=>!rwcTest.isX11(a))"
+chk "bare windows leave no room of their own" "2|0" \
+  "$(wait_for '2|0' "const ws=$bare.map(a=>a.metaWindow); ws.length+'|'+Math.max(...ws.map(w=>{const f=w.get_frame_rect(),b=w.get_buffer_rect();
+     return Math.max(f.x-b.x,f.y-b.y,b.x+b.width-f.x-f.width,b.y+b.height-f.y-f.height);}))")"
+chk "every rounded window has room for the whole shadow" "ok" \
+  "$(wait_for ok "const ws=[...$bare,$wl,$x11]; ws.every(a=>rwcTest.effect(rwcTest.target(a))) ?
+     ws.map(a=>rwcTest.room(a)).filter(r=>r<27).join() || 'ok' : 'not rounded yet'")"
+ev "const b=$bare_wl; for (const a of global.get_window_actors()) if (a !== b) a.metaWindow.minimize();
+    b.metaWindow.move_resize_frame(true, 100, 60, 300, 250); b.metaWindow.activate(global.get_current_time()); 0" >/dev/null
+wait_for 100,60 "const f=($bare_wl).metaWindow.get_frame_rect(); f.x+','+f.y" >/dev/null
+sleep 1
+ev "rwcTest.capture(); 0" >/dev/null
+for _ in $(seq 50); do
+  shown=$(val "rwcTest.shadowShowing($bare_wl)")
+  [ "$shown" != pending ] && break
+  sleep 0.2
+done
+if [ "$shown" = unsupported ]; then
+  echo "  SKIP  the shadow is drawn beside a bare window (needs --privileged)"
+else
+  chk "the shadow is drawn beside a bare window" "ok" \
+    "$(val "Number('$shown') > 0.05 ? 'ok' : 'darker by $shown'")"
+fi
+ev "$bare.forEach(a=>a.metaWindow.delete(global.get_current_time()));
+    global.get_window_actors().forEach(a=>a.metaWindow.unminimize()); 0" >/dev/null
+chk "bare windows closed" "3" "$(wait_for 3 "$windows")"
+
 # Stress: churn windows, states, the theme and the extension itself, then
 # check that everything ended up where it should.
 open_wl; open_wl; open_x11
@@ -286,7 +318,7 @@ chk "after the stress, every window is in the right state" "ok" "$(wait_for ok '
 
 ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
 chk "disable leaves no effects behind" "0" \
-  "$(wait_for 0 'let n=0; const walk=a=>{if(a.get_effect&&rwcTest.effect(a))n++;a.get_children().forEach(walk);};
+  "$(wait_for 0 'let n=0; const walk=a=>{if(a.get_effects)n+=rwcTest.ours(a);a.get_children().forEach(walk);};
      global.get_window_actors().forEach(walk); ""+n')"
 ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
 chk "enabling again restores every effect" "ok" "$(wait_for ok 'rwcTest.audit()')"

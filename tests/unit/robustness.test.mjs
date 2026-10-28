@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readWindowStyle} from './cssParse.js';
-import {compileShadow} from './shadowProfile.js';
+import {compileShadow, shadowExtent} from './shadowProfile.js';
 
 // The parser reads whatever the user put in ~/.config/gtk-4.0/gtk.css, so
 // malformed input must never throw or hand the shader out-of-range values.
@@ -86,10 +86,11 @@ test('any parsed shadow compiles to finite uniforms with alpha in range', () => 
             spread: (next() - 0.5) * 30,
             color: [next(), next(), next(), next()],
         }));
-        const s = compileShadow(layers, next() * 40, 0.5 + next() * 2);
+        const s = compileShadow(layers, 0.5 + next() * 2);
         for (const v of [...s.color, ...s.spread, ...s.sigma, ...s.alpha, ...s.offset])
             assert.ok(Number.isFinite(v));
-        assert.ok(s.sigma.every(v => v > 0), 'the shader divides by sigma');
+        assert.ok(Number.isFinite(shadowExtent(layers)) && shadowExtent(layers) >= 0);
+        assert.ok(s.sigma.every(v => v === 0 || v >= 0.35), 'the shader divides by any sigma above zero');
         assert.ok(s.alpha.every(v => v >= 0 && v <= 1));
     }
 });
