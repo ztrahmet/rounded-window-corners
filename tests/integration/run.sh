@@ -135,13 +135,23 @@ chk "a foreign actor at index 0 does not steal the effect" "false|true" \
   "$(wait_for 'false|true' "const a=$x11; const f=a.get_children().find(c=>c.name==='foreign-blur');
      \`\${!!(f&&rwcTest.effect(f))}|\${!!rwcTest.effect(rwcTest.surface(a))}\`")"
 
-ev "$wl.metaWindow.maximize(); 0" >/dev/null
-chk "maximized: effect removed" "false" "$(wait_for false "$(rounded "$wl")")"
-ev "$wl.metaWindow.unmaximize(); 0" >/dev/null
-chk "unmaximized: effect restored" "true" "$(wait_for true "$(rounded "$wl")")"
-ev "$wl.metaWindow.make_fullscreen(); 0" >/dev/null
+# The look changes only once the app has redrawn (#12). Reading it in the same
+# call as the change sees the moment before that.
+for kind in Wayland X11; do
+  a=$wl; [ $kind = X11 ] && a=$x11
+  chk "$kind: maximizing keeps the rounding until the app redraws" "true" \
+    "$(val "$a.metaWindow.maximize(); $(rounded "$a")")"
+  chk "$kind: maximized: effect removed" "false" "$(wait_for false "$(rounded "$a")")"
+  chk "$kind: unmaximizing stays square until the app redraws" "false" \
+    "$(val "$a.metaWindow.unmaximize(); $(rounded "$a")")"
+  chk "$kind: unmaximized: effect restored at the right bounds" "true|ok" \
+    "$(wait_for 'true|ok' "$(rounded "$a")+'|'+(rwcTest.boundsError($a) || 'ok')")"
+done
+chk "fullscreen keeps the rounding until the app redraws" "true" \
+  "$(val "$wl.metaWindow.make_fullscreen(); $(rounded "$wl")")"
 chk "fullscreen: effect removed" "false" "$(wait_for false "$(rounded "$wl")")"
-ev "$wl.metaWindow.unmake_fullscreen(); 0" >/dev/null
+chk "leaving fullscreen stays square until the app redraws" "false" \
+  "$(val "$wl.metaWindow.unmake_fullscreen(); $(rounded "$wl")")"
 chk "unfullscreen: effect restored" "true" "$(wait_for true "$(rounded "$wl")")"
 
 for size in "700 500" "900 650" "800 600"; do
