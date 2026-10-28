@@ -52,9 +52,11 @@ them:
 
 ```bash
 podman build -f tests/integration/Containerfile --build-arg FEDORA=rawhide -t rwc-test tests/integration/
-podman run --rm --user 0 -v "$PWD:/src:ro,z" -v "$PWD/tests:/tests:ro,z" \
+podman run --rm --privileged --user 0 -v "$PWD:/src:ro,z" -v "$PWD/tests:/tests:ro,z" \
     rwc-test /tests/integration/entrypoint.sh
 ```
+
+Without `--privileged` the pixel checks are skipped.
 
 The drift canary checks that libadwaita's window style still matches the built-in copy:
 
@@ -62,9 +64,8 @@ The drift canary checks that libadwaita's window style still matches the built-i
 podman run --rm -v "$PWD:/src:ro,z" rwc-test gjs -m /src/tests/integration/drift-canary.js
 ```
 
-Screenshots work in the container too. Run it with `--privileged`, which the image
-loaders need, and capture with `global.stage.paint_to_content()` through the shell's
-`Eval` D-Bus method.
+For your own screenshots, capture with `global.stage.paint_to_content()` through the
+shell's `Eval` D-Bus method, in a `--privileged` container.
 
 CI runs the unit tests on every push, and the container suite and canary on pushes and
 weekly.
