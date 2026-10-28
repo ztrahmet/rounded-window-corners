@@ -1,6 +1,7 @@
 # How it works
 
-One shader effect per window that needs it. Nothing else.
+One shader effect per window that needs it, and a small one that makes room for its
+shadow. Nothing else.
 
 ## Which windows
 
@@ -40,18 +41,20 @@ The shader clips the window to its rounded shape and replaces the app's own thin
 just inside the edge, so only one outline is left. It then draws the shadow outside and
 the outline on top, in the same order GTK does.
 
-The shadow is fitted into the space the app already leaves around its window, so nothing
-is drawn beyond what the window covers anyway. Edges are drawn at the screen's pixel
-density, so at 200% they are as crisp as libadwaita's.
+The shadow is libadwaita's at its full size, whatever room the app leaves around its
+window, so every window gets the same one. It is computed as GTK's renderer does, so it
+matches libadwaita's. Edges are drawn at the screen's pixel density, so at 200% they are
+as crisp as libadwaita's.
 
-Because the outline and shadow are part of the same effect, the overview, alt-tab and
-screenshots show them without any patching.
+Because the outline and shadow are part of the same effect, the overview and alt-tab show
+them without any patching. Window screenshots only cover what the app itself draws, so the
+shadow is cut there for apps that leave little room.
 
 ## Cost
 
-Each rounded window is drawn through an offscreen buffer about its own size, and the
-shader runs as the window repaints. Windows that aren't repainting cost nothing, and
-maximized and fullscreen windows have no effect at all.
+Each rounded window is drawn through an offscreen buffer the size of the window and its
+shadow, and the shader runs as the window repaints. Windows that aren't repainting cost
+nothing, and maximized and fullscreen windows have no effect at all.
 
 ## Enable and disable
 
