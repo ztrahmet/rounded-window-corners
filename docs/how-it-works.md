@@ -9,7 +9,8 @@ libadwaita is found by looking at the libraries its process has loaded. libadwai
 are left alone, since they already round themselves.
 
 A window is left square while it is maximized, tiled or fullscreen, and when the radius is
-0. The effect is removed in those states, not just hidden.
+0. The effect is removed in those states, not just hidden. As in libadwaita, the look
+changes once the app has redrawn at its new size, not when the state changes.
 
 On X11 (XWayland) the effect goes on the window's surface rather than the whole window, so
 mutter's own frame and shadow on server-side decorated windows are kept. The surface is
