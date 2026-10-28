@@ -50,6 +50,74 @@ const rwcTest = {
         return `${got.map(Math.round)} for ${want.map(Math.round)}`;
     },
 
+    // The shell serves DisplayConfig itself, so the calls must not block.
+    setScale(scale) {
+        const {Gio, GLib} = imports.gi;
+        const call = (method, params, done) => Gio.DBus.session.call('org.gnome.Mutter.DisplayConfig',
+            '/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', method, params, null, 0, -1, null,
+            (bus, res) => done?.(bus.call_finish(res).deepUnpack()));
+        call('GetCurrentState', null, ([serial, monitors]) => {
+            const [[connector], modes] = monitors[0];
+            const mode = modes.find(m => 'is-current' in m[6]);
+            const supported = mode[5].find(s => Math.abs(s - scale) < 0.01);
+            call('ApplyMonitorsConfig', new GLib.Variant('(uua(iiduba(ssa{sv}))a{sv})',
+                [serial, 1, [[0, 0, supported, 0, true, [[connector, mode[0], {}]]]], {}]), null);
+        });
+    },
+
+    // Stores a pixbuf of the top-left of the stage, or the error, in rwcTest.shot.
+    capture() {
+        const {Clutter, Gio, Mtk, Shell} = imports.gi;
+        rwcTest.shot = null;
+        rwcTest.shotScale = global.display.get_monitor_scale(0);
+        const content = global.stage.paint_to_content(new Mtk.Rectangle({x: 0, y: 0, width: 500, height: 400}),
+            rwcTest.shotScale, null, Clutter.PaintFlag.NO_CURSORS);
+        Shell.Screenshot.composite_to_stream(content.get_texture(), 0, 0, -1, -1, 1, null, 0, 0, 1,
+            Gio.MemoryOutputStream.new_resizable(), (o, res) => {
+                try {
+                    rwcTest.shot = Shell.Screenshot.composite_to_stream_finish(res);
+                } catch (e) {
+                    rwcTest.shot = e;
+                }
+            });
+    },
+
+    // Worst (R - G) / 255 of the app's red border at the edges and bottom corners.
+    borderShowing(actor) {
+        const shot = rwcTest.shot;
+        if (shot === null)
+            return 'pending';
+        if (!(shot instanceof imports.gi.GdkPixbuf.Pixbuf))
+            return 'unsupported';
+
+        const s = rwcTest.shotScale;
+        const f = actor.metaWindow.get_frame_rect();
+        const pixels = shot.read_pixel_bytes().toArray();
+        const stride = shot.get_rowstride();
+        const channels = shot.get_n_channels();
+        let worst = 0;
+        const look = (x0, y0, w, h) => {
+            for (let y = y0; y < y0 + h; y++) {
+                for (let x = x0; x < x0 + w; x++) {
+                    const i = y * stride + x * channels;
+                    const [r, g, b] = [pixels[i], pixels[i + 1], pixels[i + 2]];
+                    if (r + b > 127)
+                        worst = Math.max(worst, (r - g) / 255);
+                }
+            }
+        };
+        const left = Math.floor(f.x * s);
+        const right = Math.floor((f.x + f.width) * s);
+        const bottom = Math.floor((f.y + f.height) * s);
+        const corner = Math.ceil(20 * s);
+        look(left - 3, Math.round((f.y + f.height / 2) * s), 9, 1);
+        look(right - 5, Math.round((f.y + f.height / 2) * s), 9, 1);
+        look(Math.round((f.x + f.width / 2) * s), bottom - 6, 1, 9);
+        look(left - 2, bottom - corner, corner, corner + 2);
+        look(right - corner + 2, bottom - corner, corner, corner + 2);
+        return worst.toFixed(2);
+    },
+
     // Checks every window against what the extension should be doing to it.
     audit() {
         const actors = global.get_window_actors();

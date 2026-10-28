@@ -42,7 +42,7 @@ dbus-run-session -- bash -c '
   gsettings set org.gnome.shell enabled-extensions "[\"rounded-window-corners@ztrahmet.github.io\",\"rwc-test-helper@local\"]"
   gsettings set org.gnome.desktop.background picture-uri ""
   gsettings set org.gnome.desktop.interface enable-animations false
-  exec gnome-shell --headless --virtual-monitor 1400x900 --wayland-display=rwc-ci
+  exec gnome-shell --headless --virtual-monitor 1440x900 --wayland-display=rwc-ci
 ' > $ROOT/log/shell.log 2>&1 &
 
 find_shell() {
@@ -129,7 +129,7 @@ chk "X11: effect on the surface, not the window actor" "false|true" \
 # Blur My Shell parents its blur to the window actor at index 0. The surface
 # must still be found by type rather than by position.
 ev "const C=imports.gi.Clutter; const a=$x11;
-    a.insert_child_at_index(new C.Actor({width:1400,height:900,name:'foreign-blur'}),0);
+    a.insert_child_at_index(new C.Actor({width:1440,height:900,name:'foreign-blur'}),0);
     a.metaWindow.focus(global.get_current_time()); 0" >/dev/null
 chk "a foreign actor at index 0 does not steal the effect" "false|true" \
   "$(wait_for 'false|true' "const a=$x11; const f=a.get_children().find(c=>c.name==='foreign-blur');
@@ -211,6 +211,39 @@ for theme in Yaru Arc-Dark Breeze; do
 done
 DBUS_SESSION_BUS_ADDRESS=$BUS gsettings reset org.gnome.desktop.interface gtk-theme
 rm -f $ROOT/config/gtk-4.0/gtk.css
+
+# At fractional scales the blur changes with the window's position (#10).
+monitor_scale="''+global.display.get_monitor_scale(0)"
+smear="''+rwcTest.effect($wl)._smear"
+for scale in 1.25 1.5; do
+  ev "rwcTest.setScale($scale); 0" >/dev/null
+  wait_for $scale "$monitor_scale" >/dev/null
+  worst=0
+  for x in 40 41 42 43; do
+    ev "const w = ($wl).metaWindow; w.move_resize_frame(true, $x, 40, 400, 300); w.activate(global.get_current_time()); 0" >/dev/null
+    wait_for ok "rwcTest.boundsError($wl) || 'ok'" >/dev/null
+    sleep 0.5
+    ev "rwcTest.capture(); 0" >/dev/null
+    for _ in $(seq 50); do
+      shown=$(val "rwcTest.borderShowing($wl)")
+      [ "$shown" != pending ] && break
+      sleep 0.2
+    done
+    [ "$shown" = unsupported ] && break
+    worst=$(awk -v a=$worst -v b=$shown 'BEGIN { print (b > a) ? b : a }')
+  done
+  chk "at $scale: smear handling is on and the bounds match" "1|ok" \
+    "$(val "$smear+'|'+(rwcTest.boundsError($wl) || 'ok')")"
+  if [ "$shown" = unsupported ]; then
+    echo "  SKIP  at $scale: the app's border stays hidden (needs --privileged)"
+  else
+    chk "at $scale: the app's border stays hidden at every position" "ok" \
+      "$(awk -v w=$worst 'BEGIN { print (w < 0.05) ? "ok" : "showing " w }')"
+  fi
+done
+ev "rwcTest.setScale(1); 0" >/dev/null
+wait_for 1 "$monitor_scale" >/dev/null
+chk "back at 100%: smear handling is off" "0" "$(wait_for 0 "$smear")"
 
 # Stress: churn windows, states, the theme and the extension itself, then
 # check that everything ended up where it should.

@@ -39,10 +39,10 @@ jobs:
             -t rwc-test tests/integration/
 
       # Mutter uses a surfaceless renderer when there is no GPU, which is what a
-      # runner looks like.
+      # runner looks like. The pixel checks need --privileged.
       - name: Functional tests
         run: |
-          podman run --rm --user 0 \
+          podman run --rm --privileged --user 0 \
             -v "$PWD:/src:ro" -v "$PWD/tests:/tests:ro" \
             rwc-test /tests/integration/entrypoint.sh
 
@@ -70,7 +70,7 @@ jobs:
             bash -c 'cd /src && ./scripts/package.sh'
           mkdir -p /tmp/pkg
           unzip -q dist/*.shell-extension.zip -d /tmp/pkg
-          podman run --rm --user 0 -e EXT_SRC=/pkg \
+          podman run --rm --privileged --user 0 -e EXT_SRC=/pkg \
             -v /tmp/pkg:/pkg:ro -v "$PWD/tests:/tests:ro" \
             rwc-test /tests/integration/entrypoint.sh
 
