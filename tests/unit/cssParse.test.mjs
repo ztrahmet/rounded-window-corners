@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {FALLBACK_CSS, parseColor, parseLength, parseBoxShadow, readWindowStyle} from './cssParse.js';
+import {FALLBACK_CSS, parseBoxShadow, readWindowStyle} from './cssParse.js';
 
 // Stands in for Pango, which GTK asks for color names.
 const PANGO = new Map([['white', [1, 1, 1, 1]], ['black', [0, 0, 0, 1]], ['red', [1, 0, 0, 1]], ['green', [0, 128 / 255, 0, 1]]]);
@@ -13,63 +13,14 @@ const styleOf = (...sheets) => readWindowStyle(sheets, LIGHT);
 const radiiOf = (...sheets) => styleOf(...sheets).radii;
 const round = s => JSON.parse(JSON.stringify(s, (k, v) => typeof v === 'number' ? Number(v.toFixed(6)) : v));
 
-test('lengths: px and unitless zero only', () => {
-    assert.equal(parseLength('12px'), 12);
-    assert.equal(parseLength('0'), 0);
-    assert.equal(parseLength('-3px'), -3);
-    assert.equal(parseLength('1.5px'), 1.5);
-    for (const v of ['1rem', '1.5em', '50%', 'calc(12px + 1px)', '12.3.4px', 'px', '', `${'9'.repeat(400)}px`])
-        assert.equal(parseLength(v), null, v);
-});
-
-test('lengths: a long digit run stays linear', () => {
-    const t0 = process.hrtime.bigint();
-    parseLength(`${'9'.repeat(40000)}x`);
-    const ms = Number(process.hrtime.bigint() - t0) / 1e6;
-    assert.ok(ms < 50, `took ${ms.toFixed(0)}ms`);
-});
-
-test('colors: the syntaxes GTK and libadwaita emit', () => {
-    assert.deepEqual(parseColor('#ff0000', names), [1, 0, 0, 1]);
-    assert.deepEqual(parseColor('#f008', names), [1, 0, 0, 0x88 / 255]);
-    assert.deepEqual(parseColor('transparent', names), [0, 0, 0, 0]);
-    assert.deepEqual(parseColor('rgba(0, 0, 0, 0.2)', names), [0, 0, 0, 0.2]);
-    const rgb = parseColor('RGB(255 255 255/7%)', names);
-    assert.equal(rgb[0], 1);
-    assert.ok(Math.abs(rgb[3] - 0.07) < 1e-9);
-    for (const v of ['oklch(0.5 0.1 20)', 'hsl(210 50% 40%)', 'shade(#222, 1.2)', 'rgb(1 2 3 4 5)',
-        'rgba(0, 0, 0, )', '#ff0000 !important', '#12345', 'nosuchcolor', '@undefined'])
-        assert.equal(parseColor(v, names), null, v);
-});
-
-test('colors: names come from Pango, and currentColor from the window', () => {
-    assert.deepEqual(parseColor('Green', names), [0, 128 / 255, 0, 1]);
-    assert.deepEqual(parseColor('currentColor', names), CURRENT);
-});
-
-test('colors: out-of-range channels and alpha are clamped, as GTK does', () => {
-    assert.deepEqual(parseColor('rgb(300, -20, 0)', names), [1, 0, 0, 1]);
-    assert.deepEqual(parseColor('rgba(0, 0, 0, 3)', names), [0, 0, 0, 1]);
-    assert.deepEqual(parseColor('rgba(0, 0, 0, -1)', names), [0, 0, 0, 0]);
-    assert.deepEqual(parseColor('rgb(0 0 0 / 150%)', names), [0, 0, 0, 1]);
-    assert.deepEqual(parseColor('color-mix(in srgb, white 200%, transparent)', names), [1, 1, 1, 1]);
-});
-
-test('colors: color-mix() with transparent scales the alpha, whichever side it is on', () => {
-    assert.deepEqual(parseColor('color-mix(in srgb, red 30%, transparent)', names), [1, 0, 0, 0.3]);
-    assert.deepEqual(round(parseColor('color-mix(in srgb, transparent 70%, red)', names)), [1, 0, 0, 0.3]);
-    assert.deepEqual(parseColor('color-mix(in srgb, transparent, red 40%)', names), [1, 0, 0, 0.4]);
-    assert.deepEqual(parseColor('color-mix(in srgb, red, transparent)', names), [1, 0, 0, 0.5]);
-    assert.equal(parseColor('color-mix(in srgb, red, white)', names), null);
-});
-
 test('box-shadow: lengths, inset and color in any order, the color defaulting to currentColor', () => {
     const layer = {dx: 0, dy: 4, blur: 8, spread: 0, color: [0, 0, 0, 0.2]};
     assert.deepEqual(parseBoxShadow('0 4px 8px rgba(0,0,0,0.2)', names), [layer]);
     assert.deepEqual(parseBoxShadow('rgba(0,0,0,0.2) 0 4px 8px', names), [layer]);
     assert.deepEqual(parseBoxShadow('0 4px 8px', names), [{...layer, color: CURRENT}]);
     assert.deepEqual(parseBoxShadow('0 4px 8px currentColor', names), [{...layer, color: CURRENT}]);
-    for (const v of ['0 0 10px hsl(210 50% 40%)', '0 0 10px alpha(@theme_bg_color, 0.5)', '#000',
+    assert.deepEqual(parseBoxShadow('0 calc(2px * 2) 8px', names), [{...layer, color: CURRENT}]);
+    for (const v of ['0 0 10px alpha(@theme_bg_color, 0.5)', '#000',
         '#000 0 0 #000', '0 0 1px 2px 3px #000', '0 0 4px #000 !important', '0 0 #000 4px', '0 0 -4px #000',
         'inset inset 0 0 #000', '0', ''])
         assert.equal(parseBoxShadow(v, names), null, v);
@@ -149,6 +100,13 @@ test('selectors: those GTK matches to a libadwaita window apply', () => {
         assert.equal(radiiOf(`${selector} { border-radius: 7px; }`)[0], 7, selector);
 });
 
+test('selectors: :dir() follows the text direction', () => {
+    const css = 'window:dir(ltr) { border-radius: 4px; } window:not(:dir(ltr)) { border-radius: 6px; }';
+    assert.equal(readWindowStyle([css], LIGHT).radii[0], 4);
+    assert.equal(readWindowStyle([css], {...LIGHT, rtl: true}).radii[0], 6);
+    assert.equal(radiiOf('window:not(:not(.csd)) { border-radius: 7px; }')[0], 0, 'GTK does not nest :not()');
+});
+
 test('selectors: other nodes, other window states and unknown syntax never apply', () => {
     for (const selector of ['decoration', 'headerbar', 'window.csd.maximized', 'window.csd.tiled',
         'window.dialog', 'window.solid-csd', 'window > headerbar', 'window .csd', 'window+window',
@@ -180,6 +138,17 @@ test('cascade: variables resolve across stylesheets, and are case-sensitive', ()
     assert.equal(radiiOf(adw, 'window { border-radius: var(--nope, 2px); }')[0], 2);
     assert.equal(radiiOf(adw, 'window { border-radius: var(--nope, var(--window-radius)); }')[0], 15);
     assert.deepEqual(styleOf(adw, ':root { --c: rgb(0 0 255); } window { outline-color: var(--nope, var(--c)); }').outlineColor, [0, 0, 1, 1]);
+});
+
+test('colors: libadwaita\'s computed accent color reaches the window, clamped when drawn', () => {
+    const adw = `:root { --accent-bg-color: @accent_bg_color; --accent-color: oklab(from var(--accent-bg-color) var(--standalone)); }
+        :root { --standalone: min(l, 0.5) a b; }
+        @media (prefers-color-scheme: dark) { :root { --standalone: max(l, 0.85) a b; } }`;
+    const sheets = [adw, '@define-color accent_bg_color #3584e4;', 'window { outline: 2px solid var(--accent-color); }'];
+    const near = (got, want) => assert.ok(got.every((v, i) => Math.abs(v - want[i]) < 1e-4), `${got}`);
+    near(readWindowStyle(sheets, LIGHT).outlineColor, [0.01646, 0.37937, 0.74356, 1]);
+    near(readWindowStyle(sheets, {...LIGHT, dark: true}).outlineColor, [0.50431, 0.81723, 1, 1]);
+    assert.equal(styleOf('window { outline: calc(1px + 2px) solid red; outline-offset: calc(-2px * 2); }').outlineWidth, 3);
 });
 
 test('@define-color: names resolve across stylesheets and media queries, as libadwaita\'s accent does', () => {

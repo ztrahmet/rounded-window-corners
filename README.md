@@ -55,4 +55,12 @@ would rather it match the rest of GNOME and never think about it.
 - [How it works](docs/how-it-works.md)
 - [Development](docs/development.md)
 
+## License
+
 GPL-3.0-or-later.
+
+Some parts are adapted from LGPL-2.1-or-later projects:
+
+- the shadow, from GTK's renderer (`gsk/gpu/shaders/gskgpuboxshadow.glsl`)
+- the color conversions, from GTK (`gtk/gtkcolorutils.c`, `gdk/gdkhsla.c`)
+- the built-in window style, from libadwaita's stylesheet

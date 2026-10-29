@@ -135,6 +135,11 @@ done
 chk "fullscreen keeps the rounding until the app redraws" "true" \
   "$(val "$wl.metaWindow.make_fullscreen(); $(rounded "$wl")")"
 chk "fullscreen: effect off" "false" "$(wait_for false "$(rounded "$wl")")"
+# mutter only scans a fullscreen window out directly when its paint box is the monitor.
+chk "fullscreen: the paint box is the monitor" "ok" \
+  "$(val "const a=$wl; const [, b]=a.get_paint_box(); const m=global.display.get_monitor_geometry(a.metaWindow.get_monitor());
+     const box=[b.x1, b.y1, b.x2, b.y2].map(Math.round);
+     ''+box === ''+[m.x, m.y, m.x + m.width, m.y + m.height] ? 'ok' : ''+box")"
 chk "leaving fullscreen stays square until the app redraws" "false" \
   "$(val "$wl.metaWindow.unmake_fullscreen(); $(rounded "$wl")")"
 chk "unfullscreen: effect restored" "true" "$(wait_for true "$(rounded "$wl")")"
@@ -196,7 +201,16 @@ chk "a color name reaches the effect" "15|1|-1|1.00,0.00,0.00,1.00" "$(wait_for 
 printf 'window { outline-color: var(--accent-bg-color); }\n' > $ROOT/config/gtk-4.0/gtk.css
 gset set org.gnome.desktop.interface accent-color teal
 chk "the system accent color reaches the effect" "15|1|-1|0.13,0.56,0.64,1.00" "$(wait_for '15|1|-1|0.13,0.56,0.64,1.00' "$outline")"
+# libadwaita computes --accent-color with oklab(); GTK names the desktop's accent accent_color.
+printf 'window { outline-color: var(--accent-color); }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "libadwaita's computed accent color reaches the effect" "15|1|-1|0.00,0.44,0.52,1.00" "$(wait_for '15|1|-1|0.00,0.44,0.52,1.00' "$outline")"
+printf 'window { outline-color: @accent_color; }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "the desktop's accent_color reaches the effect" "15|1|-1|0.13,0.56,0.64,1.00" "$(wait_for '15|1|-1|0.13,0.56,0.64,1.00' "$outline")"
 gset reset org.gnome.desktop.interface accent-color
+
+printf 'window { box-shadow: 0 3px 9px 1px rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.75); }\n' > $ROOT/config/gtk-4.0/gtk.css
+layers="rwcTest.effect($wl).rwcArgs[5].filter(s => s.color[3] > 0).map(s => s.shape.join(' ')).join('|')"
+chk "each shadow layer keeps its own offset, in GTK's order" "0 3 1 4.5|0 0 1 0" "$(wait_for '0 3 1 4.5|0 0 1 0' "$layers")"
 
 # libadwaita ignores the GTK theme, so the extension must too.
 for theme in Yaru Arc-Dark Breeze; do

@@ -10,6 +10,7 @@ lib/windowTracker.js          which windows get an effect, and their geometry
 lib/roundedCornersEffect.js   the shader effect
 lib/styleResolver.js          reads libadwaita's stylesheet and gtk.css
 lib/cssParse.js               the cascade, no GNOME imports
+lib/cssValues.js              numbers, lengths and colors, no GNOME imports
 lib/shadowProfile.js          box-shadow to shader values, no GNOME imports
 lib/toolkitProbe.js           detects libadwaita apps
 tools/adw-probe.js            helper that prints libadwaita's stylesheet

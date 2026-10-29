@@ -28,12 +28,6 @@ GNOME Shell can't load libadwaita, so a short `gjs` helper in `tools/` reads its
 If that fails, a built-in copy of libadwaita's window rules is used instead. A weekly CI
 check notices when libadwaita changes them.
 
-Like GTK, anything the extension can't read is skipped rather than guessed. It reads pixel
-lengths, the color syntaxes libadwaita uses, color names, `var()` and `@define-color`, so
-`var(--accent-bg-color)` in your gtk.css follows your accent color. Colors computed with
-functions such as `oklab()` aren't read. Each corner can have its own radius; an elliptical
-corner is drawn as a circle.
-
 Edits to `gtk.css`, and to files it imports, apply live.
 
 ## Drawing
@@ -45,8 +39,9 @@ the outline on top, in the same order GTK does.
 
 The shadow is libadwaita's at its full size, whatever room the app leaves around its
 window, so every window gets the same one. It is computed as GTK's renderer does, so it
-matches libadwaita's. Edges are drawn at the screen's pixel density, so at 200% they are
-as crisp as libadwaita's.
+matches libadwaita's. Each layer of a `box-shadow` keeps its own offset and color, and
+they are stacked in GTK's order; past six layers, the faintest are left out. Edges are
+drawn at the screen's pixel density, so at 200% they are as crisp as libadwaita's.
 
 Because the outline and shadow are part of the same effect, the overview and alt-tab show
 them without any patching. Window screenshots only cover what the app itself draws, so the
