@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# lib/cssParse.js and lib/shadowProfile.js import nothing from GNOME, so they
-# run under plain node. Node decides module type from the nearest package.json,
-# and the extension deliberately ships none, so the sources and their tests are
-# copied somewhere that has one.
+# Node loads these as modules only next to a package.json, which the extension doesn't ship, so run a copy.
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(cd "$here/../.." && pwd)

@@ -1,4 +1,4 @@
-# Image for headless GNOME Shell 51 tests using Fedora rawhide.
+# Headless GNOME Shell for the integration tests, on Fedora rawhide.
 ARG FEDORA=rawhide
 FROM registry.fedoraproject.org/fedora:${FEDORA}
 
@@ -7,14 +7,12 @@ RUN dnf install -y --setopt=install_weak_deps=False \
         libadwaita-demo procps-ng zip unzip \
     && dnf clean all
 
-# Real GTK 4 themes, which libadwaita ignores. A theme rawhide drops is skipped.
+# Real GTK themes, to check that the extension ignores them as libadwaita does.
 RUN dnf install -y --setopt=install_weak_deps=False --skip-unavailable \
         arc-theme breeze-gtk-gtk4 yaru-gtk4-theme \
     && dnf clean all
 
-# GNOME Shell chooses its systemd login manager when /run/systemd/seats exists.
-# The image ships that directory but no logind, so the shell throws during
-# startup and aborts. Without it the shell uses its dummy login manager.
+# The image has /run/systemd but no logind, which makes the shell abort at startup.
 RUN rm -rf /run/systemd
 
 RUN useradd -m runner

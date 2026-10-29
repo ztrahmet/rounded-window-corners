@@ -1,5 +1,4 @@
-// Test helpers, evaluated inside the shell by run.sh. gdbus parses the code as
-// a GVariant string first, so it must stay free of backslash escapes.
+// Evaluated inside the shell by run.sh. gdbus reads it as a GVariant string, so no backslash escapes.
 const UUID = 'rounded-window-corners@ztrahmet.github.io';
 const NAME = 'rounded-window-corners';
 
@@ -7,10 +6,9 @@ const rwcTest = {
     tracker: () => Main.extensionManager.lookup(UUID).stateObj._tracker,
     effect: actor => actor.get_effect(NAME),
     ours: actor => actor.get_effects().filter(e => e.get_name().startsWith(NAME)).length,
-    surface: actor => actor.get_children().find(c => c.constructor.$gtype.name.startsWith('MetaSurfaceActor')),
+    rounded: actor => actor.get_effects().filter(e => e.get_name().startsWith(NAME) && e.enabled).length === 2,
     isX11: actor => actor.metaWindow.get_client_type() === Meta.WindowClientType.X11,
     isAdwaita: actor => /adwaita/i.test(actor.metaWindow.get_wm_class() || ''),
-    target: actor => rwcTest.isX11(actor) ? rwcTest.surface(actor) : actor,
 
     shouldRound(actor) {
         const win = actor.metaWindow;
@@ -18,8 +16,7 @@ const rwcTest = {
             !win.maximizedHorizontally && !win.maximizedVertically && !win.fullscreen;
     },
 
-    // Records what each effect was last given, so the tests can compare it
-    // with the window it belongs to.
+    // Records what each effect was last given, to compare with its window.
     spy(effect) {
         const proto = Object.getPrototypeOf(effect);
         if (proto.rwcSpied)
@@ -34,17 +31,14 @@ const rwcTest = {
 
     // Empty when the effect's bounds match the window frame inside its buffer.
     boundsError(actor) {
-        const target = rwcTest.target(actor);
-        const effect = target && rwcTest.effect(target);
+        const effect = rwcTest.effect(actor);
         if (!effect || !effect.rwcArgs)
             return 'no recorded update';
 
         const win = actor.metaWindow;
         const f = win.get_frame_rect();
         const b = win.get_buffer_rect();
-        const sx = target.width / b.width;
-        const sy = target.height / b.height;
-        const want = [(f.x - b.x) * sx, (f.y - b.y) * sy, (f.x - b.x + f.width) * sx, (f.y - b.y + f.height) * sy];
+        const want = [f.x - b.x, f.y - b.y, f.x - b.x + f.width, f.y - b.y + f.height];
         const got = effect.rwcArgs[0];
         if (want.every((v, i) => Math.abs(v - got[i]) < 0.5))
             return '';
@@ -113,7 +107,7 @@ const rwcTest = {
         return worst.toFixed(2);
     },
 
-    // How much the shadow darkens the background 3 px left of the window.
+    // How much the shadow darkens the background 1 to 12 px left of the window.
     shadowShowing(actor) {
         const pixel = rwcTest.pixels();
         if (typeof pixel === 'string')
@@ -122,10 +116,9 @@ const rwcTest = {
         const s = rwcTest.shotScale;
         const f = actor.metaWindow.get_frame_rect();
         const y = Math.round((f.y + f.height / 2) * s);
-        const light = x => pixel(x, y).reduce((sum, v) => sum + v, 0);
-        const near = light(Math.floor((f.x - 3) * s));
-        const far = light(Math.floor((f.x - 45) * s));
-        return ((far - near) / far).toFixed(2);
+        const light = x => pixel(Math.floor(x * s), y).reduce((sum, v) => sum + v, 0);
+        const far = light(f.x - 45);
+        return Array.from({length: 12}, (_, i) => ((far - light(f.x - 1 - i)) / far).toFixed(3)).join();
     },
 
     // The last capture as pixel(x, y) => [r, g, b], or why there is none.
@@ -145,8 +138,8 @@ const rwcTest = {
     },
 
     // The room must come just before the effect, or its framebuffer lacks it.
-    roomError(target) {
-        const names = target.get_effects().map(e => e.get_name());
+    roomError(actor) {
+        const names = actor.get_effects().map(e => e.get_name());
         return names.indexOf(NAME) === names.indexOf(`${NAME}-room`) + 1 ? '' : `effects ${names}`;
     },
 
@@ -165,23 +158,25 @@ const rwcTest = {
         const problems = [];
         for (const actor of actors) {
             const name = actor.metaWindow.get_wm_class() || '?';
-            const rounded = [actor, ...actor.get_children()].filter(a => rwcTest.ours(a));
-            if (!rwcTest.shouldRound(actor)) {
-                if (rounded.length)
+            if (actor.get_children().some(rwcTest.ours)) {
+                problems.push(`${name} has the effect on a child`);
+            } else if (!rwcTest.shouldRound(actor)) {
+                if (rwcTest.rounded(actor))
                     problems.push(`${name} should not be rounded`);
-            } else if (rounded.length !== 1 || rounded[0] !== rwcTest.target(actor)) {
-                problems.push(`${name} has the effect on ${rounded.length} actors`);
-            } else if (rwcTest.roomError(rounded[0])) {
-                problems.push(`${name} ${rwcTest.roomError(rounded[0])}`);
+            } else if (!rwcTest.rounded(actor)) {
+                problems.push(`${name} is not rounded`);
+            } else if (rwcTest.roomError(actor)) {
+                problems.push(`${name} ${rwcTest.roomError(actor)}`);
             } else {
                 const error = rwcTest.boundsError(actor);
                 if (error)
                     problems.push(`${name} bounds ${error}`);
             }
         }
-        const tracked = rwcTest.tracker()._states.size;
-        if (tracked !== actors.length)
-            problems.push(`tracker holds ${tracked} windows for ${actors.length}`);
+        const tracked = rwcTest.tracker()._windows.size;
+        const roundable = actors.filter(a => !rwcTest.isAdwaita(a)).length;
+        if (tracked !== roundable)
+            problems.push(`tracker holds ${tracked} windows for ${roundable}`);
         return problems.join('; ') || 'ok';
     },
 };

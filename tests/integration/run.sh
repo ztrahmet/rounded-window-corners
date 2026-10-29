@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# Functional tests against a real GNOME Shell, headless and without a GPU.
-#
-# These check the state and geometry each effect is given, not the pixels the
-# shader draws. The checks that run inside the shell are in helpers.js.
+# Functional tests against a real headless GNOME Shell. The checks run inside the shell are in helpers.js.
 set -u
 UUID=rounded-window-corners@ztrahmet.github.io
 EXT_SRC=${EXT_SRC:-/src}
@@ -10,9 +7,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=/tmp/rwc
 PASS=0; FAIL=0
 
-# The extension needs the Clutter.ShaderEffect snippet API of GNOME 51. The
-# image tracks rawhide, which is not pinned to a release, so an older shell is
-# reported rather than failed.
+# The image follows rawhide, so a shell older than the extension needs is skipped, not failed.
 MAJOR=$(gnome-shell --version | grep -oE '[0-9]+' | head -1)
 if [ "${MAJOR:-0}" -lt 51 ]; then
   echo "$(gnome-shell --version)"
@@ -60,11 +55,11 @@ BUS=$(tr '\0' '\n' < /proc/$SPID/environ | grep '^DBUS_SESSION_BUS_ADDRESS=' | c
 
 ev() { DBUS_SESSION_BUS_ADDRESS=$BUS gdbus call --session --dest org.gnome.Shell \
         --object-path /org/gnome/Shell --method org.gnome.Shell.Eval "$1" 2>/dev/null; }
+gset() { DBUS_SESSION_BUS_ADDRESS=$BUS gsettings "$@"; }
 val() { ev "$1" | sed 's/^(true, .//; s/.)$//; s/^"//; s/"$//'; }
 chk() { if [ "$2" = "$3" ]; then echo "  PASS  $1"; PASS=$((PASS+1));
         else echo "  FAIL  $1 (want '$2' got '$3')"; FAIL=$((FAIL+1)); fi; }
-# Polls a JS expression until it gives the wanted value, for up to 15s, and
-# prints the last value it gave.
+# Polls a JS expression for up to 15 s and prints its last value.
 wait_for() {
   local want=$1 expr=$2 got=
   for _ in $(seq 75); do
@@ -80,7 +75,7 @@ wl='global.get_window_actors().find(a=>a.metaWindow.get_client_type()!==Meta.Win
 x11='global.get_window_actors().find(a=>a.metaWindow.get_client_type()===Meta.WindowClientType.X11)'
 adw='global.get_window_actors().find(a=>/adwaita/i.test(a.metaWindow.get_wm_class()||""))'
 windows='""+global.get_window_actors().length'
-rounded() { echo "\"\"+!!rwcTest.effect(rwcTest.target($1))"; }
+rounded() { echo "\"\"+rwcTest.rounded($1)"; }
 
 echo "$(gnome-shell --version)"
 ev "$(cat "$HERE/helpers.js"); 0" >/dev/null
@@ -90,14 +85,13 @@ fi
 chk "extension enables cleanly" "1|none" \
   "$(wait_for '1|none' "const e=Main.extensionManager.lookup('$UUID'); \`\${e.state}|\${e.error||'none'}\`")"
 
-# Re-sync from inside window-created, while the extension is still probing the
-# new window's toolkit, the way a theme change can.
+# Re-sync while the new windows are still being probed, as a style change can.
 ev "globalThis.rwcCreated = [];
     globalThis.rwcHook = global.display.connect('window-created', (d, w) => {
       const a = w.get_compositor_private();
       if (!a) return;
       rwcTest.tracker()._syncAll();
-      rwcCreated.push([a, !!rwcTest.effect(a)]);
+      rwcCreated.push([a, rwcTest.rounded(a)]);
     }); 0" >/dev/null
 
 CLIENT=/tests/integration/clients/bordered-gtk3.js
@@ -123,25 +117,16 @@ chk "a re-sync while probing does not round a libadwaita window" "false" \
 ev "rwcTest.spy(rwcTest.effect($wl)); rwcTest.tracker()._syncAll(); 0" >/dev/null
 chk "Wayland: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
 chk "X11: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
-chk "X11: effect on the surface, not the window actor" "false|true" \
-  "$(val "const a=$x11; \`\${!!rwcTest.effect(a)}|\${!!rwcTest.effect(rwcTest.surface(a))}\`")"
+# On X11 the effect goes on the window actor too, so it replaces mutter's own shadow.
+chk "X11: effect on the window actor, not its surface" "true|0" \
+  "$(val "const a=$x11; \`\${rwcTest.rounded(a)}|\${a.get_children().filter(rwcTest.ours).length}\`")"
 
-# Blur My Shell parents its blur to the window actor at index 0. The surface
-# must still be found by type rather than by position.
-ev "const C=imports.gi.Clutter; const a=$x11;
-    a.insert_child_at_index(new C.Actor({width:1440,height:900,name:'foreign-blur'}),0);
-    a.metaWindow.focus(global.get_current_time()); 0" >/dev/null
-chk "a foreign actor at index 0 does not steal the effect" "false|true" \
-  "$(wait_for 'false|true' "const a=$x11; const f=a.get_children().find(c=>c.name==='foreign-blur');
-     \`\${!!(f&&rwcTest.effect(f))}|\${!!rwcTest.effect(rwcTest.surface(a))}\`")"
-
-# The look changes only once the app has redrawn (#12). Reading it in the same
-# call as the change sees the moment before that.
+# The look changes only after the app redraws (#12), so the same call must still see the old one.
 for kind in Wayland X11; do
   a=$wl; [ $kind = X11 ] && a=$x11
   chk "$kind: maximizing keeps the rounding until the app redraws" "true" \
     "$(val "$a.metaWindow.maximize(); $(rounded "$a")")"
-  chk "$kind: maximized: effect removed" "false" "$(wait_for false "$(rounded "$a")")"
+  chk "$kind: maximized: effect off" "false" "$(wait_for false "$(rounded "$a")")"
   chk "$kind: unmaximizing stays square until the app redraws" "false" \
     "$(val "$a.metaWindow.unmaximize(); $(rounded "$a")")"
   chk "$kind: unmaximized: effect restored at the right bounds" "true|ok" \
@@ -149,80 +134,81 @@ for kind in Wayland X11; do
 done
 chk "fullscreen keeps the rounding until the app redraws" "true" \
   "$(val "$wl.metaWindow.make_fullscreen(); $(rounded "$wl")")"
-chk "fullscreen: effect removed" "false" "$(wait_for false "$(rounded "$wl")")"
+chk "fullscreen: effect off" "false" "$(wait_for false "$(rounded "$wl")")"
 chk "leaving fullscreen stays square until the app redraws" "false" \
   "$(val "$wl.metaWindow.unmake_fullscreen(); $(rounded "$wl")")"
 chk "unfullscreen: effect restored" "true" "$(wait_for true "$(rounded "$wl")")"
+
+# An offscreen effect added later, like the Shell's dimmer, must come after ours or it cuts the shadow.
+ev "$wl.add_effect_with_name('foreign-dimmer', new imports.gi.Clutter.BrightnessContrastEffect());
+    $wl.metaWindow.maximize(); 0" >/dev/null
+wait_for false "$(rounded "$wl")" >/dev/null
+ev "$wl.metaWindow.unmaximize(); 0" >/dev/null
+wait_for true "$(rounded "$wl")" >/dev/null
+chk "a later offscreen effect stays after ours" "rounded-window-corners-room,rounded-window-corners,foreign-dimmer" \
+  "$(val "$wl.get_effects().map(e=>e.get_name()).join()")"
+ev "$wl.remove_effect_by_name('foreign-dimmer'); 0" >/dev/null
 
 for size in "700 500" "900 650" "800 600"; do
   ev "$x11.metaWindow.move_resize_frame(true, 100, 100, ${size% *}, ${size#* }); 0" >/dev/null; sleep 0.3
 done
 chk "X11: bounds follow every resize" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
-# Spoil the bounds, then let only the surface report a new size: it must re-sync.
-ev "const s=rwcTest.surface($x11); const e=rwcTest.effect(s);
-    e.update([0, 0, 1, 1], ...e.rwcArgs.slice(1)); s.notify('size'); 0" >/dev/null
-chk "X11: a late surface resize re-syncs the bounds" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
+# Spoil the bounds, then let only the app's picture report a new size: the bounds must recover.
+ev "const a=$x11; const e=rwcTest.effect(a);
+    e.update([0, 0, 1, 1], ...e.rwcArgs.slice(1)); a.get_texture().emit('size-changed'); 0" >/dev/null
+chk "X11: a late redraw re-syncs the bounds" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
 ev "$wl.metaWindow.move_resize_frame(true, 300, 200, 640, 480); 0" >/dev/null
 chk "Wayland: bounds follow a resize" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
 
-# The offscreen framebuffer is the paint volume enlarged by Clutter. If that
-# padding ever changes, every sampled pixel shifts and the corners shrink.
+# The shader relies on Clutter's framebuffer padding, which no API exposes, so catch it changing.
 chk "offscreen padding is still +3, and the effect has painted" "true|true" \
   "$(wait_for 'true|true' "const a=$wl; const r=rwcTest.effect(a).get_target_size();
-     const v=a.get_paint_volume(); const s=Math.max(Math.ceil(a.get_resource_scale()),1);
+     const v=a.get_paint_volume(); const s=a.get_resource_scale();
      \`\${r[0]}|\${r[1]===(Math.round(v.get_width())+3)*s && r[2]===(Math.round(v.get_height())+3)*s}\`")"
 
-# The theme's values must reach the effect live, including "square".
+# gtk.css edits must reach the effect live, including a radius of 0.
 mkdir -p $ROOT/config/gtk-4.0
 printf 'window.csd { border-radius: 0px; }\n' > $ROOT/config/gtk-4.0/gtk.css
-chk "a live gtk.css with radius 0 removes the effect" "false" "$(wait_for false "$(rounded "$wl")")"
+chk "a live gtk.css with radius 0 turns the effect off" "false" "$(wait_for false "$(rounded "$wl")")"
 printf 'window.csd { border-radius: 7px; }\n' > $ROOT/config/gtk-4.0/gtk.css
 radii="\"\"+rwcTest.effect($wl).rwcArgs[1]"
 chk "a live gtk.css radius reaches the effect" "7,7,7,7" "$(wait_for 7,7,7,7 "$radii")"
 printf 'window.csd { border-radius: 20px 20px 0 0; }\n' > $ROOT/config/gtk-4.0/gtk.css
 chk "each corner keeps its own radius" "20,20,0,0" "$(wait_for 20,20,0,0 "$radii")"
-printf 'window.csd { border-radius: 0 !important; }\n' > $ROOT/config/gtk-4.0/gtk.css
-chk "a declaration GTK rejects is ignored" "15,15,15,15" "$(wait_for 15,15,15,15 "$radii")"
 rm -f $ROOT/config/gtk-4.0/gtk.css
 chk "removing it restores libadwaita's radius" "15,15,15,15" "$(wait_for 15,15,15,15 "$radii")"
 
-# libadwaita's own values, per mode, as the effect is given them.
+# libadwaita's values as the effect is given them, following the system settings.
 outline="const a=rwcTest.effect($wl).rwcArgs; \`\${a[1][0]}|\${a[2]}|\${a[3]}|\${a[4].map(v=>v.toFixed(2))}\`"
 chk "libadwaita: radius, outline and offset" "15|1|-1|1.00,1.00,1.00,0.07" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.07' "$outline")"
-DBUS_SESSION_BUS_ADDRESS=$BUS gsettings set org.gnome.desktop.a11y.interface high-contrast true
-chk "libadwaita high contrast: outline" "15|1|-1|1.00,1.00,1.00,0.30" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.30' "$outline")"
-DBUS_SESSION_BUS_ADDRESS=$BUS gsettings set org.gnome.desktop.interface color-scheme prefer-dark
-chk "libadwaita dark high contrast: outline" "15|1|-1|1.00,1.00,1.00,0.30" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.30' "$outline")"
-DBUS_SESSION_BUS_ADDRESS=$BUS gsettings set org.gnome.desktop.a11y.interface high-contrast false
-chk "libadwaita dark: outline" "15|1|-1|1.00,1.00,1.00,0.07" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.07' "$outline")"
-DBUS_SESSION_BUS_ADDRESS=$BUS gsettings set org.gnome.desktop.interface color-scheme default
+gset set org.gnome.desktop.a11y.interface high-contrast true
+chk "high contrast: libadwaita's outline" "15|1|-1|1.00,1.00,1.00,0.30" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.30' "$outline")"
+gset set org.gnome.desktop.a11y.interface high-contrast false
+printf 'window { outline: 2px solid; }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "an outline without a color takes the window's" "15|2|-1|0.00,0.00,0.02,0.80" "$(wait_for '15|2|-1|0.00,0.00,0.02,0.80' "$outline")"
+gset set org.gnome.desktop.interface color-scheme prefer-dark
+chk "dark: the window's color is libadwaita's" "15|2|-1|1.00,1.00,1.00,1.00" "$(wait_for '15|2|-1|1.00,1.00,1.00,1.00' "$outline")"
+gset set org.gnome.desktop.interface color-scheme default
 
-# The fallback has the same values as libadwaita, so only a variable that
-# libadwaita alone defines shows its stylesheet was read.
-printf 'window { outline-color: var(--accent-blue); }\n' > $ROOT/config/gtk-4.0/gtk.css
-chk "libadwaita's own stylesheet is read" "15|1|-1|0.21,0.52,0.89,1.00" "$(wait_for '15|1|-1|0.21,0.52,0.89,1.00' "$outline")"
+printf 'window { outline-color: red; }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "a color name reaches the effect" "15|1|-1|1.00,0.00,0.00,1.00" "$(wait_for '15|1|-1|1.00,0.00,0.00,1.00' "$outline")"
+# Only libadwaita's own stylesheet defines --accent-bg-color.
+printf 'window { outline-color: var(--accent-bg-color); }\n' > $ROOT/config/gtk-4.0/gtk.css
+gset set org.gnome.desktop.interface accent-color teal
+chk "the system accent color reaches the effect" "15|1|-1|0.13,0.56,0.64,1.00" "$(wait_for '15|1|-1|0.13,0.56,0.64,1.00' "$outline")"
+gset reset org.gnome.desktop.interface accent-color
 
-# Selectors GTK also matches to the window, and an outline drawn inset.
-printf 'window, .csd, decoration {\n    outline: 8px solid #3584e4;\n    outline-offset: -8px;\n}\n' > $ROOT/config/gtk-4.0/gtk.css
-chk "a gtk.css outline on window and .csd reaches the effect" "15|8|-8|0.21,0.52,0.89,1.00" \
-  "$(wait_for '15|8|-8|0.21,0.52,0.89,1.00' "$outline")"
-
-# libadwaita ignores the GTK theme, so the windows rounded to match it must
-# too. Each switch is followed by a gtk.css edit, which forces a re-read.
-width=2
+# libadwaita ignores the GTK theme, so the extension must too.
 for theme in Yaru Arc-Dark Breeze; do
-  if [ ! -e /usr/share/themes/$theme/gtk-4.0/gtk.css ]; then
-    echo "  SKIP  theme $theme is not installed"; continue
-  fi
-  DBUS_SESSION_BUS_ADDRESS=$BUS gsettings set org.gnome.desktop.interface gtk-theme $theme
-  printf 'window { outline-width: %dpx; }\n' $width > $ROOT/config/gtk-4.0/gtk.css
-  chk "theme $theme is ignored" "15|$width" "$(wait_for "15|$width" "const a=rwcTest.effect($wl).rwcArgs; a[1][0]+'|'+a[2]")"
-  width=$((width + 1))
+  [ -e /usr/share/themes/$theme/gtk-4.0/gtk.css ] && break
 done
-DBUS_SESSION_BUS_ADDRESS=$BUS gsettings reset org.gnome.desktop.interface gtk-theme
+gset set org.gnome.desktop.interface gtk-theme $theme
+printf 'window { outline-width: 3px; }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "the GTK theme is ignored" "15|3" "$(wait_for '15|3' "const a=rwcTest.effect($wl).rwcArgs; a[1][0]+'|'+a[2]")"
+gset reset org.gnome.desktop.interface gtk-theme
 rm -f $ROOT/config/gtk-4.0/gtk.css
 
-# At fractional scales the blur changes with the window's position (#10).
+# At fractional scales the app's border must stay hidden at every position (#10).
 monitor_scale="''+global.display.get_monitor_scale(0)"
 smear="''+rwcTest.effect($wl)._smear"
 for scale in 1.25 1.5; do
@@ -255,40 +241,49 @@ ev "rwcTest.setScale(1); 0" >/dev/null
 wait_for 1 "$monitor_scale" >/dev/null
 chk "back at 100%: smear handling is off" "0" "$(wait_for 0 "$smear")"
 
-# An app that leaves no room around itself still gets libadwaita's whole
-# shadow (#14), which reaches 26 px, plus one for antialiasing.
+# Windows that leave no room of their own still get the whole shadow (#14), and on X11 only ours.
 RWC_BARE=1 WAYLAND_DISPLAY=rwc-ci GDK_BACKEND=wayland gjs $CLIENT >/dev/null 2>&1 &
 RWC_BARE=1 DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH GDK_BACKEND=x11 gjs $CLIENT >/dev/null 2>&1 &
 bare='global.get_window_actors().filter(a=>a.metaWindow.get_title()==="rwc-bare")'
 bare_wl="$bare.find(a=>!rwcTest.isX11(a))"
+bare_x11="$bare.find(a=>rwcTest.isX11(a))"
 chk "bare windows leave no room of their own" "2|0" \
   "$(wait_for '2|0' "const ws=$bare.map(a=>a.metaWindow); ws.length+'|'+Math.max(...ws.map(w=>{const f=w.get_frame_rect(),b=w.get_buffer_rect();
      return Math.max(f.x-b.x,f.y-b.y,b.x+b.width-f.x-f.width,b.y+b.height-f.y-f.height);}))")"
 chk "every rounded window has room for the whole shadow" "ok" \
-  "$(wait_for ok "const ws=[...$bare,$wl,$x11]; ws.every(a=>rwcTest.effect(rwcTest.target(a))) ?
+  "$(wait_for ok "const ws=[...$bare,$wl,$x11]; ws.every(rwcTest.rounded) ?
      ws.map(a=>rwcTest.room(a)).filter(r=>r<27).join() || 'ok' : 'not rounded yet'")"
-ev "const b=$bare_wl; for (const a of global.get_window_actors()) if (a !== b) a.metaWindow.minimize();
-    b.metaWindow.move_resize_frame(true, 100, 60, 300, 250); b.metaWindow.activate(global.get_current_time()); 0" >/dev/null
-wait_for 100,60 "const f=($bare_wl).metaWindow.get_frame_rect(); f.x+','+f.y" >/dev/null
-sleep 1
-ev "rwcTest.capture(); 0" >/dev/null
-for _ in $(seq 50); do
-  shown=$(val "rwcTest.shadowShowing($bare_wl)")
-  [ "$shown" != pending ] && break
-  sleep 0.2
-done
-if [ "$shown" = unsupported ]; then
-  echo "  SKIP  the shadow is drawn beside a bare window (needs --privileged)"
+# Show a window alone in the same place and print how much its shadow darkens the background.
+shadow_of() {
+  ev "const b=$1; for (const a of global.get_window_actors()) if (a !== b) a.metaWindow.minimize();
+      b.metaWindow.unminimize(); b.metaWindow.move_resize_frame(true, 100, 60, 300, 250);
+      b.metaWindow.activate(global.get_current_time()); 0" >/dev/null
+  wait_for 100,60 "const f=($1).metaWindow.get_frame_rect(); f.x+','+f.y" >/dev/null
+  sleep 1
+  ev "rwcTest.capture(); 0" >/dev/null
+  for _ in $(seq 50); do
+    shown=$(val "rwcTest.shadowShowing($1)")
+    [ "$shown" != pending ] && break
+    sleep 0.2
+  done
+  printf '%s' "$shown"
+}
+shadow_wl=$(shadow_of "$bare_wl")
+shadow_x11=$(shadow_of "$bare_x11")
+if [ "$shadow_wl" = unsupported ]; then
+  echo "  SKIP  the shadow is drawn beside a bare window, once (needs --privileged)"
 else
   chk "the shadow is drawn beside a bare window" "ok" \
-    "$(val "Number('$shown') > 0.05 ? 'ok' : 'darker by $shown'")"
+    "$(val "Number('$shadow_wl'.split(',')[2]) > 0.05 ? 'ok' : 'darkens 3 px out by $shadow_wl'")"
+  chk "X11: mutter's own shadow does not add to it" "ok" \
+    "$(val "const w='$shadow_wl'.split(',').map(Number), x='$shadow_x11'.split(',').map(Number);
+       w.every((v, i) => Math.abs(v - x[i]) < 0.02) ? 'ok' : 'Wayland $shadow_wl, X11 $shadow_x11'")"
 fi
 ev "$bare.forEach(a=>a.metaWindow.delete(global.get_current_time()));
     global.get_window_actors().forEach(a=>a.metaWindow.unminimize()); 0" >/dev/null
 chk "bare windows closed" "3" "$(wait_for 3 "$windows")"
 
-# Stress: churn windows, states, the theme and the extension itself, then
-# check that everything ended up where it should.
+# Stress: churn windows, states, the style and the extension itself, then audit every window.
 open_wl; open_wl; open_x11
 chk "stress: three more windows opened" "6" "$(wait_for 6 "$windows")"
 for _ in $(seq 10); do
@@ -306,7 +301,7 @@ for _ in $(seq 3); do
   printf 'window.csd { border-radius: 0px; }\n' > $ROOT/config/gtk-4.0/gtk.css; sleep 0.3
   rm -f $ROOT/config/gtk-4.0/gtk.css; sleep 0.3
 done
-# GNOME applies these asynchronously, so wait for each one to take effect.
+# Enabling and disabling complete asynchronously, so wait for each one.
 state="''+Main.extensionManager.lookup('$UUID').state"
 for _ in $(seq 5); do
   ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null

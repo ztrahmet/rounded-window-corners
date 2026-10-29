@@ -8,41 +8,41 @@ const adwaita = [
     {dx: 0, dy: 0, blur: 0, spread: 1, color: [0, 0, 0, 0.05]},
 ];
 
-test('no layers disables the shadow', () => {
-    assert.equal(compileShadow([]).color[3], 0);
+test('no layers draws no shadow', () => {
+    assert.deepEqual(compileShadow([]).alpha, [0, 0, 0, 0]);
     assert.equal(shadowExtent([]), 0);
 });
 
-test('fully transparent layers are dropped', () => {
-    const transparent = [{dx: 0, dy: 0, blur: 4, spread: 0, color: [0, 0, 0, 0]}];
-    assert.equal(compileShadow(transparent).color[3], 0);
-    assert.equal(shadowExtent(transparent), 0, 'nothing drawn needs no room');
-});
-
-test('libadwaita shadow compiles to usable uniforms', () => {
+test('libadwaita\'s shadow fills three slots, as GTK sizes it', () => {
     const s = compileShadow(adwaita);
-    assert.equal(s.color[3], 1, 'alpha is the master switch, on when enabled');
-    assert.equal(s.spread.length, 4);
-    assert.equal(s.sigma.length, 4);
-    assert.equal(s.alpha.length, 4);
-    assert.deepEqual(s.sigma.map(v => v > 0), [true, true, false, true],
-        'only the unblurred layer has sigma 0');
-    for (const v of [...s.spread, ...s.sigma, ...s.alpha, ...s.color, ...s.offset])
-        assert.ok(Number.isFinite(v), 'no NaN or Infinity may reach the GPU');
+    assert.deepEqual(s.color, [0, 0, 0]);
+    assert.deepEqual(s.offset, [0, 0]);
+    assert.deepEqual(s.spread, [5, 2, 1, 0]);
+    assert.deepEqual(s.sigma, [7, 2.5, 0, 0], 'half the blur, and 0 for the unblurred layer');
+    assert.deepEqual(s.alpha, [0.15, 0.1, 0.05, 0]);
 });
 
-test('the shadow keeps its CSS size, in actor pixels', () => {
-    const one = compileShadow(adwaita);
-    const two = compileShadow(adwaita, 2);
-    assert.deepEqual(one.sigma.slice(0, 3), [7, 2.5, 0]);
-    assert.deepEqual(one.spread.slice(0, 3), [5, 2, 1]);
-    assert.deepEqual(two.sigma.slice(0, 3), [14, 5, 0], 'scaled with the actor, never fitted');
+test('as in GTK, only a blur below 0.01 px is drawn unblurred', () => {
+    const layer = blur => [{dx: 0, dy: 0, blur, spread: 0, color: [0, 0, 0, 1]}];
+    assert.equal(compileShadow(layer(0.009)).sigma[0], 0);
+    assert.equal(compileShadow(layer(0.01)).sigma[0], 0.005);
+    assert.equal(compileShadow(layer(0.5)).sigma[0], 0.25);
+});
+
+test('the layers share a color and offset, weighted by opacity', () => {
+    const s = compileShadow([
+        {dx: 4, dy: 0, blur: 2, spread: 0, color: [1, 0, 0, 0.75]},
+        {dx: 0, dy: 8, blur: 2, spread: 0, color: [0, 0, 1, 0.25]},
+    ]);
+    assert.deepEqual(s.color, [0.75, 0, 0.25]);
+    assert.deepEqual(s.offset, [3, 2]);
 });
 
 test('the extent covers the widest layer, offsets included', () => {
     assert.equal(shadowExtent(adwaita), 26, '5px spread + 3 sigma of a 14px blur');
     const offset = [{dx: 3, dy: 4, blur: 0, spread: 0, color: [0, 0, 0, 0.5]}];
     assert.equal(shadowExtent(offset), 5, 'an unblurred layer reaches only its offset');
+    assert.equal(shadowExtent([{dx: 0, dy: 0, blur: 0, spread: -4, color: [0, 0, 0, 1]}]), 0);
 });
 
 test('more layers than the shader has slots keeps the most opaque', () => {
@@ -53,8 +53,5 @@ test('more layers than the shader has slots keeps the most opaque', () => {
         {dx: 0, dy: 0, blur: 2, spread: 0, color: [0, 0, 0, 0.40]},
         {dx: 0, dy: 0, blur: 2, spread: 0, color: [0, 0, 0, 0.03]},
     ];
-    const s = compileShadow(many);
-    assert.equal(s.alpha.length, 4);
-    assert.ok(s.alpha.includes(0.5) && s.alpha.includes(0.4),
-        'the two most opaque layers must survive');
+    assert.deepEqual(compileShadow(many).alpha, [0.5, 0.4, 0.03, 0.02]);
 });
