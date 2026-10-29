@@ -22,8 +22,8 @@ Requires GNOME Shell 51.
 so light, dark and high contrast follow on their own.
 
 **Your gtk.css counts.** Change the window radius or outline in
-`~/.config/gtk-4.0/gtk.css` and the other windows follow your libadwaita apps, live. Your
-GTK theme is ignored, because libadwaita ignores it too.
+`~/.config/gtk-4.0/gtk.css`, even to your accent color, and the other windows follow your
+libadwaita apps, live. Your GTK theme is ignored, because libadwaita ignores it too.
 
 **Patches nothing.** No GNOME Shell method is overridden, so there is nothing to fight
 with your dock or tiling extension.
@@ -42,10 +42,10 @@ learned from both.
 
 | | This | The others |
 | --- | --- | --- |
-| Border colour | from libadwaita and your gtk.css | you pick it |
-| Light / dark / contrast | automatic | one colour serves both |
-| Shell methods patched | none | three |
-| Actors per window | two effects | effect, shadow widget, constraints |
+| Border color | from libadwaita and your gtk.css | one you pick |
+| Light / dark / contrast | automatic | one color serves both |
+| Shell methods patched | none | three, for the overview and workspace switching |
+| Per window | two effects | an effect, plus a shadow actor with its own effect and four constraints |
 
 Use theirs if you want squircles or different corners for one app. Use this one if you
 would rather it match the rest of GNOME and never think about it.

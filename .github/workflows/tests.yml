@@ -19,6 +19,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      # lib/cssParse.js and lib/shadowProfile.js import nothing from GNOME, so
-      # they run under plain node without a shell.
+      # The parser and shadow code import nothing from GNOME, so plain node runs them.
       - run: ./tests/unit/run.sh

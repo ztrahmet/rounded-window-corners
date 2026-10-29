@@ -40,15 +40,14 @@ Start apps in it with `WAYLAND_DISPLAY=rwc-test`.
 
 ## Tests
 
-The unit tests cover the CSS reading and the shadow maths, under plain `node`:
+The unit tests cover the CSS reading and the shadow math, under plain `node`:
 
 ```bash
 ./tests/unit/run.sh
 ```
 
-The integration tests run a real headless GNOME Shell 51 in a Fedora rawhide container,
-open Wayland, XWayland and libadwaita windows, and check what the extension does with
-them:
+The integration tests run a real headless GNOME Shell in a Fedora rawhide container, open
+Wayland, XWayland and libadwaita windows, and check what the extension does with them:
 
 ```bash
 podman build -f tests/integration/Containerfile --build-arg FEDORA=rawhide -t rwc-test tests/integration/
@@ -67,8 +66,8 @@ podman run --rm -v "$PWD:/src:ro,z" rwc-test gjs -m /src/tests/integration/drift
 For your own screenshots, capture with `global.stage.paint_to_content()` through the
 shell's `Eval` D-Bus method, in a `--privileged` container.
 
-CI runs the unit tests on every push, and the container suite and canary on pushes and
-weekly.
+CI runs the unit tests on every push. The container suite and the canary run on pushes
+that change more than the docs and images, and weekly, to notice when libadwaita changes.
 
 ## Packaging
 

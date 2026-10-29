@@ -3,11 +3,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-# gnome-extensions pack takes only extension.js and metadata.json unless told
-# otherwise, so everything else the extension needs is listed here.
+# gnome-extensions pack only takes extension.js and metadata.json unless told, so list the rest.
 EXTRA=(lib tools LICENSE)
 
-# gnome-extensions 51.1 crashes when the output directory does not exist.
+# gnome-extensions pack crashes if the output directory is missing.
 rm -rf dist
 mkdir dist
 gnome-extensions pack --force -o dist "${EXTRA[@]/#/--extra-source=}" .
