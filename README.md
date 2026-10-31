@@ -1,18 +1,28 @@
-# Rounded Window Corners Native
+<div align="center">
+  <h1>Rounded Window Corners Native</h1>
+  <p><i>Rounds every window to match libadwaita. Nothing to configure.</i></p>
 
-Rounds every window to match libadwaita. Nothing to configure.
+  <a href="https://extensions.gnome.org/extension/10809/rounded-window-corners-native/">
+    <img src="https://img.shields.io/badge/Install%20from-extensions.gnome.org-4A86CF?style=for-the-badge&logo=Gnome&logoColor=white" alt="Install from GNOME Extensions" />
+  </a>
 
-![Light mode](data/screenshot.png)
+  <br>
 
-![Dark mode](data/screenshot-dark.png)
+  <a href="https://extensions.gnome.org/extension/10809/rounded-window-corners-native/">
+    <img src="https://img.shields.io/badge/GNOME_Shell-51-blue" alt="GNOME Shell Version" />
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/ztrahmet/rounded-window-corners" alt="License" />
+  </a>
+</div>
 
-GNOME only rounds apps built with libadwaita. GTK3, Qt, Electron, Java and most terminals
-stay square. This extension gives them the same corners, hairline outline and shadow that
-libadwaita draws, so every window looks like it belongs.
+<br>
 
-In the shots above, NVIDIA Settings and the GTK3 demo are GTK3, IntelliJ IDEA is Java and
-draws its own window decorations, and Chromium is bottom right. All four are rounded by
-this extension.
+![Screenshot](data/screenshot.png)
+
+Gives GTK3, Qt, Electron, Java, and all other apps the exact corners, border, and shadow of native libadwaita windows.
+
+In the screenshot above, Text Editor (top left) is built with **libadwaita**. IntelliJ IDEA (top right) is Java, LibreOffice (bottom left) is GTK3, and Chromium (bottom right) is GTK. All non-libadwaita windows are rounded by this extension to seamlessly match.
 
 Requires GNOME Shell 51.
 
