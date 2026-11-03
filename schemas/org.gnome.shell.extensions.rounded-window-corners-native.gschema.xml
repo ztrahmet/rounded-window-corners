@@ -26,9 +26,22 @@
       <default>[]</default>
       <summary>Desktop IDs of the only apps that are rounded</summary>
     </key>
+    <key name="blacklist-categories" type="as">
+      <default>[]</default>
+      <summary>Toolkits whose apps are not rounded, named as in styled-categories</summary>
+    </key>
+    <key name="whitelist-categories" type="as">
+      <default>[]</default>
+      <summary>Toolkits whose apps are the only ones rounded besides the whitelist, named as in styled-categories</summary>
+    </key>
     <key name="styled-apps" type="as">
       <default>[]</default>
       <summary>Desktop IDs of the apps with a style of their own, each stored under apps/ID/</summary>
+    </key>
+    <key name="styled-categories" type="as">
+      <default>[]</default>
+      <summary>Toolkits whose apps share a style of their own, each stored under categories/TOOLKIT/</summary>
+      <description>Toolkits: libadwaita, libhandy, chromium, firefox, java, qt, gtk4 and gtk3.</description>
     </key>
     <child name="appearance" schema="org.gnome.shell.extensions.rounded-window-corners-native.appearance"/>
   </schema>

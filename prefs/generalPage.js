@@ -25,7 +25,8 @@ class GeneralPage extends Adw.PreferencesPage {
         const behavior = new Adw.PreferencesGroup({title: _('Behavior')});
         this.add(behavior);
         for (const [key, title, subtitle] of [
-            ['round-libadwaita-apps', _('Round libadwaita Apps'), _('They round their own windows; turn on to give them your style')],
+            ['round-libadwaita-apps', _('Round libadwaita Apps'),
+                _('They round their own windows; turn on to give them your style')],
             ['round-libhandy-apps', _('Round libhandy Apps'), _('Most of them round their own windows too')],
             ['round-maximized', _('Round Maximized and Tiled Windows'), _('Fullscreen windows stay square')],
         ]) {

@@ -34,11 +34,11 @@ class AppsPage extends Adw.PreferencesPage {
         group.add(mode);
         this.add(group);
 
-        const blacklist = new AppListGroup(settings, 'blacklist', {
+        const blacklist = new AppListGroup(settings, 'blacklist', 'blacklist-categories', {
             title: _('Blacklist'),
             description: _('Every app is rounded except these.'),
         });
-        const whitelist = new AppListGroup(settings, 'whitelist', {
+        const whitelist = new AppListGroup(settings, 'whitelist', 'whitelist-categories', {
             title: _('Whitelist'),
             description: _('Only these apps are rounded.'),
         });
