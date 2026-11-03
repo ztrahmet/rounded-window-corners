@@ -32,10 +32,14 @@ Edits to `gtk.css`, and to files it imports, apply live.
 
 ## Drawing
 
-The shader clips the window to its rounded shape and replaces the app's own thin border
-just inside the edge, so only one outline is left. At fractional scales it reaches a little
-further in, because the border is blurred there. It then draws the shadow outside and
-the outline on top, in the same order GTK does.
+The shader draws each window in four steps:
+
+![A window corner, magnified: without the extension, then after each step](../data/corner-steps.gif)
+
+1. **Fill.** The app's own thin border just inside the edge takes the color next to it.
+2. **Clip.** The window is cut to its rounded shape.
+3. **Shadow.** The shadow is drawn outside.
+4. **Outline.** The outline is drawn on top, in the same order GTK draws it.
 
 The shadow is libadwaita's at its full size, whatever room the app leaves around its
 window, so every window gets the same one. It is computed as GTK's renderer does, so it

@@ -7,7 +7,7 @@ No build step. The source tree is the extension, so a symlink is the whole insta
 ```
 extension.js                  enable() and disable()
 lib/windowTracker.js          which windows get an effect, and their geometry
-lib/roundedCornersEffect.js   the shader effect
+lib/roundedCornersEffect.js   the shader effect, and the one that makes room for the shadow
 lib/styleResolver.js          reads libadwaita's stylesheet and gtk.css
 lib/cssParse.js               the cascade, no GNOME imports
 lib/cssValues.js              numbers, lengths and colors, no GNOME imports
@@ -21,8 +21,8 @@ data/                         icon and screenshots, not shipped
 
 ## A shell to test in
 
-Run a nested headless shell with its own config, so a crash doesn't take your session
-with it:
+Run a nested shell with its own config, so a crash doesn't take your session with it.
+`--devkit` shows it in a window, and needs mutter's devkit (`mutter-devkit` on Fedora):
 
 ```bash
 ROOT=/tmp/rwc-dev
@@ -33,11 +33,12 @@ XDG_CONFIG_HOME=$ROOT/config XDG_DATA_HOME=$ROOT/data XDG_CACHE_HOME=$ROOT/cache
 dbus-run-session -- bash -c '
   gsettings set org.gnome.shell disable-user-extensions false
   gsettings set org.gnome.shell enabled-extensions "[\"rounded-window-corners@ztrahmet.github.io\"]"
-  gnome-shell --headless --virtual-monitor 1400x900 --wayland-display=rwc-test
+  gnome-shell --devkit --wayland-display=rwc-test
 '
 ```
 
-Start apps in it with `WAYLAND_DISPLAY=rwc-test`.
+Start apps in it with `WAYLAND_DISPLAY=rwc-test`. For scripts, use
+`--headless --virtual-monitor 1400x900` instead of `--devkit`; it shows nothing.
 
 ## Tests
 
