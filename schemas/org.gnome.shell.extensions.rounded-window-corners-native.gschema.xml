@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.rounded-window-corners-native"
+          path="/org/gnome/shell/extensions/rounded-window-corners-native/">
+    <key name="round-libadwaita-apps" type="b">
+      <default>false</default>
+      <summary>Round libadwaita apps like any other app</summary>
+    </key>
+    <key name="round-libhandy-apps" type="b">
+      <default>true</default>
+      <summary>Round libhandy apps like any other app</summary>
+    </key>
+    <key name="round-maximized" type="b">
+      <default>false</default>
+      <summary>Keep maximized and tiled windows rounded</summary>
+    </key>
+  </schema>
+</schemalist>
