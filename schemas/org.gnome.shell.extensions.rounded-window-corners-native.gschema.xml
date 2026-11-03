@@ -26,6 +26,10 @@
       <default>[]</default>
       <summary>Desktop IDs of the only apps that are rounded</summary>
     </key>
+    <key name="styled-apps" type="as">
+      <default>[]</default>
+      <summary>Desktop IDs of the apps with a style of their own, each stored under apps/ID/</summary>
+    </key>
     <child name="appearance" schema="org.gnome.shell.extensions.rounded-window-corners-native.appearance"/>
   </schema>
 
