@@ -26,5 +26,32 @@
       <default>[]</default>
       <summary>Desktop IDs of the only apps that are rounded</summary>
     </key>
+    <child name="appearance" schema="org.gnome.shell.extensions.rounded-window-corners-native.appearance"/>
+  </schema>
+
+  <schema id="org.gnome.shell.extensions.rounded-window-corners-native.appearance">
+    <key name="custom-style" type="b">
+      <default>false</default>
+      <summary>Use the values below instead of libadwaita's style and gtk.css</summary>
+    </key>
+    <key name="corner-radius" type="i">
+      <range min="0" max="48"/>
+      <default>15</default>
+      <summary>Corner radius in pixels</summary>
+    </key>
+    <key name="outline-width" type="i">
+      <range min="0" max="8"/>
+      <default>1</default>
+      <summary>Width of the outline inside the window's edge, in pixels</summary>
+    </key>
+    <key name="outline-color" type="s">
+      <default>'rgba(255,255,255,0.07)'</default>
+      <summary>Color of the outline, as CSS</summary>
+    </key>
+    <key name="shadow-strength" type="d">
+      <range min="0" max="2"/>
+      <default>1</default>
+      <summary>Strength of libadwaita's shadow, 1 being libadwaita's own</summary>
+    </key>
   </schema>
 </schemalist>
