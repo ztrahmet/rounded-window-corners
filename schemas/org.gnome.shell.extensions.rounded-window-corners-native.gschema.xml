@@ -53,5 +53,19 @@
       <default>1</default>
       <summary>Strength of libadwaita's shadow, 1 being libadwaita's own</summary>
     </key>
+    <key name="border-method" type="s">
+      <choices>
+        <choice value="off"/>
+        <choice value="extend"/>
+        <choice value="clip"/>
+      </choices>
+      <default>'extend'</default>
+      <summary>How the app's own border is hidden: not at all, covered by the pixels next to it, or cut off</summary>
+    </key>
+    <key name="border-width" type="i">
+      <range min="1" max="8"/>
+      <default>1</default>
+      <summary>Width of the app's own border, in pixels</summary>
+    </key>
   </schema>
 </schemalist>
