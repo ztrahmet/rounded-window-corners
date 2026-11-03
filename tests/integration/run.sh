@@ -212,6 +212,12 @@ gset set org.gnome.desktop.interface color-scheme default
 
 printf 'window { outline-color: red; }\n' > $ROOT/config/gtk-4.0/gtk.css
 chk "a color name reaches the effect" "15|1|-1|1.00,0.00,0.00,1.00" "$(wait_for '15|1|-1|1.00,0.00,0.00,1.00' "$outline")"
+# The outline follows focus, as libadwaita's does (#17).
+printf 'window { outline: 2px solid red; }\nwindow:backdrop { outline-color: blue; }\n' > $ROOT/config/gtk-4.0/gtk.css
+ev "$wl.metaWindow.activate(global.get_current_time()); 0" >/dev/null
+chk "focused: the focused outline" "15|2|-1|1.00,0.00,0.00,1.00" "$(wait_for '15|2|-1|1.00,0.00,0.00,1.00' "$outline")"
+ev "$x11.metaWindow.activate(global.get_current_time()); 0" >/dev/null
+chk "backdrop: the backdrop outline" "15|2|-1|0.00,0.00,1.00,1.00" "$(wait_for '15|2|-1|0.00,0.00,1.00,1.00' "$outline")"
 # Only libadwaita's own stylesheet defines --accent-bg-color.
 printf 'window { outline-color: var(--accent-bg-color); }\n' > $ROOT/config/gtk-4.0/gtk.css
 gset set org.gnome.desktop.interface accent-color teal

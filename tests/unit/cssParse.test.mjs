@@ -43,12 +43,12 @@ test('the fallback sheet gives libadwaita\'s window style', () => {
     ];
     for (const dark of [false, true]) {
         assert.deepEqual(round(readWindowStyle([FALLBACK_CSS], {...LIGHT, dark})), {
-            radii: [15, 15, 15, 15], outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.07],
-            shadow: shadow(0.05), shadowBackdrop: backdrop(0.05),
+            radii: [15, 15, 15, 15], outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.07], shadow: shadow(0.05),
+            backdrop: {outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.07], shadow: backdrop(0.05)},
         });
         assert.deepEqual(round(readWindowStyle([FALLBACK_CSS], {...LIGHT, dark, highContrast: true})), {
-            radii: [15, 15, 15, 15], outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.3],
-            shadow: shadow(0.8), shadowBackdrop: backdrop(0.8),
+            radii: [15, 15, 15, 15], outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.3], shadow: shadow(0.8),
+            backdrop: {outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.3], shadow: backdrop(0.8)},
         });
     }
 
@@ -215,7 +215,13 @@ test('backdrop: the focused rules apply unless overridden or excluded', () => {
         window.csd { box-shadow: 0 0 4px #000; }
         window:not(:backdrop) { outline-width: 3px; }`;
     const s = styleOf(css);
-    assert.deepEqual(s.shadowBackdrop, s.shadow);
-    assert.equal(styleOf(`${css} window.csd:backdrop { box-shadow: none; }`).shadowBackdrop.length, 0);
+    assert.deepEqual(s.backdrop.shadow, s.shadow);
+    assert.equal(styleOf(`${css} window.csd:backdrop { box-shadow: none; }`).backdrop.shadow.length, 0);
     assert.equal(styleOf(`${css} window:backdrop { box-shadow: none; }`).shadow.length, 1);
+
+    const outlined = styleOf('window { outline: 2px solid red; } window:backdrop { outline-color: transparent; }');
+    assert.deepEqual([outlined.outlineWidth, outlined.outlineColor], [2, [1, 0, 0, 1]]);
+    assert.deepEqual([outlined.backdrop.outlineWidth, outlined.backdrop.outlineColor], [2, [0, 0, 0, 0]]);
+    const excluded = styleOf(`window { outline: 1px solid red; } ${css}`);
+    assert.deepEqual([excluded.outlineWidth, excluded.backdrop.outlineWidth], [3, 1]);
 });
