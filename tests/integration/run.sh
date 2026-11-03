@@ -114,6 +114,21 @@ chk "libadwaita window is left alone" "false" "$(val "$(rounded "$adw")")"
 chk "a re-sync while probing does not round a libadwaita window" "false" \
   "$(val 'rwcCreated.filter(([a]) => rwcTest.isAdwaita(a)).map(([, e]) => e).join()')"
 
+# Popups are never rounded, so they are neither probed nor tracked.
+ev "globalThis.rwcPopups = [];
+    globalThis.rwcHook = global.display.connect('window-created', (d, w) =>
+      rwcPopups.push(\`\${w.get_window_type() === Meta.WindowType.NORMAL}/\${rwcTest.tracker()._windows.has(w.get_compositor_private())}\`)); 0" >/dev/null
+POPOVER=/tests/integration/clients/popover-gtk4.js
+WAYLAND_DISPLAY=rwc-ci GDK_BACKEND=wayland gjs $POPOVER >/dev/null 2>&1 &
+DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH GDK_BACKEND=x11 gjs $POPOVER >/dev/null 2>&1 &
+chk "popups open on Wayland and X11" "7" "$(wait_for 7 "$windows")"
+# Each entry is normal/tracked.
+chk "windows are tracked, their popups are not" "false/false,false/false,true/true,true/true" \
+  "$(val 'global.display.disconnect(rwcHook); rwcPopups.sort().join()')"
+ev 'global.get_window_actors().filter(a => a.metaWindow.get_title() === "rwc-popover")
+    .forEach(a => a.metaWindow.delete(global.get_current_time())); 0' >/dev/null
+chk "popover windows closed" "3" "$(wait_for 3 "$windows")"
+
 ev "rwcTest.spy(rwcTest.effect($wl)); rwcTest.tracker()._syncAll(); 0" >/dev/null
 chk "Wayland: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
 chk "X11: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
