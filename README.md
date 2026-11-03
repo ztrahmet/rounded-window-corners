@@ -73,4 +73,5 @@ Some parts are adapted from LGPL-2.1-or-later projects:
 
 - the shadow, from GTK's renderer (`gsk/gpu/shaders/gskgpuboxshadow.glsl`)
 - the color conversions, from GTK (`gtk/gtkcolorutils.c`, `gdk/gdkhsla.c`)
+- the color functions and `color-mix()`, from GTK (`gtk/gtkcsscolorvalue.c`, `gtk/gtkcsscolor.c`)
 - the built-in window style, from libadwaita's stylesheet
