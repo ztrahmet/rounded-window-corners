@@ -34,7 +34,9 @@ Edits to `gtk.css`, and to files it imports, apply live.
 
 The shader draws each window in four steps:
 
-![A window corner, magnified: without the extension, then after each step](../data/corner-steps.gif)
+<div align="center">
+  <img src="../data/corner-steps.gif" width="480" alt="A window corner, magnified: without the extension, then after each step" />
+</div>
 
 1. **Fill.** The app's own thin border just inside the edge takes the color next to it.
 2. **Clip.** The window is cut to its rounded shape.
