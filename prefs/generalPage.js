@@ -35,6 +35,7 @@ class GeneralPage extends Adw.PreferencesPage {
             behavior.add(row);
         }
 
-        addAppearanceGroups(this, settings.get_child('appearance'), true);
+        addAppearanceGroups(this, settings.get_child('appearance'),
+            _('Use these values instead of libadwaita’s style and your gtk.css'));
     }
 });

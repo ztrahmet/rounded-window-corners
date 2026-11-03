@@ -32,19 +32,21 @@ class AppStylesPage extends Adw.PreferencesPage {
 
         this.add(new AppListGroup(settings, 'styled-apps', 'styled-categories', {
             title: _('App Styles'),
-            description: _('Apps and kinds of apps with a style of their own, which starts as libadwaita’s. An app’s own style comes first.'),
+            description: _('Apps and app categories with an appearance of their own. An app’s own comes first.'),
             notes: new Map([
                 ['libadwaita', _('Only while Round libadwaita Apps is on')],
                 ['libhandy', _('Only while Round libhandy Apps is on')],
             ]),
             open: (key, id, name) => {
                 const page = new Adw.PreferencesPage();
-                addAppearanceGroups(page, appearanceOf(key, id), false);
+                addAppearanceGroups(page, appearanceOf(key, id), key === 'styled-apps'
+                    ? _('Use these values instead of its category’s or the general style')
+                    : _('Use these values instead of the general style'));
                 const view = new Adw.ToolbarView({content: page});
                 view.add_top_bar(new Adw.HeaderBar());
                 window.push_subpage(new Adw.NavigationPage({title: name, child: view}));
             },
-            // So an entry added again starts from libadwaita's style.
+            // So an entry added again starts afresh.
             removed: (key, id) => {
                 const appearance = appearanceOf(key, id);
                 for (const name of schema.list_keys())

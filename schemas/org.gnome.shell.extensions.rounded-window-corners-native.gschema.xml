@@ -49,7 +49,7 @@
   <schema id="org.gnome.shell.extensions.rounded-window-corners-native.appearance">
     <key name="custom-style" type="b">
       <default>false</default>
-      <summary>Use the values below instead of libadwaita's style and gtk.css</summary>
+      <summary>Use the values below instead of the next style: an app's category's, then the general one, then libadwaita's and gtk.css</summary>
     </key>
     <key name="corner-radius" type="i">
       <range min="0" max="48"/>
@@ -62,13 +62,37 @@
       <summary>Width of the outline inside the window's edge, in pixels</summary>
     </key>
     <key name="outline-color" type="s">
-      <default>'rgba(255,255,255,0.07)'</default>
+      <default>'rgb(255,255,255)'</default>
       <summary>Color of the outline, as CSS</summary>
     </key>
-    <key name="shadow-strength" type="d">
-      <range min="0" max="2"/>
-      <default>1</default>
-      <summary>Strength of libadwaita's shadow, 1 being libadwaita's own</summary>
+    <key name="outline-opacity" type="d">
+      <range min="0" max="1"/>
+      <default>0.07</default>
+      <summary>Opacity of the outline</summary>
+    </key>
+    <key name="shadow-angle" type="i">
+      <range min="0" max="359"/>
+      <default>90</default>
+      <summary>Direction the light comes from, in degrees counter-clockwise from the right; the shadow is moved the other way</summary>
+    </key>
+    <key name="shadow-distance" type="i">
+      <range min="0" max="32"/>
+      <default>0</default>
+      <summary>How far the shadow is moved, in pixels</summary>
+    </key>
+    <key name="shadow-blur" type="i">
+      <range min="0" max="48"/>
+      <default>14</default>
+      <summary>Blur of the shadow's main layer in pixels, libadwaita's other layers following in proportion</summary>
+    </key>
+    <key name="shadow-color" type="s">
+      <default>'rgb(0,0,0)'</default>
+      <summary>Color of the shadow, as CSS</summary>
+    </key>
+    <key name="shadow-opacity" type="d">
+      <range min="0" max="1"/>
+      <default>0.15</default>
+      <summary>Opacity of the shadow's main layer, libadwaita's other layers following in proportion</summary>
     </key>
     <key name="border-method" type="s">
       <choices>
