@@ -66,12 +66,12 @@ test('malformed stylesheets never throw and only give sane values', () => {
         for (const env of ENVS) {
             const s = readWindowStyle([css, stylesheet(next)], env);
             assert.ok(s.radii.length === 4 && s.radii.every(r => Number.isFinite(r) && r >= 0), css);
-            assert.ok(Number.isFinite(s.outlineWidth) && s.outlineWidth >= 0, css);
-            assert.ok(Number.isFinite(s.outlineOffset), css);
-            assert.ok(inUnitRange(s.outlineColor), css);
-            for (const layers of [s.shadow, s.shadowBackdrop]) {
-                assert.ok(Array.isArray(layers), css);
-                for (const l of layers) {
+            for (const look of [s, s.backdrop]) {
+                assert.ok(Number.isFinite(look.outlineWidth) && look.outlineWidth >= 0, css);
+                assert.ok(Number.isFinite(look.outlineOffset), css);
+                assert.ok(inUnitRange(look.outlineColor), css);
+                assert.ok(Array.isArray(look.shadow), css);
+                for (const l of look.shadow) {
                     assert.ok([l.dx, l.dy, l.blur, l.spread].every(Number.isFinite), css);
                     assert.ok(l.blur >= 0 && inUnitRange(l.color) && l.color[3] > 0, css);
                 }
