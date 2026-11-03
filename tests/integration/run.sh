@@ -180,6 +180,16 @@ chk "X11: a late redraw re-syncs the bounds" "ok" "$(wait_for ok "rwcTest.bounds
 ev "$wl.metaWindow.move_resize_frame(true, 300, 200, 640, 480); 0" >/dev/null
 chk "Wayland: bounds follow a resize" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
 
+# A type change reaches an unfocused X11 window, which gets no other update for it (#16).
+ev "$wl.metaWindow.activate(global.get_current_time()); 0" >/dev/null
+wait_for false "''+$x11.metaWindow.appearsFocused" >/dev/null
+XID=$(val "$x11.metaWindow.get_description().split(' ')[0]")
+retype() { DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH xprop -id $XID -f _NET_WM_WINDOW_TYPE 32a -set _NET_WM_WINDOW_TYPE _NET_WM_WINDOW_TYPE_$1; }
+retype UTILITY
+chk "X11: an unfocused window that becomes a utility window is not rounded" "false" "$(wait_for false "$(rounded "$x11")")"
+retype NORMAL
+chk "X11: it is rounded again once it becomes a normal window" "true" "$(wait_for true "$(rounded "$x11")")"
+
 # The shader relies on Clutter's framebuffer padding, which no API exposes, so catch it changing.
 chk "offscreen padding is still +3, and the effect has painted" "true|true" \
   "$(wait_for 'true|true' "const a=$wl; const r=rwcTest.effect(a).get_target_size();
