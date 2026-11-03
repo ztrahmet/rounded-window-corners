@@ -1,5 +1,5 @@
-# Headless GNOME Shell for the integration tests, on Fedora rawhide.
-ARG FEDORA=rawhide
+# Headless GNOME Shell for the integration tests, on the Fedora release that ships it.
+ARG FEDORA=45
 FROM registry.fedoraproject.org/fedora:${FEDORA}
 
 RUN dnf install -y --setopt=install_weak_deps=False \

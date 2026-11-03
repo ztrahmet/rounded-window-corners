@@ -7,7 +7,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=/tmp/rwc
 PASS=0; FAIL=0
 
-# The image follows rawhide, so a shell older than the extension needs is skipped, not failed.
+# An older Fedora's shell can't load the extension, so it is skipped, not failed.
 MAJOR=$(gnome-shell --version | grep -oE '[0-9]+' | head -1)
 if [ "${MAJOR:-0}" -lt 51 ]; then
   echo "$(gnome-shell --version)"

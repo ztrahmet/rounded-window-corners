@@ -48,11 +48,11 @@ The unit tests cover the CSS reading and the shadow math, under plain `node`:
 ./tests/unit/run.sh
 ```
 
-The integration tests run a real headless GNOME Shell in a Fedora rawhide container, open
+The integration tests run a real headless GNOME Shell in a Fedora container, open
 Wayland, XWayland and libadwaita windows, and check what the extension does with them:
 
 ```bash
-podman build -f tests/integration/Containerfile --build-arg FEDORA=rawhide -t rwc-test tests/integration/
+podman build -f tests/integration/Containerfile --build-arg FEDORA=45 -t rwc-test tests/integration/
 podman run --rm --privileged --user 0 -v "$PWD:/src:ro,z" -v "$PWD/tests:/tests:ro,z" \
     rwc-test /tests/integration/entrypoint.sh
 ```

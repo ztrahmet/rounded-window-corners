@@ -15,8 +15,8 @@ jobs:
     name: parser and shadow compiler
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '24'
       # The parser and shadow code import nothing from GNOME, so plain node runs them.

@@ -25,9 +25,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {fedora: 'rawhide', gnome: '51'}
+          - {fedora: '45', gnome: '51'}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build the test image
         run: |
@@ -51,11 +51,11 @@ jobs:
     name: the uploaded package runs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build the test image
         run: |
-          podman build -f tests/integration/Containerfile --build-arg FEDORA=rawhide \
+          podman build -f tests/integration/Containerfile --build-arg FEDORA=45 \
             -t rwc-test tests/integration/
 
       # Test the package that gets uploaded, not only the source tree it was built from.
@@ -69,7 +69,7 @@ jobs:
             -v /tmp/pkg:/pkg:ro -v "$PWD/tests:/tests:ro" \
             rwc-test /tests/integration/entrypoint.sh
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: extension-package
           path: dist/*.shell-extension.zip
