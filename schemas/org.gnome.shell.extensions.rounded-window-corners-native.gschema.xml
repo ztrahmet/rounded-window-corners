@@ -14,5 +14,17 @@
       <default>false</default>
       <summary>Keep maximized and tiled windows rounded</summary>
     </key>
+    <key name="use-whitelist" type="b">
+      <default>false</default>
+      <summary>Round only the apps in the whitelist, instead of all apps but those in the blacklist</summary>
+    </key>
+    <key name="blacklist" type="as">
+      <default>[]</default>
+      <summary>Desktop IDs of the apps that are not rounded</summary>
+    </key>
+    <key name="whitelist" type="as">
+      <default>[]</default>
+      <summary>Desktop IDs of the only apps that are rounded</summary>
+    </key>
   </schema>
 </schemalist>
