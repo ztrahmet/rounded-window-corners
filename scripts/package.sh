@@ -19,4 +19,3 @@ if [ -n "$missing" ]; then
 fi
 
 echo "$PWD/$zip ($(du -h "$zip" | cut -f1))"
-echo "Upload it at https://extensions.gnome.org/upload/ with data/icon.png and data/screenshot.png."
