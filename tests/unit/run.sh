@@ -6,6 +6,8 @@ root=$(cd "$here/../.." && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 printf '{"type":"module"}\n' > "$work/package.json"
-cp "$root/lib/cssParse.js" "$root/lib/cssValues.js" "$root/lib/shadowProfile.js" "$work/"
+cp "$root/lib/cssParse.js" "$root/lib/cssValues.js" "$root/lib/customStyle.js" "$root/lib/shadowProfile.js" "$work/"
+# The custom style's tests read the schema defaults.
+cp "$root"/schemas/*.gschema.xml "$work/"
 cp "$here"/*.test.mjs "$work/"
 cd "$work" && node --test

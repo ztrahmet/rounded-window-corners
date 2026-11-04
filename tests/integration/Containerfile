@@ -4,7 +4,7 @@ FROM registry.fedoraproject.org/fedora:${FEDORA}
 
 RUN dnf install -y --setopt=install_weak_deps=False \
         gnome-shell mesa-dri-drivers dbus-daemon \
-        libadwaita-demo procps-ng zip unzip xprop \
+        libadwaita-demo procps-ng zip unzip xprop python3 \
     && dnf clean all
 
 # Real GTK themes, to check that the extension ignores them as libadwaita does.
