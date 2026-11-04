@@ -372,8 +372,12 @@ border_with() {
 }
 border_off=$(border_with off)
 border_clip=$(border_with clip)
+# Some renderers capture the screen in other colors than the app draws, which the border measures can't read.
+colors=$(measure "rwcTest.trueColors($wl)")
 if [ "$border_off" = unsupported ]; then
   echo "  SKIP  settings: Off shows the app's border and Clip cuts it off (needs --privileged)"
+elif [ "$colors" != ok ]; then
+  echo "  SKIP  settings: Off shows the app's border and Clip cuts it off (the capture shows the window's blue as $colors)"
 else
   chk "settings: Off shows the app's border and Clip cuts it off" "shown|hidden" \
     "$(awk -v o=$border_off -v c=$border_clip 'BEGIN { print ((o > 0.5) ? "shown" : "hidden " o) "|" ((c < 0.05) ? "hidden" : "showing " c) }')"
@@ -418,6 +422,8 @@ for scale in 1.25 1.5; do
     "$(val "$smear+'|'+(rwcTest.boundsError($wl) || 'ok')")"
   if [ "$shown" = unsupported ]; then
     echo "  SKIP  at $scale: the app's border stays hidden (needs --privileged)"
+  elif [ "$colors" != ok ]; then
+    echo "  SKIP  at $scale: the app's border stays hidden (the capture shows the window's blue as $colors)"
   else
     chk "at $scale: the app's border stays hidden at every position" "ok" \
       "$(awk -v w=$worst 'BEGIN { print (w < 0.05) ? "ok" : "showing " w }')"

@@ -107,6 +107,18 @@ const rwcTest = {
         return worst.toFixed(2);
     },
 
+    // 'ok' when the capture shows the window's blue as the app draws it, which borderShowing() relies on.
+    trueColors(actor) {
+        const pixel = rwcTest.pixels();
+        if (typeof pixel === 'string')
+            return pixel;
+
+        const s = rwcTest.shotScale;
+        const f = actor.metaWindow.get_frame_rect();
+        const [r, g, b] = pixel(Math.round((f.x + f.width / 2) * s), Math.round((f.y + f.height / 2) * s));
+        return r < 16 && g < 16 && b > 239 ? 'ok' : `${r},${g},${b}`;
+    },
+
     // How much the shadow darkens the background 1 to 12 px left of the window.
     shadowShowing(actor) {
         const pixel = rwcTest.pixels();
