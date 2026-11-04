@@ -30,9 +30,9 @@ function colorRow(appearance, key, title) {
         valign: Gtk.Align.CENTER,
     });
     button.connect('notify::rgba', () => {
-        const color = button.rgba.to_string();
-        if (color !== appearance.get_string(key))
-            appearance.set_string(key, color);
+        const stored = new Gdk.RGBA();
+        if (!stored.parse(appearance.get_string(key)) || !stored.equal(button.rgba))
+            appearance.set_string(key, button.rgba.to_string());
     });
 
     const row = new Adw.ActionRow({title, activatable_widget: button});

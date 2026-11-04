@@ -10,11 +10,11 @@ process has loaded: libadwaita, libhandy, Chromium and Electron, Firefox and Thu
 Java, Qt, GTK 4 or GTK 3. libadwaita apps are left alone by default, since they already
 round themselves, and the settings can leave libhandy apps alone too.
 
-Apps are matched by their desktop file, the way GNOME Shell matches them. Apps and
-toolkits on the blacklist are never rounded; with the whitelist on, only the ones on it
-are. A libadwaita or libhandy app whose switch is off is still rounded when its toolkit is
-whitelisted, or when the app itself is whitelisted or has a style of its own. Dialogs that
-another process puts over the app, like the file chooser, don't count as the app's.
+Apps are matched by their desktop file, the way GNOME Shell matches them, except that a
+dialog another process puts over an app, like the file chooser, counts as its own app's.
+Apps and toolkits on the blacklist are never rounded; with the whitelist on, only the ones
+on it are. A libadwaita or libhandy app whose switch is off is still rounded when its
+toolkit is whitelisted, or when the app itself is whitelisted or has a style of its own.
 
 A window is left square while it is maximized, tiled or fullscreen. The effect is turned
 off in those states. A setting rounds maximized and tiled windows too, without a shadow;

@@ -271,6 +271,7 @@ SCHEMA=org.gnome.shell.extensions.rounded-window-corners-native
 SCHEMA_PATH=/org/gnome/shell/extensions/rounded-window-corners-native
 eset() { gset --schemadir $EXT/schemas set $SCHEMA "$@"; }
 aset() { gset --schemadir $EXT/schemas set $SCHEMA.appearance:$SCHEMA_PATH/$1/ "${@:2}"; }
+aget() { gset --schemadir $EXT/schemas get $SCHEMA.appearance:$SCHEMA_PATH/$1/ "${@:2}"; }
 app_of() { val "imports.gi.Shell.WindowTracker.get_default().get_window_app(($1).metaWindow).get_id()"; }
 WL_APP=$(app_of "$wl"); X11_APP=$(app_of "$x11"); ADW_APP=$(app_of "$adw")
 # Whether the Wayland, X11 and libadwaita windows are rounded.
@@ -324,6 +325,23 @@ reclass "${X11_CLASS[@]}"
 need "$X11_APP" "$x11_app" "the X11 window did not move back to its own app"
 chk "settings: and it is rounded again once it changes back" "true" "$(val "$(rounded "$x11")")"
 eset blacklist "[]"
+
+# The Shell gives a dialog that another process puts over an app, like the file chooser portal, that app; its own settings apply.
+DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH GDK_BACKEND=x11 gjs /tests/integration/clients/foreign-dialog-gtk3.js $XID >/dev/null 2>&1 &
+foreign='global.get_window_actors().find(a=>a.metaWindow.get_title()==="rwc-foreign")'
+need "$X11_APP" "const d=($foreign)?.metaWindow;
+  d?.get_transient_for() === ($x11).metaWindow ? imports.gi.Shell.WindowTracker.get_default().get_window_app(d).get_id() : 'none'" \
+  "the Shell did not give the foreign dialog the X11 window's app"
+pair="[$x11,$foreign].map(rwcTest.rounded).join()"
+eset blacklist "['$X11_APP']"
+chk "settings: a dialog from another process does not follow the app it is over onto the blacklist" "false,true" \
+  "$(wait_for false,true "$pair")"
+eset blacklist "[]"
+eset styled-apps "['$X11_APP']"; aset apps/$X11_APP custom-style true; aset apps/$X11_APP corner-radius 21
+chk "settings: nor take that app's style" "21,15" "$(wait_for 21,15 "[$x11,$foreign].map(a=>rwcTest.effect(a).rwcArgs[1][0]).join()")"
+eset styled-apps "[]"
+ev "($foreign).metaWindow.delete(global.get_current_time()); 0" >/dev/null
+need 3 "$windows" "the foreign dialog did not close"
 
 aset appearance custom-style true; aset appearance corner-radius 9
 aset appearance outline-color "'rgb(255,0,0)'"; aset appearance outline-opacity 0.5
@@ -482,9 +500,15 @@ chk "enabling again restores every effect" "ok" "$(wait_for ok 'rwcTest.audit()'
 
 # The preferences find every file they import, or they open as an error page.
 prefs='global.get_window_actors().find(a=>a.metaWindow.get_wm_class()==="org.gnome.Shell.Extensions")'
+# Colors stored in another spelling than GTK's, which the preferences must show without writing them back.
+aset appearance outline-color "'#ffffff'"; aset appearance shadow-color "'red'"
 DBUS_SESSION_BUS_ADDRESS=$BUS gnome-extensions prefs $UUID >/dev/null 2>&1
 name=$(val "Main.extensionManager.lookup('$UUID').metadata.name")
 chk "the preferences open" "$name" "$(wait_for "$name" "($prefs)?.metaWindow.get_title() ?? 'no window'")"
+sleep 1
+chk "opening the preferences leaves the stored colors alone" "'#ffffff'|'red'" \
+  "$(aget appearance outline-color)|$(aget appearance shadow-color)"
+gset --schemadir $EXT/schemas reset-recursively $SCHEMA.appearance:$SCHEMA_PATH/appearance/
 ev "$prefs.metaWindow.delete(global.get_current_time()); 0" >/dev/null
 need false "''+!!($prefs)" "the preferences did not close"
 
