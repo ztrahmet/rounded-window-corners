@@ -1,6 +1,6 @@
 {
   "name": "Rounded Window Corners Native",
-  "description": "Gives every window the rounded corners, hairline outline and drop shadow that libadwaita apps already have. All values are read from libadwaita's stylesheet and your ~/.config/gtk-4.0/gtk.css, so light/dark, high contrast and gtk.css changes are followed automatically. No preferences, and no GNOME Shell methods are patched.",
+  "description": "Gives every window the rounded corners, hairline outline and drop shadow that libadwaita apps already have. All values are read from libadwaita's stylesheet and your ~/.config/gtk-4.0/gtk.css, so light/dark, high contrast and gtk.css changes are followed automatically. Optional settings round maximized windows, choose which apps are rounded and give apps a style of their own. No GNOME Shell methods are patched.",
   "settings-schema": "org.gnome.shell.extensions.rounded-window-corners-native",
   "shell-version": ["51"],
   "url": "https://github.com/ztrahmet/rounded-window-corners",

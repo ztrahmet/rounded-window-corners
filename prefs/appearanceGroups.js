@@ -108,6 +108,7 @@ export function addAppearanceGroups(page, appearance, customSubtitle) {
 
     const method = new Adw.ComboRow({
         title: _('Hide App Border'),
+        // Translators: Extend and Clip are this row's options.
         subtitle: _('Extend paints over it, Clip cuts it off'),
         model: Gtk.StringList.new([_('Off'), _('Extend'), _('Clip')]),
     });
@@ -118,6 +119,7 @@ export function addAppearanceGroups(page, appearance, customSubtitle) {
     // Rows show changes made elsewhere too, but write a key only when the user changes it, so a reset key stays reset.
     const refresh = () => {
         outline.subtitle = [
+            // Translators: a summary's parts are joined with commas, as in "Width 1 px, opacity 7%".
             _('Width %d px').replace('%d', appearance.get_int('outline-width')),
             _('opacity %s').replace('%s', percent.format(appearance.get_double('outline-opacity'))),
         ].join(', ');
