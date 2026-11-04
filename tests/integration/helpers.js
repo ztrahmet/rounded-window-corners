@@ -173,10 +173,10 @@ const rwcTest = {
                     problems.push(`${name} bounds ${error}`);
             }
         }
+        // libadwaita windows are tracked too, so their switch applies live.
         const tracked = rwcTest.tracker()._windows.size;
-        const roundable = actors.filter(a => !rwcTest.isAdwaita(a)).length;
-        if (tracked !== roundable)
-            problems.push(`tracker holds ${tracked} windows for ${roundable}`);
+        if (tracked !== actors.length)
+            problems.push(`tracker holds ${tracked} windows for ${actors.length}`);
         return problems.join('; ') || 'ok';
     },
 };

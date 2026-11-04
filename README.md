@@ -1,6 +1,6 @@
 <div align="center">
   <h1>Rounded Window Corners Native</h1>
-  <p><i>Rounds every window to match libadwaita. Nothing to configure.</i></p>
+  <p><i>Rounds every window to match libadwaita, with nothing to set up.</i></p>
 
   <a href="https://extensions.gnome.org/extension/10809/rounded-window-corners-native/">
     <img src="https://img.shields.io/badge/Install%20from-extensions.gnome.org-4A86CF?style=for-the-badge&logo=Gnome&logoColor=white" alt="Install from GNOME Extensions" />
@@ -35,6 +35,12 @@ so light, dark and high contrast follow on their own.
 `~/.config/gtk-4.0/gtk.css`, even to your accent color, and the other windows follow your
 libadwaita apps, live. Your GTK theme is ignored, because libadwaita ignores it too.
 
+**Settings if you want them.** Round libadwaita apps too, or leave libhandy apps alone.
+Round maximized and tiled windows. Pick the apps, or whole toolkits like Qt or Electron,
+that are never rounded, or the only ones that are. Give any of them a style of its own:
+radius, outline, shadow, and how their own thin border is hidden. The settings are in
+English, French, German, Russian, Spanish and Turkish.
+
 **Patches nothing.** No GNOME Shell method is overridden, so there is nothing to fight
 with your dock or tiling extension.
 
@@ -52,13 +58,13 @@ learned from both.
 
 | | This | The others |
 | --- | --- | --- |
-| Border color | from libadwaita and your gtk.css | one you pick |
+| Border color | from libadwaita and your gtk.css, or one you pick | one you pick |
 | Light / dark / contrast | automatic | one color serves both |
 | Shell methods patched | none | three, for the overview and workspace switching |
 | Per window | two effects | an effect, plus a shadow actor with its own effect and four constraints |
 
-Use theirs if you want squircles or different corners for one app. Use this one if you
-would rather it match the rest of GNOME and never think about it.
+Use theirs if you want squircles. Use this one if you would rather it match the rest of
+GNOME and never think about it.
 
 ## Docs
 

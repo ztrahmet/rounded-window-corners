@@ -1,0 +1,259 @@
+# Russian translations for Rounded Window Corners Native.
+# This file is distributed under the same license as the extension.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: rounded-window-corners\n"
+"Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
+"POT-Creation-Date: 2026-11-04 06:37+0300\n"
+"PO-Revision-Date: 2026-11-04 06:37+0300\n"
+"Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: prefs/appChooser.js:47
+msgid "Add App"
+msgstr "Добавить приложение"
+
+#: prefs/appChooser.js:48
+msgid "Search apps"
+msgstr "Поиск приложений"
+
+#: prefs/appearanceGroups.js:55
+msgid "Opacity"
+msgstr "Непрозрачность"
+
+#: prefs/appearanceGroups.js:75
+msgid "Style"
+msgstr "Стиль"
+
+#: prefs/appearanceGroups.js:78
+msgid "Custom Style"
+msgstr "Свой стиль"
+
+#: prefs/appearanceGroups.js:82
+msgid "Light Angle"
+msgstr "Угол света"
+
+#: prefs/appearanceGroups.js:84 prefs/appearanceGroups.js:85
+msgid "Color"
+msgstr "Цвет"
+
+#: prefs/appearanceGroups.js:86
+msgid "Outline"
+msgstr "Контур"
+
+#: prefs/appearanceGroups.js:87 prefs/appearanceGroups.js:115
+msgid "Width"
+msgstr "Ширина"
+
+#: prefs/appearanceGroups.js:91
+msgid "Shadow"
+msgstr "Тень"
+
+#: prefs/appearanceGroups.js:93
+msgid "Distance"
+msgstr "Расстояние"
+
+#: prefs/appearanceGroups.js:94
+msgid "Blur"
+msgstr "Размытие"
+
+#: prefs/appearanceGroups.js:98
+msgid "Corner Radius"
+msgstr "Радиус углов"
+
+#: prefs/appearanceGroups.js:104
+msgid "App Border"
+msgstr "Рамка приложений"
+
+#: prefs/appearanceGroups.js:105
+msgid "Many apps draw a thin border that the outline replaces"
+msgstr "Многие приложения рисуют тонкую рамку, её заменяет контур"
+
+#: prefs/appearanceGroups.js:110
+msgid "Hide App Border"
+msgstr "Скрывать рамку"
+
+#. Translators: Extend and Clip are this row's options.
+#: prefs/appearanceGroups.js:112
+msgid "Extend paints over it, Clip cuts it off"
+msgstr "«Растянуть» её закрашивает, «Обрезать» срезает"
+
+#: prefs/appearanceGroups.js:113
+msgid "Off"
+msgstr "Выключено"
+
+#: prefs/appearanceGroups.js:113
+msgid "Extend"
+msgstr "Растянуть"
+
+#: prefs/appearanceGroups.js:113
+msgid "Clip"
+msgstr "Обрезать"
+
+#. Translators: a summary's parts are joined with commas, as in "Width 1 px, opacity 7%".
+#: prefs/appearanceGroups.js:123
+#, javascript-format
+msgid "Width %d px"
+msgstr "Ширина %d пикс."
+
+#: prefs/appearanceGroups.js:124 prefs/appearanceGroups.js:130
+#, javascript-format
+msgid "opacity %s"
+msgstr "непрозрачность %s"
+
+#: prefs/appearanceGroups.js:127
+#, javascript-format
+msgid "Light angle %d°"
+msgstr "Угол света %d°"
+
+#: prefs/appearanceGroups.js:128
+#, javascript-format
+msgid "distance %d px"
+msgstr "расстояние %d пикс."
+
+#: prefs/appearanceGroups.js:129
+#, javascript-format
+msgid "blur %d px"
+msgstr "размытие %d пикс."
+
+#: prefs/appListGroup.js:22
+msgid "libadwaita Apps"
+msgstr "Приложения libadwaita"
+
+#: prefs/appListGroup.js:23
+msgid "libhandy Apps"
+msgstr "Приложения libhandy"
+
+#: prefs/appListGroup.js:24
+msgid "Chromium and Electron Apps"
+msgstr "Приложения Chromium и Electron"
+
+#: prefs/appListGroup.js:25
+msgid "Firefox and Thunderbird"
+msgstr "Firefox и Thunderbird"
+
+#: prefs/appListGroup.js:26
+msgid "Java Apps"
+msgstr "Приложения Java"
+
+#: prefs/appListGroup.js:27
+msgid "Qt Apps"
+msgstr "Приложения Qt"
+
+#: prefs/appListGroup.js:28
+msgid "GTK 4 Apps"
+msgstr "Приложения GTK 4"
+
+#: prefs/appListGroup.js:29
+msgid "GTK 3 Apps"
+msgstr "Приложения GTK 3"
+
+#: prefs/appListGroup.js:60
+msgid "Add App…"
+msgstr "Добавить приложение…"
+
+#: prefs/appListGroup.js:61
+msgid "Add Category"
+msgstr "Добавить категорию"
+
+#: prefs/appListGroup.js:115
+msgid "Remove"
+msgstr "Убрать"
+
+#: prefs/appsPage.js:24
+msgid "Apps"
+msgstr "Приложения"
+
+#: prefs/appsPage.js:27
+msgid "List"
+msgstr "Список"
+
+#: prefs/appsPage.js:28
+msgid "Switching keeps both lists"
+msgstr "При переключении оба списка сохраняются"
+
+#: prefs/appsPage.js:29 prefs/appsPage.js:46
+msgid "Blacklist"
+msgstr "Чёрный список"
+
+#: prefs/appsPage.js:29 prefs/appsPage.js:50
+msgid "Whitelist"
+msgstr "Белый список"
+
+#: prefs/appsPage.js:47
+msgid "These apps are never rounded"
+msgstr "Эти приложения никогда не скругляются"
+
+#: prefs/appsPage.js:51
+msgid "Only these apps are rounded"
+msgstr "Скругляются только эти приложения"
+
+#: prefs/appStylesPage.js:25
+msgid "App Styles"
+msgstr "Стили"
+
+#: prefs/appStylesPage.js:34
+msgid "Apps and Categories"
+msgstr "Приложения и категории"
+
+#: prefs/appStylesPage.js:35
+msgid "An app’s style comes before its category’s"
+msgstr "Стиль приложения важнее стиля его категории"
+
+#: prefs/appStylesPage.js:37
+msgid "Needs Round libadwaita Apps"
+msgstr "Нужен параметр «Скруглять приложения libadwaita»"
+
+#: prefs/appStylesPage.js:38
+msgid "Needs Round libhandy Apps"
+msgstr "Нужен параметр «Скруглять приложения libhandy»"
+
+#: prefs/appStylesPage.js:43
+msgid "Replaces the category and general styles"
+msgstr "Заменяет стиль категории и общий стиль"
+
+#: prefs/appStylesPage.js:44
+msgid "Replaces the general style"
+msgstr "Заменяет общий стиль"
+
+#: prefs/generalPage.js:23
+msgid "General"
+msgstr "Общие"
+
+#: prefs/generalPage.js:25
+msgid "Windows"
+msgstr "Окна"
+
+#: prefs/generalPage.js:28
+msgid "Round libadwaita Apps"
+msgstr "Скруглять приложения libadwaita"
+
+#: prefs/generalPage.js:28
+msgid "Only needed for a custom style or when maximized"
+msgstr "Нужно только для своего стиля или развёрнутых окон"
+
+#: prefs/generalPage.js:29
+msgid "Round libhandy Apps"
+msgstr "Скруглять приложения libhandy"
+
+#: prefs/generalPage.js:29
+msgid "Not all of them round their own windows"
+msgstr "Не все из них скругляют свои окна сами"
+
+#: prefs/generalPage.js:30
+msgid "Round Maximized and Tiled Windows"
+msgstr "Скруглять развёрнутые и прикреплённые окна"
+
+#: prefs/generalPage.js:31
+msgid "They get no shadow, and fullscreen windows stay square"
+msgstr "Они без тени, а полноэкранные окна остаются с прямыми углами"
+
+#: prefs/generalPage.js:38
+msgid "Replaces libadwaita’s style and gtk.css"
+msgstr "Заменяет стиль libadwaita и gtk.css"

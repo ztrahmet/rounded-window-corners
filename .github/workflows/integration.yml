@@ -55,8 +55,7 @@ jobs:
 
       - name: Build the test image
         run: |
-          podman build -f tests/integration/Containerfile --build-arg FEDORA=45 \
-            -t rwc-test tests/integration/
+          podman build -f tests/integration/Containerfile -t rwc-test tests/integration/
 
       # Test the package that gets uploaded, not only the source tree it was built from.
       - name: Build the package and run the suite against it

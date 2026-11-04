@@ -84,6 +84,11 @@ test('initial, inherit and unset give GTK\'s initial values', () => {
     assert.deepEqual(styleOf(FALLBACK_CSS, 'window { all: 3px; }').radii, [15, 15, 15, 15]);
 });
 
+test('comments are ignored anywhere, as GTK ignores them', () => {
+    assert.deepEqual(radiiOf('/* a */ window /* b */ { /* c */ border-radius: /* d */ 7px /* e */; }'), [7, 7, 7, 7]);
+    assert.deepEqual(radiiOf('window { border-radius: 7px; /* } window { border-radius: 2px; */ }'), [7, 7, 7, 7]);
+});
+
 test('media queries: GTK\'s features, and no media types', () => {
     const css = `@media (prefers-color-scheme: dark) { window { border-radius: 1px; } }
         @media (prefers-contrast: more) and (prefers-color-scheme: light) { window { border-radius: 2px; } }
