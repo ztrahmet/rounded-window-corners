@@ -480,6 +480,14 @@ chk "disable leaves no effects behind" "0" \
 ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
 chk "enabling again restores every effect" "ok" "$(wait_for ok 'rwcTest.audit()')"
 
+# The preferences find every file they import, or they open as an error page.
+prefs='global.get_window_actors().find(a=>a.metaWindow.get_wm_class()==="org.gnome.Shell.Extensions")'
+DBUS_SESSION_BUS_ADDRESS=$BUS gnome-extensions prefs $UUID >/dev/null 2>&1
+name=$(val "Main.extensionManager.lookup('$UUID').metadata.name")
+chk "the preferences open" "$name" "$(wait_for "$name" "($prefs)?.metaWindow.get_title() ?? 'no window'")"
+ev "$prefs.metaWindow.delete(global.get_current_time()); 0" >/dev/null
+need false "''+!!($prefs)" "the preferences did not close"
+
 chk "no errors or warnings logged by the extension" "0" \
   "$(grep -cE "rounded-window-corners:|JS ERROR|JS WARNING: [^ ]*$UUID|Unhandled promise rejection" $ROOT/log/shell.log)"
 

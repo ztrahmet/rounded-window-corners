@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # gnome-extensions pack only takes its standard files, like extension.js and metadata.json, so list the rest.
-EXTRA=(lib tools LICENSE)
+EXTRA=(lib prefs tools LICENSE)
 
 # gnome-extensions pack crashes if the output directory is missing.
 rm -rf dist
