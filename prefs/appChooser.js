@@ -45,7 +45,7 @@ export function appRow(id, app) {
  */
 export function chooseApp(parent, exclude, chosen) {
     const dialog = new Adw.Dialog({title: _('Add App'), content_width: 420, content_height: 560});
-    const search = new Gtk.SearchEntry({placeholder_text: _('Search Apps'), hexpand: true});
+    const search = new Gtk.SearchEntry({placeholder_text: _('Search apps'), hexpand: true});
     const list = new Gtk.ListBox({
         selection_mode: Gtk.SelectionMode.NONE,
         css_classes: ['boxed-list'],

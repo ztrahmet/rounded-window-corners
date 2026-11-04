@@ -25,14 +25,15 @@ function spinRow(appearance, key, title, lower, upper) {
 }
 
 function colorRow(appearance, key, title) {
-    const rgba = new Gdk.RGBA();
-    rgba.parse(appearance.get_string(key));
     const button = new Gtk.ColorDialogButton({
         dialog: new Gtk.ColorDialog({with_alpha: false}),
-        rgba,
         valign: Gtk.Align.CENTER,
     });
-    button.connect('notify::rgba', () => appearance.set_string(key, button.rgba.to_string()));
+    button.connect('notify::rgba', () => {
+        const color = button.rgba.to_string();
+        if (color !== appearance.get_string(key))
+            appearance.set_string(key, color);
+    });
 
     const row = new Adw.ActionRow({title, activatable_widget: button});
     row.add_suffix(button);
@@ -71,67 +72,76 @@ function expanderRow(title, rows) {
  * @param {string} customSubtitle
  */
 export function addAppearanceGroups(page, appearance, customSubtitle) {
-    const style = new Adw.PreferencesGroup({title: _('Appearance')});
+    const style = new Adw.PreferencesGroup({title: _('Style')});
     page.add(style);
 
     const custom = new Adw.SwitchRow({title: _('Custom Style'), subtitle: customSubtitle});
     appearance.bind('custom-style', custom, 'active', Gio.SettingsBindFlags.DEFAULT);
     style.add(custom);
 
-    const radius = spinRow(appearance, 'corner-radius', _('Corner Radius'), 0, 48);
-    const angle = spinRow(appearance, 'shadow-angle', _('Angle'), 0, 359);
+    const angle = spinRow(appearance, 'shadow-angle', _('Light Angle'), 0, 359);
     angle.wrap = true;
+    const outlineColor = colorRow(appearance, 'outline-color', _('Color'));
+    const shadowColor = colorRow(appearance, 'shadow-color', _('Color'));
     const outline = expanderRow(_('Outline'), [
         spinRow(appearance, 'outline-width', _('Width'), 0, 8),
-        colorRow(appearance, 'outline-color', _('Color')),
+        outlineColor,
         opacityRow(appearance, 'outline-opacity'),
     ]);
     const shadow = expanderRow(_('Shadow'), [
         angle,
         spinRow(appearance, 'shadow-distance', _('Distance'), 0, 32),
         spinRow(appearance, 'shadow-blur', _('Blur'), 0, 48),
-        colorRow(appearance, 'shadow-color', _('Color')),
+        shadowColor,
         opacityRow(appearance, 'shadow-opacity'),
     ]);
-    for (const row of [radius, outline, shadow]) {
+    for (const row of [spinRow(appearance, 'corner-radius', _('Corner Radius'), 0, 48), outline, shadow]) {
         appearance.bind('custom-style', row, 'sensitive', Gio.SettingsBindFlags.GET);
         style.add(row);
     }
 
-    const summarize = () => {
-        outline.subtitle = [
-            `${_('Width')} ${appearance.get_int('outline-width')} px`,
-            `${_('Opacity')} ${percent.format(appearance.get_double('outline-opacity'))}`,
-        ].join(', ');
-        shadow.subtitle = [
-            `${_('Angle')} ${appearance.get_int('shadow-angle')}°`,
-            `${_('Distance')} ${appearance.get_int('shadow-distance')} px`,
-            `${_('Blur')} ${appearance.get_int('shadow-blur')} px`,
-            `${_('Opacity')} ${percent.format(appearance.get_double('shadow-opacity'))}`,
-        ].join(', ');
-    };
-    const changed = appearance.connect('changed', summarize);
-    page.connect('destroy', () => appearance.disconnect(changed));
-    summarize();
-
     const border = new Adw.PreferencesGroup({
         title: _('App Border'),
-        description: _('Many apps draw a thin border of their own, which the outline replaces.'),
+        description: _('Many apps draw a thin border that the outline replaces'),
     });
     page.add(border);
 
     const method = new Adw.ComboRow({
         title: _('Hide App Border'),
-        subtitle: _('Extend covers it with the pixels next to it, Clip cuts it off'),
+        subtitle: _('Extend paints over it, Clip cuts it off'),
         model: Gtk.StringList.new([_('Off'), _('Extend'), _('Clip')]),
-        selected: BORDER_METHODS.indexOf(appearance.get_string('border-method')),
     });
     const width = spinRow(appearance, 'border-width', _('Width'), 1, 8);
-    width.sensitive = method.selected !== 0;
-    method.connect('notify::selected', () => {
-        appearance.set_string('border-method', BORDER_METHODS[method.selected]);
-        width.sensitive = method.selected !== 0;
-    });
     border.add(method);
     border.add(width);
+
+    // Rows show changes made elsewhere too, but write a key only when the user changes it, so a reset key stays reset.
+    const refresh = () => {
+        outline.subtitle = [
+            _('Width %d px').replace('%d', appearance.get_int('outline-width')),
+            _('opacity %s').replace('%s', percent.format(appearance.get_double('outline-opacity'))),
+        ].join(', ');
+        shadow.subtitle = [
+            _('Light angle %d°').replace('%d', appearance.get_int('shadow-angle')),
+            _('distance %d px').replace('%d', appearance.get_int('shadow-distance')),
+            _('blur %d px').replace('%d', appearance.get_int('shadow-blur')),
+            _('opacity %s').replace('%s', percent.format(appearance.get_double('shadow-opacity'))),
+        ].join(', ');
+        for (const [row, key] of [[outlineColor, 'outline-color'], [shadowColor, 'shadow-color']]) {
+            const rgba = new Gdk.RGBA();
+            if (rgba.parse(appearance.get_string(key)) && !rgba.equal(row.activatable_widget.rgba))
+                row.activatable_widget.rgba = rgba;
+        }
+        method.selected = BORDER_METHODS.indexOf(appearance.get_string('border-method'));
+        width.sensitive = method.selected !== 0;
+    };
+    const changed = appearance.connect('changed', refresh);
+    page.connect('destroy', () => appearance.disconnect(changed));
+    refresh();
+
+    method.connect('notify::selected', () => {
+        const value = BORDER_METHODS[method.selected];
+        if (value !== appearance.get_string('border-method'))
+            appearance.set_string('border-method', value);
+    });
 }

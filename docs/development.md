@@ -52,7 +52,7 @@ The integration tests run a real headless GNOME Shell in a Fedora container, ope
 Wayland, XWayland and libadwaita windows, and check what the extension does with them:
 
 ```bash
-podman build -f tests/integration/Containerfile --build-arg FEDORA=45 -t rwc-test tests/integration/
+podman build -f tests/integration/Containerfile -t rwc-test tests/integration/
 podman run --rm --privileged --user 0 -v "$PWD:/src:ro,z" -v "$PWD/tests:/tests:ro,z" \
     rwc-test /tests/integration/entrypoint.sh
 ```

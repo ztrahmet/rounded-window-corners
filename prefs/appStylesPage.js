@@ -31,17 +31,17 @@ class AppStylesPage extends Adw.PreferencesPage {
         });
 
         this.add(new AppListGroup(settings, 'styled-apps', 'styled-categories', {
-            title: _('App Styles'),
-            description: _('Apps and app categories with an appearance of their own. An app’s own comes first.'),
+            title: _('Apps and Categories'),
+            description: _('An app’s style comes before its category’s'),
             notes: new Map([
-                ['libadwaita', _('Only while Round libadwaita Apps is on')],
-                ['libhandy', _('Only while Round libhandy Apps is on')],
+                ['libadwaita', _('Needs Round libadwaita Apps')],
+                ['libhandy', _('Needs Round libhandy Apps')],
             ]),
             open: (key, id, name) => {
                 const page = new Adw.PreferencesPage();
                 addAppearanceGroups(page, appearanceOf(key, id), key === 'styled-apps'
-                    ? _('Use these values instead of its category’s or the general style')
-                    : _('Use these values instead of the general style'));
+                    ? _('Replaces the category and general styles')
+                    : _('Replaces the general style'));
                 const view = new Adw.ToolbarView({content: page});
                 view.add_top_bar(new Adw.HeaderBar());
                 window.push_subpage(new Adw.NavigationPage({title: name, child: view}));

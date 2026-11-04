@@ -12,13 +12,11 @@ import {WindowTracker} from './lib/windowTracker.js';
 
 export default class RoundedWindowCornersExtension extends Extension {
     enable() {
-        this._settings = this.getSettings();
-        this._tracker = new WindowTracker(this.path, this._settings);
+        this._tracker = new WindowTracker(this.path, this.getSettings());
     }
 
     disable() {
         this._tracker.destroy();
         this._tracker = null;
-        this._settings = null;
     }
 }

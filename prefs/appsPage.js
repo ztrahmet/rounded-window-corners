@@ -25,22 +25,30 @@ class AppsPage extends Adw.PreferencesPage {
 
         const mode = new Adw.ComboRow({
             title: _('List'),
-            subtitle: _('Both lists are kept when you switch'),
+            subtitle: _('Switching keeps both lists'),
             model: Gtk.StringList.new([_('Blacklist'), _('Whitelist')]),
-            selected: settings.get_boolean('use-whitelist') ? 1 : 0,
         });
-        mode.connect('notify::selected', () => settings.set_boolean('use-whitelist', mode.selected === 1));
+        const refresh = () => {
+            mode.selected = settings.get_boolean('use-whitelist') ? 1 : 0;
+        };
+        const changed = settings.connect('changed::use-whitelist', refresh);
+        this.connect('destroy', () => settings.disconnect(changed));
+        refresh();
+        mode.connect('notify::selected', () => {
+            if ((mode.selected === 1) !== settings.get_boolean('use-whitelist'))
+                settings.set_boolean('use-whitelist', mode.selected === 1);
+        });
         const group = new Adw.PreferencesGroup();
         group.add(mode);
         this.add(group);
 
         const blacklist = new AppListGroup(settings, 'blacklist', 'blacklist-categories', {
             title: _('Blacklist'),
-            description: _('Every app is rounded except these.'),
+            description: _('These apps are never rounded'),
         });
         const whitelist = new AppListGroup(settings, 'whitelist', 'whitelist-categories', {
             title: _('Whitelist'),
-            description: _('Only these apps are rounded.'),
+            description: _('Only these apps are rounded'),
         });
         settings.bind('use-whitelist', blacklist, 'visible',
             Gio.SettingsBindFlags.GET | Gio.SettingsBindFlags.INVERT_BOOLEAN);

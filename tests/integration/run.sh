@@ -7,14 +7,6 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 ROOT=/tmp/rwc
 PASS=0; FAIL=0
 
-# An older Fedora's shell can't load the extension, so it is skipped, not failed.
-MAJOR=$(gnome-shell --version | grep -oE '[0-9]+' | head -1)
-if [ "${MAJOR:-0}" -lt 51 ]; then
-  echo "$(gnome-shell --version)"
-  echo "  SKIP  the extension requires GNOME Shell 51 or newer"
-  exit 0
-fi
-
 rm -rf $ROOT; mkdir -p $ROOT/{config,cache,data/gnome-shell/extensions,log}
 ln -sfn "$EXT_SRC" $ROOT/data/gnome-shell/extensions/$UUID
 
@@ -196,12 +188,13 @@ chk "offscreen padding is still +3, and the effect has painted" "true|true" \
      const v=a.get_paint_volume(); const s=a.get_resource_scale();
      \`\${r[0]}|\${r[1]===(Math.round(v.get_width())+3)*s && r[2]===(Math.round(v.get_height())+3)*s}\`")"
 
-# gtk.css edits must reach the effect live, including a radius of 0.
+# gtk.css edits must reach the effect live. At a radius of 0 the window keeps its outline and shadow, as in libadwaita.
 mkdir -p $ROOT/config/gtk-4.0
-printf 'window.csd { border-radius: 0px; }\n' > $ROOT/config/gtk-4.0/gtk.css
-chk "a live gtk.css with radius 0 turns the effect off" "false" "$(wait_for false "$(rounded "$wl")")"
-printf 'window.csd { border-radius: 7px; }\n' > $ROOT/config/gtk-4.0/gtk.css
 radii="\"\"+rwcTest.effect($wl).rwcArgs[1]"
+printf 'window.csd { border-radius: 0px; }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "a live gtk.css radius of 0 keeps the effect, with square corners" "true|0,0,0,0" \
+  "$(wait_for 'true|0,0,0,0' "$(rounded "$wl")+'|'+$radii")"
+printf 'window.csd { border-radius: 7px; }\n' > $ROOT/config/gtk-4.0/gtk.css
 chk "a live gtk.css radius reaches the effect" "7,7,7,7" "$(wait_for 7,7,7,7 "$radii")"
 printf 'window.csd { border-radius: 20px 20px 0 0; }\n' > $ROOT/config/gtk-4.0/gtk.css
 chk "each corner keeps its own radius" "20,20,0,0" "$(wait_for 20,20,0,0 "$radii")"
@@ -242,6 +235,12 @@ gset reset org.gnome.desktop.interface accent-color
 printf 'window { box-shadow: 0 3px 9px 1px rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.75); }\n' > $ROOT/config/gtk-4.0/gtk.css
 layers="rwcTest.effect($wl).rwcArgs[5].filter(s => s.color[3] > 0).map(s => s.shape.join(' ')).join('|')"
 chk "each shadow layer keeps its own offset, in GTK's order" "0 3 1 4.5|0 0 1 0" "$(wait_for '0 3 1 4.5|0 0 1 0' "$layers")"
+# A wider shadow grows the window's framebuffer, which must be drawn again, not reused from before.
+printf 'window { box-shadow: 0 8px 40px 12px rgba(0,0,0,.6); }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "a wider shadow redraws an idle window at its new size" "true" \
+  "$(wait_for true "const a=$wl; const r=rwcTest.effect(a).get_target_size();
+     const v=a.get_paint_volume(); const s=a.get_resource_scale();
+     ''+(r[1]===(Math.round(v.get_width())+3)*s && r[2]===(Math.round(v.get_height())+3)*s)")"
 
 # libadwaita ignores the GTK theme, so the extension must too.
 for theme in Yaru Arc-Dark Breeze; do

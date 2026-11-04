@@ -16,7 +16,7 @@ import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions
 
 import {appRow, chooseApp, installedApps} from './appChooser.js';
 
-// The toolkits the extension recognizes, in the order it checks them.
+// The toolkits the extension recognizes.
 function categories() {
     return [
         ['libadwaita', _('libadwaita Apps')],
