@@ -41,15 +41,25 @@ test('the fallback sheet gives libadwaita\'s window style', () => {
         {dx: 0, dy: 0, blur: 10, spread: 5, color: [0, 0, 0, 0.08]},
         {dx: 0, dy: 0, blur: 0, spread: 1, color: [0, 0, 0, alpha]},
     ];
+    // Tiled, no outline and a 1 px line in the window's color at the border opacity; maximized, neither.
+    const color = dark => dark ? [1, 1, 1, 1] : [0, 0, 6 / 255, 0.8];
+    const line = (dark, opacity) => [{dx: 0, dy: 0, blur: 0, spread: 1, color: [...color(dark).slice(0, 3), color(dark)[3] * opacity]}];
+    const look = (dark, layers) => ({outlineWidth: 0, outlineOffset: -1, outlineColor: color(dark), shadow: layers});
+    const states = (dark, opacity) => ({
+        tiled: {...look(dark, line(dark, opacity)), backdrop: look(dark, line(dark, opacity))},
+        maximized: {...look(dark, []), backdrop: look(dark, [])},
+    });
     for (const dark of [false, true]) {
-        assert.deepEqual(round(readWindowStyle([FALLBACK_CSS], {...LIGHT, dark})), {
+        assert.deepEqual(round(readWindowStyle([FALLBACK_CSS], {...LIGHT, dark})), round({
             radii: [15, 15, 15, 15], outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.07], shadow: shadow(0.05),
             backdrop: {outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.07], shadow: backdrop(0.05)},
-        });
-        assert.deepEqual(round(readWindowStyle([FALLBACK_CSS], {...LIGHT, dark, highContrast: true})), {
+            ...states(dark, 0.15),
+        }));
+        assert.deepEqual(round(readWindowStyle([FALLBACK_CSS], {...LIGHT, dark, highContrast: true})), round({
             radii: [15, 15, 15, 15], outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.3], shadow: shadow(0.8),
             backdrop: {outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.3], shadow: backdrop(0.8)},
-        });
+            ...states(dark, 0.5),
+        }));
     }
 
     // currentColor is the window's color.
@@ -229,4 +239,14 @@ test('backdrop: the focused rules apply unless overridden or excluded', () => {
     assert.deepEqual([outlined.backdrop.outlineWidth, outlined.backdrop.outlineColor], [2, [0, 0, 0, 0]]);
     const excluded = styleOf(`window { outline: 1px solid red; } ${css}`);
     assert.deepEqual([excluded.outlineWidth, excluded.backdrop.outlineWidth], [3, 1]);
+});
+
+test('tiled and maximized: their own rules apply, and no shadow shows around a maximized window', () => {
+    const css = `window.csd { outline: 1px solid red; box-shadow: 0 0 4px #000; }
+        window.csd.tiled-left { outline-width: 2px; box-shadow: 0 0 0 1px red; }
+        window.csd.maximized { outline-width: 3px; box-shadow: 0 0 9px #000; }`;
+    const s = styleOf(css);
+    assert.deepEqual([s.outlineWidth, s.shadow[0].blur], [1, 4]);
+    assert.deepEqual([s.tiled.outlineWidth, s.tiled.shadow], [2, [{dx: 0, dy: 0, blur: 0, spread: 1, color: [1, 0, 0, 1]}]]);
+    assert.deepEqual([s.maximized.outlineWidth, s.maximized.shadow, s.maximized.backdrop.shadow], [3, [], []]);
 });

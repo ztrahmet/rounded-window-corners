@@ -10,6 +10,7 @@ const schema = Object.fromEntries(keys.map(([, name, type, value]) => [name, typ
 const DEFAULTS = {
     radius: schema['corner-radius'],
     outlineWidth: schema['outline-width'],
+    outlinePosition: schema['outline-position'],
     outlineColor: schema['outline-color'],
     outlineOpacity: schema['outline-opacity'],
     shadowAngle: schema['shadow-angle'],
@@ -37,6 +38,11 @@ const LIBADWAITA = {
         ],
     },
 };
+// Tiled, only a line in the shadow color; maximized, nothing.
+const NONE = {outlineWidth: 0, outlineOffset: -1, outlineColor: [1, 1, 1, 0.07]};
+const TILED = {...NONE, shadow: [{dx: 0, dy: 0, blur: 0, spread: 1, color: [0, 0, 0, 0.12]}]};
+LIBADWAITA.tiled = {...TILED, backdrop: TILED};
+LIBADWAITA.maximized = {...NONE, shadow: [], backdrop: {...NONE, shadow: []}};
 
 test('the schema defaults give libadwaita\'s light style', () => {
     assert.deepEqual(round(styleWith({})), LIBADWAITA);
@@ -73,4 +79,17 @@ test('colors: as drawn, and libadwaita\'s when they cannot be read', () => {
         assert.deepEqual([fallback.outlineColor, fallback.shadow.map(l => l.color)],
             [LIBADWAITA.outlineColor, LIBADWAITA.shadow.map(l => l.color)], unreadable);
     }
+});
+
+test('tiled and maximized: no outline, and the tiled line takes the shadow\'s color and opacity but not its light', () => {
+    const s = styleWith({outlineWidth: 4, shadowColor: '#ff0000', shadowOpacity: 0.3, shadowDistance: 10, shadowBlur: 28});
+    assert.deepEqual([s.tiled.outlineWidth, s.maximized.outlineWidth], [0, 0]);
+    assert.deepEqual(round(s.tiled.shadow), [{dx: 0, dy: 0, blur: 0, spread: 1, color: [1, 0, 0, 0.24]}]);
+    assert.deepEqual([s.maximized.shadow, s.maximized.backdrop.shadow], [[], []]);
+    assert.deepEqual(styleWith({shadowOpacity: 0}).tiled.shadow, [], 'no shadow, no line');
+});
+
+test('the outline sits inside, across or outside the window\'s edge', () => {
+    const offset = position => styleWith({outlineWidth: 4, outlinePosition: position}).outlineOffset;
+    assert.deepEqual(['inside', 'center', 'outside'].map(offset), [-4, -2, 0]);
 });

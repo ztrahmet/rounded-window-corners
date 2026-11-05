@@ -66,7 +66,7 @@ test('malformed stylesheets never throw and only give sane values', () => {
         for (const env of ENVS) {
             const s = readWindowStyle([css, stylesheet(next)], env);
             assert.ok(s.radii.length === 4 && s.radii.every(r => Number.isFinite(r) && r >= 0), css);
-            for (const look of [s, s.backdrop]) {
+            for (const look of [s, s.backdrop, s.tiled, s.tiled.backdrop, s.maximized, s.maximized.backdrop]) {
                 assert.ok(Number.isFinite(look.outlineWidth) && look.outlineWidth >= 0, css);
                 assert.ok(Number.isFinite(look.outlineOffset), css);
                 assert.ok(inUnitRange(look.outlineColor), css);
