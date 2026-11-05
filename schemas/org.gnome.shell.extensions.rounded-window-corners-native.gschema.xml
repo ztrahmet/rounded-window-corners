@@ -13,7 +13,7 @@
     <key name="round-maximized" type="b">
       <default>false</default>
       <summary>Keep maximized and tiled windows rounded</summary>
-      <description>They get no shadow. Fullscreen windows stay square.</description>
+      <description>Their outline and shadow follow libadwaita. Fullscreen windows stay square.</description>
     </key>
     <key name="use-whitelist" type="b">
       <default>false</default>
