@@ -64,7 +64,16 @@
     <key name="outline-width" type="i">
       <range min="0" max="8"/>
       <default>1</default>
-      <summary>Width of the outline inside the window's edge, in pixels</summary>
+      <summary>Width of the outline, in pixels</summary>
+    </key>
+    <key name="outline-position" type="s">
+      <choices>
+        <choice value="inside"/>
+        <choice value="center"/>
+        <choice value="outside"/>
+      </choices>
+      <default>'inside'</default>
+      <summary>Where the outline sits against the window's edge</summary>
     </key>
     <key name="outline-color" type="s">
       <default>'rgb(255,255,255)'</default>

@@ -13,6 +13,7 @@ import Gtk from 'gi://Gtk';
 
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+const OUTLINE_POSITIONS = ['inside', 'center', 'outside'];
 const BORDER_METHODS = ['off', 'extend', 'clip'];
 
 const percent = new Intl.NumberFormat(undefined, {style: 'percent'});
@@ -57,6 +58,15 @@ function opacityRow(appearance, key) {
     return row;
 }
 
+function comboRow(appearance, key, title, values, labels) {
+    const row = new Adw.ComboRow({title, model: Gtk.StringList.new(labels)});
+    row.connect('notify::selected', () => {
+        if (values[row.selected] !== appearance.get_string(key))
+            appearance.set_string(key, values[row.selected]);
+    });
+    return row;
+}
+
 function expanderRow(title, rows) {
     const row = new Adw.ExpanderRow({title});
     for (const child of rows)
@@ -83,8 +93,11 @@ export function addAppearanceGroups(page, appearance, customSubtitle) {
     angle.wrap = true;
     const outlineColor = colorRow(appearance, 'outline-color', _('Color'));
     const shadowColor = colorRow(appearance, 'shadow-color', _('Color'));
+    const position = comboRow(appearance, 'outline-position', _('Position'), OUTLINE_POSITIONS,
+        [_('Inside'), _('Center'), _('Outside')]);
     const outline = expanderRow(_('Outline'), [
         spinRow(appearance, 'outline-width', _('Width'), 0, 8),
+        position,
         outlineColor,
         opacityRow(appearance, 'outline-opacity'),
     ]);
@@ -106,12 +119,9 @@ export function addAppearanceGroups(page, appearance, customSubtitle) {
     });
     page.add(border);
 
-    const method = new Adw.ComboRow({
-        title: _('Hide App Border'),
-        // Translators: Extend and Clip are this row's options.
-        subtitle: _('Extend paints over it, Clip cuts it off'),
-        model: Gtk.StringList.new([_('Off'), _('Extend'), _('Clip')]),
-    });
+    const method = comboRow(appearance, 'border-method', _('Hide App Border'), BORDER_METHODS,
+        [_('Off'), _('Extend'), _('Clip')]);
+    method.subtitle = _('Extend paints over it, Clip cuts it off');
     const width = spinRow(appearance, 'border-width', _('Width'), 1, 8);
     border.add(method);
     border.add(width);
@@ -119,7 +129,6 @@ export function addAppearanceGroups(page, appearance, customSubtitle) {
     // Rows show changes made elsewhere too, but write a key only when the user changes it, so a reset key stays reset.
     const refresh = () => {
         outline.subtitle = [
-            // Translators: a summary's parts are joined with commas, as in "Width 1 px, opacity 7%".
             _('Width %d px').replace('%d', appearance.get_int('outline-width')),
             _('opacity %s').replace('%s', percent.format(appearance.get_double('outline-opacity'))),
         ].join(', ');
@@ -134,16 +143,11 @@ export function addAppearanceGroups(page, appearance, customSubtitle) {
             if (rgba.parse(appearance.get_string(key)) && !rgba.equal(row.activatable_widget.rgba))
                 row.activatable_widget.rgba = rgba;
         }
+        position.selected = OUTLINE_POSITIONS.indexOf(appearance.get_string('outline-position'));
         method.selected = BORDER_METHODS.indexOf(appearance.get_string('border-method'));
         width.sensitive = method.selected !== 0;
     };
     const changed = appearance.connect('changed', refresh);
     page.connect('destroy', () => appearance.disconnect(changed));
     refresh();
-
-    method.connect('notify::selected', () => {
-        const value = BORDER_METHODS[method.selected];
-        if (value !== appearance.get_string('border-method'))
-            appearance.set_string('border-method', value);
-    });
 }
