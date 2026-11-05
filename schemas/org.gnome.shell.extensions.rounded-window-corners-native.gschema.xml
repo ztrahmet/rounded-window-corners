@@ -43,9 +43,9 @@
       <description>Each style is stored under apps/ID/.</description>
     </key>
     <key name="styled-categories" type="as">
-      <default>[]</default>
+      <default>['chromium', 'firefox', 'gtk4', 'gtk3']</default>
       <summary>Toolkits whose apps share a style of their own</summary>
-      <description>Each style is stored under categories/TOOLKIT/. Toolkits: libadwaita, libhandy, chromium, firefox, java, qt, gtk4 and gtk3.</description>
+      <description>Each style is stored under categories/TOOLKIT/. Those listed by default start with the app's border left alone, the others inherit how it is hidden. Toolkits: libadwaita, libhandy, chromium, firefox, java, qt, gtk4 and gtk3.</description>
     </key>
     <child name="appearance" schema="org.gnome.shell.extensions.rounded-window-corners-native.appearance"/>
   </schema>
@@ -115,18 +115,29 @@
     </key>
     <key name="border-method" type="s">
       <choices>
+        <choice value="inherit"/>
         <choice value="off"/>
         <choice value="extend"/>
         <choice value="clip"/>
       </choices>
       <default>'extend'</default>
       <summary>How the app's own border is hidden</summary>
-      <description>off leaves it, extend paints over it with the pixels next to it, and clip cuts it off.</description>
+      <description>inherit takes the method and width from the toolkit's style, then the general one, where it means extend. off leaves it, extend paints over it with the pixels next to it, and clip cuts it off.</description>
     </key>
     <key name="border-width" type="i">
       <range min="1" max="8"/>
       <default>1</default>
       <summary>Width of the app's own border, in pixels</summary>
     </key>
+  </schema>
+
+  <schema id="org.gnome.shell.extensions.rounded-window-corners-native.appearance-border-inherit"
+          extends="org.gnome.shell.extensions.rounded-window-corners-native.appearance">
+    <override name="border-method">'inherit'</override>
+  </schema>
+
+  <schema id="org.gnome.shell.extensions.rounded-window-corners-native.appearance-border-off"
+          extends="org.gnome.shell.extensions.rounded-window-corners-native.appearance">
+    <override name="border-method">'off'</override>
   </schema>
 </schemalist>
