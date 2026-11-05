@@ -1,33 +1,24 @@
 # Development
 
-No build step. The source tree is the extension, so a symlink and its compiled settings
-schema are the whole install.
+There is no build step: the source tree is the extension. A symlink and the compiled
+settings schema are the whole install.
 
 ## Layout
 
-```
-extension.js                  enable() and disable()
-prefs.js                      the preferences window, with its pages in prefs/
-lib/windowTracker.js          which windows get an effect, and their geometry
-lib/roundedCornersEffect.js   the shader effect, and the one that makes room for the shadow
-lib/styleResolver.js          reads libadwaita's stylesheet and gtk.css
-lib/customStyle.js            the window style from the settings, no GNOME imports
-lib/cssParse.js               the cascade, no GNOME imports
-lib/cssValues.js              numbers, lengths and colors, no GNOME imports
-lib/shadowProfile.js          box-shadow to shader values, no GNOME imports
-lib/toolkitProbe.js           detects each app's toolkit
-tools/adw-probe.js            helper that prints libadwaita's stylesheet
-schemas/                      the settings
-po/                           translations of the preferences
-scripts/package.sh            builds the upload archive, not shipped
-tests/                        unit and integration tests
-data/                         icon and screenshots, not shipped
-```
+| Path | What's there |
+| --- | --- |
+| `extension.js`, `prefs.js` | The entry points |
+| `lib/` | The extension itself. The CSS reading and the style math have no GNOME imports, so the unit tests run them under Node. |
+| `prefs/` | The pages of the preferences window |
+| `tools/` | The helper that reads libadwaita's stylesheet |
+| `schemas/`, `po/` | The settings and the translations |
+| `tests/`, `scripts/`, `data/` | Tests, packaging and images, not shipped |
 
-## A shell to test in
+## Running it
 
-Run a nested shell with its own config, so a crash doesn't take your session with it.
-`--devkit` shows it in a window, and needs mutter's devkit (`mutter-devkit` on Fedora):
+Try changes in a nested GNOME Shell with its own config, so a crash doesn't take your
+session with it. `--devkit` shows it in a window, and needs mutter's devkit
+(`mutter-devkit` on Fedora):
 
 ```bash
 ROOT=/tmp/rwc-dev
@@ -44,20 +35,22 @@ dbus-run-session -- bash -c '
 ```
 
 Start apps in it with `WAYLAND_DISPLAY=rwc-test`. For scripts, use
-`--headless --virtual-monitor 1400x900` instead of `--devkit`; it shows nothing.
+`--headless --virtual-monitor 1400x900` instead of `--devkit`.
+
+> [!NOTE]
+> Run `glib-compile-schemas schemas/` again after changing the schema.
 
 ## Tests
 
-The unit tests cover the CSS reading, the shadow math and the custom style, under plain
-`node`:
+The unit tests cover the CSS reading, the shadow math and the custom style:
 
 ```bash
 ./tests/unit/run.sh
 ```
 
-The integration tests run a real headless GNOME Shell in a Fedora container, open
-Wayland, XWayland and libadwaita windows, and check what the extension does with them,
-the settings included, and that the preferences open:
+The integration tests run a real headless GNOME Shell in a Fedora container. They open
+Wayland, XWayland and libadwaita windows, check what the extension does with them under
+every setting, and open the preferences:
 
 ```bash
 podman build -f tests/integration/Containerfile -t rwc-test tests/integration/
@@ -65,37 +58,44 @@ podman run --rm --privileged --user 0 -v "$PWD:/src:ro,z" -v "$PWD/tests:/tests:
     rwc-test /tests/integration/entrypoint.sh
 ```
 
-Without `--privileged` the pixel checks are skipped.
+Without `--privileged`, the checks that read pixels are skipped.
 
-The drift canary checks that libadwaita's window style still matches the built-in copy:
+The drift canary checks that libadwaita's window style still matches the extension's
+built-in copy:
 
 ```bash
 podman run --rm -v "$PWD:/src:ro,z" rwc-test gjs -m /src/tests/integration/drift-canary.js
 ```
 
-For your own screenshots, capture with `global.stage.paint_to_content()` through the
-shell's `Eval` D-Bus method, in a `--privileged` container.
-
-CI runs the unit tests on every push. The container suite and the canary run on pushes
-that change more than the docs and images, and weekly, to notice when libadwaita changes.
+CI runs the unit tests on every push. The integration tests and the canary run on every
+push that changes more than the docs and images, and weekly, to catch libadwaita changes.
 
 ## Translations
 
-After changing the text of the preferences, update the template and the translations:
+After changing the text in the preferences, update the template and every translation:
 
 ```bash
 POT=po/rounded-window-corners@ztrahmet.github.io.pot
 xgettext --from-code=UTF-8 --add-comments=Translators --package-name=rounded-window-corners \
     --msgid-bugs-address=https://github.com/ztrahmet/rounded-window-corners/issues \
     -o $POT prefs.js prefs/*.js
-for po in po/*.po; do msgmerge --update --backup=none "$po" $POT; done
+for po in po/*.po; do
+    msgmerge --update --no-wrap --backup=none "$po" $POT
+    msgattrib --no-obsolete --no-wrap -o "$po" "$po"
+done
 ```
 
-A new language starts from the template, with
-`msginit -i $POT -l <language> -o po/<language>.po`.
+Then translate the new and changed strings, and check them with
+`msgfmt --check -o /dev/null po/<language>.po`. Follow the terms and punctuation GNOME's
+own translations use for each language.
 
-The package compiles the translations. To see them in a shell running from the source
-tree, compile them into `locale/` first:
+A new language starts from the template:
+
+```bash
+msginit -i $POT -l <language> -o po/<language>.po
+```
+
+To see the translations in a shell running from the source tree, compile them first:
 
 ```bash
 for po in po/*.po; do
@@ -110,8 +110,8 @@ done
 ./scripts/package.sh
 ```
 
-Builds the upload archive into `dist/`, with the translations compiled. It stops if a
-translation's placeholders don't match the English text. The icon and screenshot from
+This builds the upload archive into `dist/`, with the translations compiled, and stops if
+a translation's placeholders don't match the English text. The icon and screenshot in
 `data/` are uploaded separately on the extensions.gnome.org form.
 
 To regenerate the icon:
