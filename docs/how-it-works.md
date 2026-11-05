@@ -51,11 +51,9 @@ At a radius of 0, a window keeps its outline and shadow, as libadwaita's do.
 
 ## Limits
 
-- Window screenshots only show what the app itself draws, so the shadow is cut short for
-  apps that leave little room around their window.
-- The same happens while a window is dimmed behind a dialog, if it was dimmed before the
-  extension was turned on, for example before the screen was locked.
-- An app that draws larger corners than the radius keeps its own corners.
+- An app that draws larger corners than the radius keeps its own corners. For GTK apps,
+  give them the same radius in `gtk.css`, as the tip in [Customization](customization.md)
+  shows.
 - At fractional scales, windows are slightly blurred in the overview
   ([#2](https://github.com/ztrahmet/rounded-window-corners/issues/2)) and while rounded
   ([#20](https://github.com/ztrahmet/rounded-window-corners/issues/20)). Both come from

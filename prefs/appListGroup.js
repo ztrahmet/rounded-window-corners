@@ -60,10 +60,8 @@ class AppListGroup extends Adw.PreferencesGroup {
      * @param {string} params.title
      * @param {string} params.description
      * @param {Map<string, string>} [params.notes] - Notes on some categories.
-     * @param {?function(string, string, string): void} [params.open] - Opens
-     *   the page of an entry, given its key, ID and name.
-     * @param {function(string, string): void} [params.removed] - Called with
-     *   the key and ID of an entry taken off the list.
+     * @param {?function(string, string, string): void} [params.open] - Opens an entry's page from its key, ID and name.
+     * @param {function(string, string): void} [params.removed] - Called with the key and ID of a removed entry.
      */
     constructor(settings, key, categoryKey, {title, description, notes = new Map(), open = null, removed = () => {}}) {
         super({title, description});
