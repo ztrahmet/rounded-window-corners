@@ -3,9 +3,7 @@
   <p><i>Rounds every window to match libadwaita, with nothing to set up.</i></p>
 
   <a href="https://extensions.gnome.org/extension/10809/rounded-window-corners-native/"><img src="https://img.shields.io/badge/Install%20from-extensions.gnome.org-4A86CF?style=for-the-badge&logo=Gnome&logoColor=white" alt="Install from GNOME Extensions" /></a>
-
   <br>
-
   <a href="https://extensions.gnome.org/extension/10809/rounded-window-corners-native/"><img src="https://img.shields.io/badge/GNOME_Shell-51-blue" alt="GNOME Shell Version" /></a>
   <a href="https://extensions.gnome.org/extension/10809/rounded-window-corners-native/"><img src="https://img.shields.io/badge/dynamic/json?url=https://extensions.gnome.org/api/v1/extensions/rounded-window-corners@ztrahmet.github.io/&query=downloads&label=downloads" alt="Downloads" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/ztrahmet/rounded-window-corners" alt="License" /></a>
