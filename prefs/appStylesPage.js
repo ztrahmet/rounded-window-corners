@@ -7,28 +7,25 @@
  */
 
 import Adw from 'gi://Adw';
-import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import {addAppearanceGroups} from './appearanceGroups.js';
-import {AppListGroup} from './appListGroup.js';
+import {addAppearanceGroups, resetKeys} from './appearanceGroups.js';
+import {AppListGroup, countOnTab} from './appListGroup.js';
 
 export const AppStylesPage = GObject.registerClass(
 class AppStylesPage extends Adw.PreferencesPage {
     /**
      * @param {Gio.Settings} settings
+     * @param {Gio.Settings} appearance - The general style, which entries come after.
+     * @param {EntrySettings} entrySettings
      * @param {Adw.PreferencesWindow} window - Shows the page of each entry.
      */
-    constructor(settings, window) {
+    constructor(settings, appearance, entrySettings, window) {
         super({title: _('App Styles'), icon_name: 'preferences-desktop-appearance-symbolic'});
-
-        const schema = settings.get_child('appearance').settings_schema;
-        const appearanceOf = (key, id) => new Gio.Settings({
-            settings_schema: schema,
-            path: `${settings.path}${key === 'styled-apps' ? 'apps' : 'categories'}/${id}/`,
-        });
+        countOnTab(this, settings,
+            () => settings.get_strv('styled-apps').length + settings.get_strv('styled-categories').length);
 
         this.add(new AppListGroup(settings, 'styled-apps', 'styled-categories', {
             title: _('Apps and Categories'),
@@ -39,19 +36,15 @@ class AppStylesPage extends Adw.PreferencesPage {
             ]),
             open: (key, id, name) => {
                 const page = new Adw.PreferencesPage();
-                addAppearanceGroups(page, appearanceOf(key, id), key === 'styled-apps'
+                addAppearanceGroups(page, entrySettings.of(key, id), key === 'styled-apps'
                     ? _('Replaces the category and general styles')
-                    : _('Replaces the general style'));
+                    : _('Replaces the general style'), appearance);
                 const view = new Adw.ToolbarView({content: page});
                 view.add_top_bar(new Adw.HeaderBar());
                 window.push_subpage(new Adw.NavigationPage({title: name, child: view}));
             },
             // So an entry added again starts afresh.
-            removed: (key, id) => {
-                const appearance = appearanceOf(key, id);
-                for (const name of schema.list_keys())
-                    appearance.reset(name);
-            },
+            removed: (key, id) => resetKeys(entrySettings.of(key, id)),
         }));
     }
 });

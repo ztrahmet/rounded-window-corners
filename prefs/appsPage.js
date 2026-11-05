@@ -13,7 +13,7 @@ import Gtk from 'gi://Gtk';
 
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import {AppListGroup} from './appListGroup.js';
+import {AppListGroup, countOnTab} from './appListGroup.js';
 
 export const AppsPage = GObject.registerClass(
 class AppsPage extends Adw.PreferencesPage {
@@ -22,9 +22,13 @@ class AppsPage extends Adw.PreferencesPage {
      */
     constructor(settings) {
         super({title: _('Apps'), icon_name: 'view-app-grid-symbolic'});
+        countOnTab(this, settings, () => {
+            const list = settings.get_boolean('use-whitelist') ? 'whitelist' : 'blacklist';
+            return settings.get_strv(list).length + settings.get_strv(`${list}-categories`).length;
+        });
 
         const mode = new Adw.ComboRow({
-            title: _('List'),
+            title: _('Active List'),
             subtitle: _('Switching keeps both lists'),
             model: Gtk.StringList.new([_('Blacklist'), _('Whitelist')]),
         });

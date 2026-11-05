@@ -30,6 +30,26 @@ function categories() {
     ];
 }
 
+/**
+ * Shows how many entries a page has as a badge on its tab.
+ *
+ * @param {Adw.PreferencesPage} page
+ * @param {Gio.Settings} settings
+ * @param {Function} count - Returns the number of entries.
+ */
+export function countOnTab(page, settings, count) {
+    // The preferences window keeps its pages in a view stack, whose pages carry the badges.
+    const refresh = () => {
+        const stack = page.get_parent();
+        if (stack instanceof Adw.ViewStack)
+            stack.get_page(page).badge_number = count();
+    };
+    const changed = settings.connect('changed', refresh);
+    page.connect('destroy', () => settings.disconnect(changed));
+    page.connect('notify::parent', refresh);
+    refresh();
+}
+
 export const AppListGroup = GObject.registerClass(
 class AppListGroup extends Adw.PreferencesGroup {
     /**

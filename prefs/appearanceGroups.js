@@ -14,7 +14,10 @@ import Gtk from 'gi://Gtk';
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 const OUTLINE_POSITIONS = ['inside', 'center', 'outside'];
-const BORDER_METHODS = ['off', 'extend', 'clip'];
+const BORDER_METHODS = ['inherit', 'off', 'extend', 'clip'];
+
+// What a style keeps besides the values it is drawn with.
+const NOT_DRAWN = new Set(['custom-style', 'border-method', 'border-width']);
 
 const percent = new Intl.NumberFormat(undefined, {style: 'percent'});
 
@@ -61,8 +64,9 @@ function opacityRow(appearance, key) {
 function comboRow(appearance, key, title, values, labels) {
     const row = new Adw.ComboRow({title, model: Gtk.StringList.new(labels)});
     row.connect('notify::selected', () => {
-        if (values[row.selected] !== appearance.get_string(key))
-            appearance.set_string(key, values[row.selected]);
+        const value = values[row.selected];
+        if (value !== undefined && value !== appearance.get_string(key))
+            appearance.set_string(key, value);
     });
     return row;
 }
@@ -74,19 +78,63 @@ function expanderRow(title, rows) {
     return row;
 }
 
+// A style starts from the custom one it comes after, else from its defaults.
+function startFrom(appearance, parent) {
+    if (!parent?.get_boolean('custom-style'))
+        return;
+    for (const key of parent.settings_schema.list_keys()) {
+        if (!NOT_DRAWN.has(key))
+            appearance.set_value(key, parent.get_value(key));
+    }
+}
+
+/**
+ * Resets every key of some settings.
+ *
+ * @param {Gio.Settings} settings
+ */
+export function resetKeys(settings) {
+    for (const key of settings.settings_schema.list_keys())
+        settings.reset(key);
+}
+
 /**
  * Adds the groups for a set of appearance settings to a page.
  *
  * @param {Adw.PreferencesPage} page
  * @param {Gio.Settings} appearance
  * @param {string} customSubtitle
+ * @param {?Gio.Settings} [parent] - The style it comes after; none for the general style.
  */
-export function addAppearanceGroups(page, appearance, customSubtitle) {
+export function addAppearanceGroups(page, appearance, customSubtitle, parent = null) {
+    const border = new Adw.PreferencesGroup({
+        title: _('App Border'),
+        description: _('Many apps draw a thin border that the outline replaces'),
+    });
+    page.add(border);
+
+    const first = parent ? 0 : 1;
+    const methods = BORDER_METHODS.slice(first);
+    const method = comboRow(appearance, 'border-method', _('Hide App Border'), methods,
+        [_('Inherit'), _('Off'), _('Extend'), _('Clip')].slice(first));
+    method.subtitle = _('Extend paints over it, Clip cuts it off');
+    const width = spinRow(appearance, 'border-width', _('Width'), 1, 8);
+    border.add(method);
+    border.add(width);
+
     const style = new Adw.PreferencesGroup({title: _('Style')});
     page.add(style);
 
     const custom = new Adw.SwitchRow({title: _('Custom Style'), subtitle: customSubtitle});
-    appearance.bind('custom-style', custom, 'active', Gio.SettingsBindFlags.DEFAULT);
+    custom.connect('notify::active', () => {
+        // Read first, since starting the style refreshes the switch.
+        const active = custom.active;
+        if (active === appearance.get_boolean('custom-style'))
+            return;
+        if (appearance.get_user_value('custom-style') === null)
+            startFrom(appearance, parent);
+        appearance.set_boolean('custom-style', active);
+    });
     style.add(custom);
 
     const angle = spinRow(appearance, 'shadow-angle', _('Light Angle'), 0, 359);
@@ -108,44 +156,37 @@ export function addAppearanceGroups(page, appearance, customSubtitle) {
         shadowColor,
         opacityRow(appearance, 'shadow-opacity'),
     ]);
-    for (const row of [spinRow(appearance, 'corner-radius', _('Corner Radius'), 0, 48), outline, shadow]) {
+    const drawn = [spinRow(appearance, 'corner-radius', _('Corner Radius'), 0, 48), outline, shadow];
+    for (const row of drawn) {
         appearance.bind('custom-style', row, 'sensitive', Gio.SettingsBindFlags.GET);
         style.add(row);
     }
 
-    const border = new Adw.PreferencesGroup({
-        title: _('App Border'),
-        description: _('Many apps draw a thin border that the outline replaces'),
-    });
-    page.add(border);
-
-    const method = comboRow(appearance, 'border-method', _('Hide App Border'), BORDER_METHODS,
-        [_('Off'), _('Extend'), _('Clip')]);
-    method.subtitle = _('Extend paints over it, Clip cuts it off');
-    const width = spinRow(appearance, 'border-width', _('Width'), 1, 8);
-    border.add(method);
-    border.add(width);
-
     // Rows show changes made elsewhere too, but write a key only when the user changes it, so a reset key stays reset.
     const refresh = () => {
-        outline.subtitle = [
-            _('Width %d px').replace('%d', appearance.get_int('outline-width')),
-            _('opacity %s').replace('%s', percent.format(appearance.get_double('outline-opacity'))),
-        ].join(', ');
-        shadow.subtitle = [
-            _('Light angle %d°').replace('%d', appearance.get_int('shadow-angle')),
-            _('distance %d px').replace('%d', appearance.get_int('shadow-distance')),
-            _('blur %d px').replace('%d', appearance.get_int('shadow-blur')),
-            _('opacity %s').replace('%s', percent.format(appearance.get_double('shadow-opacity'))),
-        ].join(', ');
+        // A style shows its values once it has been switched on.
+        custom.active = appearance.get_boolean('custom-style');
+        const started = appearance.get_user_value('custom-style') !== null;
+        for (const row of drawn)
+            row.visible = started;
+        outline.subtitle = _('Width %d px, opacity %s')
+            .replace('%d', appearance.get_int('outline-width'))
+            .replace('%s', percent.format(appearance.get_double('outline-opacity')));
+        shadow.subtitle = _('Light angle %d°, distance %d px, blur %d px, opacity %s')
+            .replace('%d', appearance.get_int('shadow-angle'))
+            .replace('%d', appearance.get_int('shadow-distance'))
+            .replace('%d', appearance.get_int('shadow-blur'))
+            .replace('%s', percent.format(appearance.get_double('shadow-opacity')));
         for (const [row, key] of [[outlineColor, 'outline-color'], [shadowColor, 'shadow-color']]) {
             const rgba = new Gdk.RGBA();
             if (rgba.parse(appearance.get_string(key)) && !rgba.equal(row.activatable_widget.rgba))
                 row.activatable_widget.rgba = rgba;
         }
         position.selected = OUTLINE_POSITIONS.indexOf(appearance.get_string('outline-position'));
-        method.selected = BORDER_METHODS.indexOf(appearance.get_string('border-method'));
-        width.sensitive = method.selected !== 0;
+        // The general style doesn't offer inherit, so a stored one selects nothing.
+        const index = methods.indexOf(appearance.get_string('border-method'));
+        method.selected = index < 0 ? Gtk.INVALID_LIST_POSITION : index;
+        width.sensitive = ['extend', 'clip'].includes(methods[index]);
     };
     const changed = appearance.connect('changed', refresh);
     page.connect('destroy', () => appearance.disconnect(changed));

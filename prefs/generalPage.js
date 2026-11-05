@@ -12,14 +12,26 @@ import GObject from 'gi://GObject';
 
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import {addAppearanceGroups} from './appearanceGroups.js';
+import {addAppearanceGroups, resetKeys} from './appearanceGroups.js';
+
+// The styles of apps and categories first, while their lists still name them.
+function resetAll(settings, appearance, entrySettings) {
+    for (const key of ['styled-apps', 'styled-categories']) {
+        for (const id of settings.get_strv(key))
+            resetKeys(entrySettings.of(key, id));
+    }
+    resetKeys(appearance);
+    resetKeys(settings);
+}
 
 export const GeneralPage = GObject.registerClass(
 class GeneralPage extends Adw.PreferencesPage {
     /**
      * @param {Gio.Settings} settings
+     * @param {Gio.Settings} appearance - The general style.
+     * @param {EntrySettings} entrySettings
      */
-    constructor(settings) {
+    constructor(settings, appearance, entrySettings) {
         super({title: _('General'), icon_name: 'preferences-system-symbolic'});
 
         const windows = new Adw.PreferencesGroup({title: _('Windows')});
@@ -35,6 +47,27 @@ class GeneralPage extends Adw.PreferencesPage {
             windows.add(row);
         }
 
-        addAppearanceGroups(this, settings.get_child('appearance'), _('Replaces libadwaita’s style and gtk.css'));
+        addAppearanceGroups(this, appearance, _('Replaces libadwaita’s style and gtk.css'));
+
+        const reset = new Adw.ButtonRow({title: _('Reset All Settings…')});
+        reset.add_css_class('destructive-action');
+        reset.connect('activated', () => {
+            const dialog = new Adw.AlertDialog({
+                heading: _('Reset All Settings?'),
+                body: _('Every switch, list and style goes back to its default'),
+                close_response: 'cancel',
+            });
+            dialog.add_response('cancel', _('Cancel'));
+            dialog.add_response('reset', _('Reset'));
+            dialog.set_response_appearance('reset', Adw.ResponseAppearance.DESTRUCTIVE);
+            dialog.connect('response', (_dialog, response) => {
+                if (response === 'reset')
+                    resetAll(settings, appearance, entrySettings);
+            });
+            dialog.present(this);
+        });
+        const group = new Adw.PreferencesGroup();
+        group.add(reset);
+        this.add(group);
     }
 });
