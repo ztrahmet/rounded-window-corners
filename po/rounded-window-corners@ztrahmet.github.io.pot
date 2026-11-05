@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/"
 "issues\n"
-"POT-Creation-Date: 2026-11-04 06:37+0300\n"
+"POT-Creation-Date: 2026-11-05 12:36+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,103 +26,106 @@ msgstr ""
 msgid "Search apps"
 msgstr ""
 
-#: prefs/appearanceGroups.js:55
+#: prefs/appearanceGroups.js:59
 msgid "Opacity"
 msgstr ""
 
-#: prefs/appearanceGroups.js:75
-msgid "Style"
-msgstr ""
-
-#: prefs/appearanceGroups.js:78
-msgid "Custom Style"
-msgstr ""
-
-#: prefs/appearanceGroups.js:82
-msgid "Light Angle"
-msgstr ""
-
-#: prefs/appearanceGroups.js:84 prefs/appearanceGroups.js:85
-msgid "Color"
-msgstr ""
-
-#: prefs/appearanceGroups.js:86
-msgid "Outline"
-msgstr ""
-
-#: prefs/appearanceGroups.js:87 prefs/appearanceGroups.js:115
-msgid "Width"
-msgstr ""
-
-#: prefs/appearanceGroups.js:91
-msgid "Shadow"
-msgstr ""
-
-#: prefs/appearanceGroups.js:93
-msgid "Distance"
-msgstr ""
-
-#: prefs/appearanceGroups.js:94
-msgid "Blur"
-msgstr ""
-
-#: prefs/appearanceGroups.js:98
-msgid "Corner Radius"
-msgstr ""
-
-#: prefs/appearanceGroups.js:104
+#: prefs/appearanceGroups.js:111
 msgid "App Border"
 msgstr ""
 
-#: prefs/appearanceGroups.js:105
+#: prefs/appearanceGroups.js:112
 msgid "Many apps draw a thin border that the outline replaces"
 msgstr ""
 
-#: prefs/appearanceGroups.js:110
+#: prefs/appearanceGroups.js:118
 msgid "Hide App Border"
 msgstr ""
 
-#. Translators: Extend and Clip are this row's options.
-#: prefs/appearanceGroups.js:112
-msgid "Extend paints over it, Clip cuts it off"
+#: prefs/appearanceGroups.js:119
+msgid "Inherit"
 msgstr ""
 
-#: prefs/appearanceGroups.js:113
+#: prefs/appearanceGroups.js:119
 msgid "Off"
 msgstr ""
 
-#: prefs/appearanceGroups.js:113
+#: prefs/appearanceGroups.js:119
 msgid "Extend"
 msgstr ""
 
-#: prefs/appearanceGroups.js:113
+#: prefs/appearanceGroups.js:119
 msgid "Clip"
 msgstr ""
 
-#. Translators: a summary's parts are joined with commas, as in "Width 1 px, opacity 7%".
-#: prefs/appearanceGroups.js:123
-#, javascript-format
-msgid "Width %d px"
+#: prefs/appearanceGroups.js:120
+msgid "Extend paints over it, Clip cuts it off"
 msgstr ""
 
-#: prefs/appearanceGroups.js:124 prefs/appearanceGroups.js:130
-#, javascript-format
-msgid "opacity %s"
+#: prefs/appearanceGroups.js:121 prefs/appearanceGroups.js:147
+msgid "Width"
 msgstr ""
 
-#: prefs/appearanceGroups.js:127
-#, javascript-format
-msgid "Light angle %d°"
+#: prefs/appearanceGroups.js:125
+msgid "Style"
 msgstr ""
 
 #: prefs/appearanceGroups.js:128
-#, javascript-format
-msgid "distance %d px"
+msgid "Custom Style"
 msgstr ""
 
-#: prefs/appearanceGroups.js:129
+#: prefs/appearanceGroups.js:140
+msgid "Light Angle"
+msgstr ""
+
+#: prefs/appearanceGroups.js:142 prefs/appearanceGroups.js:143
+msgid "Color"
+msgstr ""
+
+#: prefs/appearanceGroups.js:144
+msgid "Position"
+msgstr ""
+
+#: prefs/appearanceGroups.js:145
+msgid "Inside"
+msgstr ""
+
+#: prefs/appearanceGroups.js:145
+msgid "Center"
+msgstr ""
+
+#: prefs/appearanceGroups.js:145
+msgid "Outside"
+msgstr ""
+
+#: prefs/appearanceGroups.js:146
+msgid "Outline"
+msgstr ""
+
+#: prefs/appearanceGroups.js:152
+msgid "Shadow"
+msgstr ""
+
+#: prefs/appearanceGroups.js:154
+msgid "Distance"
+msgstr ""
+
+#: prefs/appearanceGroups.js:155
+msgid "Blur"
+msgstr ""
+
+#: prefs/appearanceGroups.js:159
+msgid "Corner Radius"
+msgstr ""
+
+#: prefs/appearanceGroups.js:172
 #, javascript-format
-msgid "blur %d px"
+msgid "Width %d px, opacity %s"
+msgstr ""
+
+#: prefs/appearanceGroups.js:175
+#, javascript-format
+msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
 msgstr ""
 
 #: prefs/appListGroup.js:22
@@ -157,15 +160,15 @@ msgstr ""
 msgid "GTK 3 Apps"
 msgstr ""
 
-#: prefs/appListGroup.js:60
+#: prefs/appListGroup.js:80
 msgid "Add App…"
 msgstr ""
 
-#: prefs/appListGroup.js:61
+#: prefs/appListGroup.js:81
 msgid "Add Category"
 msgstr ""
 
-#: prefs/appListGroup.js:115
+#: prefs/appListGroup.js:135
 msgid "Remove"
 msgstr ""
 
@@ -173,90 +176,110 @@ msgstr ""
 msgid "Apps"
 msgstr ""
 
-#: prefs/appsPage.js:27
-msgid "List"
+#: prefs/appsPage.js:31
+msgid "Active List"
 msgstr ""
 
-#: prefs/appsPage.js:28
+#: prefs/appsPage.js:32
 msgid "Switching keeps both lists"
 msgstr ""
 
-#: prefs/appsPage.js:29 prefs/appsPage.js:46
+#: prefs/appsPage.js:33 prefs/appsPage.js:50
 msgid "Blacklist"
 msgstr ""
 
-#: prefs/appsPage.js:29 prefs/appsPage.js:50
+#: prefs/appsPage.js:33 prefs/appsPage.js:54
 msgid "Whitelist"
 msgstr ""
 
-#: prefs/appsPage.js:47
+#: prefs/appsPage.js:51
 msgid "These apps are never rounded"
 msgstr ""
 
-#: prefs/appsPage.js:51
+#: prefs/appsPage.js:55
 msgid "Only these apps are rounded"
 msgstr ""
 
-#: prefs/appStylesPage.js:25
+#: prefs/appStylesPage.js:26
 msgid "App Styles"
 msgstr ""
 
-#: prefs/appStylesPage.js:34
+#: prefs/appStylesPage.js:31
 msgid "Apps and Categories"
 msgstr ""
 
-#: prefs/appStylesPage.js:35
+#: prefs/appStylesPage.js:32
 msgid "An app’s style comes before its category’s"
 msgstr ""
 
-#: prefs/appStylesPage.js:37
+#: prefs/appStylesPage.js:34
 msgid "Needs Round libadwaita Apps"
 msgstr ""
 
-#: prefs/appStylesPage.js:38
+#: prefs/appStylesPage.js:35
 msgid "Needs Round libhandy Apps"
 msgstr ""
 
-#: prefs/appStylesPage.js:43
+#: prefs/appStylesPage.js:40
 msgid "Replaces the category and general styles"
 msgstr ""
 
-#: prefs/appStylesPage.js:44
+#: prefs/appStylesPage.js:41
 msgid "Replaces the general style"
 msgstr ""
 
-#: prefs/generalPage.js:23
+#: prefs/generalPage.js:35
 msgid "General"
 msgstr ""
 
-#: prefs/generalPage.js:25
+#: prefs/generalPage.js:37
 msgid "Windows"
 msgstr ""
 
-#: prefs/generalPage.js:28
+#: prefs/generalPage.js:40
 msgid "Round libadwaita Apps"
 msgstr ""
 
-#: prefs/generalPage.js:28
+#: prefs/generalPage.js:40
 msgid "Only needed for a custom style or when maximized"
 msgstr ""
 
-#: prefs/generalPage.js:29
+#: prefs/generalPage.js:41
 msgid "Round libhandy Apps"
 msgstr ""
 
-#: prefs/generalPage.js:29
+#: prefs/generalPage.js:41
 msgid "Not all of them round their own windows"
 msgstr ""
 
-#: prefs/generalPage.js:30
+#: prefs/generalPage.js:42
 msgid "Round Maximized and Tiled Windows"
 msgstr ""
 
-#: prefs/generalPage.js:31
-msgid "They get no shadow, and fullscreen windows stay square"
+#: prefs/generalPage.js:43
+msgid "Without a shadow, as in libadwaita; fullscreen stays square"
 msgstr ""
 
-#: prefs/generalPage.js:38
+#: prefs/generalPage.js:50
 msgid "Replaces libadwaita’s style and gtk.css"
+msgstr ""
+
+#: prefs/generalPage.js:52
+msgid "Reset All Settings…"
+msgstr ""
+
+#: prefs/generalPage.js:56
+msgid "Reset All Settings?"
+msgstr ""
+
+#: prefs/generalPage.js:57
+msgid "Every switch, list and style goes back to its default"
+msgstr ""
+
+#: prefs/generalPage.js:60
+msgid "Cancel"
+msgstr ""
+
+#: prefs/generalPage.js:61
+msgid "Reset"
 msgstr ""
