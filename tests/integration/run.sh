@@ -330,21 +330,24 @@ need "$X11_APP" "$x11_app" "the X11 window did not move back to its own app"
 chk "settings: and it is rounded again once it changes back" "true" "$(val "$(rounded "$x11")")"
 eset blacklist "[]"
 
-# The Shell gives a dialog that another process puts over an app, like the file chooser portal, that app; its own settings apply.
+# The Shell gives a dialog from another process, like the file chooser portal's, and that dialog's own dialog the app
+# they are over; their own app's settings apply.
 DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH GDK_BACKEND=x11 gjs /tests/integration/clients/foreign-dialog-gtk3.js $XID >/dev/null 2>&1 &
 foreign='global.get_window_actors().find(a=>a.metaWindow.get_title()==="rwc-foreign")'
-need "$X11_APP" "const d=($foreign)?.metaWindow;
-  d?.get_transient_for() === ($x11).metaWindow ? imports.gi.Shell.WindowTracker.get_default().get_window_app(d).get_id() : 'none'" \
-  "the Shell did not give the foreign dialog the X11 window's app"
-pair="[$x11,$foreign].map(rwcTest.rounded).join()"
+sub='global.get_window_actors().find(a=>a.metaWindow.get_title()==="rwc-foreign-sub")'
+need "$X11_APP,$X11_APP" "const d=($foreign)?.metaWindow, s=($sub)?.metaWindow, shell=imports.gi.Shell.WindowTracker.get_default();
+  d?.get_transient_for() === ($x11).metaWindow && s?.get_transient_for() === d ? [d, s].map(w => shell.get_window_app(w).get_id()).join() : 'none'" \
+  "the Shell did not give the foreign dialog and its own dialog the X11 window's app"
+dialogs="[$x11,$foreign,$sub].map(rwcTest.rounded).join()"
 eset blacklist "['$X11_APP']"
-chk "settings: a dialog from another process does not follow the app it is over onto the blacklist" "false,true" \
-  "$(wait_for false,true "$pair")"
+chk "settings: a dialog from another process, and its own dialog, do not follow the app they are over onto the blacklist" \
+  "false,true,true" "$(wait_for false,true,true "$dialogs")"
 eset blacklist "['org.gnome.Settings.desktop']"
-chk "settings: but follows its own app onto it" "true,false" "$(wait_for true,false "$pair")"
+chk "settings: but follow their own app onto it" "true,false,false" "$(wait_for true,false,false "$dialogs")"
 eset blacklist "[]"
 eset styled-apps "['$X11_APP']"; aset apps/$X11_APP custom-style true; aset apps/$X11_APP corner-radius 21
-chk "settings: nor take that app's style" "21,15" "$(wait_for 21,15 "[$x11,$foreign].map(a=>rwcTest.effect(a).rwcArgs[1][0]).join()")"
+chk "settings: nor take that app's style" "21,15,15" \
+  "$(wait_for 21,15,15 "[$x11,$foreign,$sub].map(a=>rwcTest.effect(a).rwcArgs[1][0]).join()")"
 eset styled-apps "[]"
 ev "($foreign).metaWindow.delete(global.get_current_time()); 0" >/dev/null
 need 3 "$windows" "the foreign dialog did not close"
