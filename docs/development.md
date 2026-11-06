@@ -76,7 +76,8 @@ After changing the text in the preferences, update the template and every transl
 
 ```bash
 POT=po/rounded-window-corners@ztrahmet.github.io.pot
-xgettext --from-code=UTF-8 --add-comments=Translators --package-name=rounded-window-corners \
+xgettext --from-code=UTF-8 --add-comments=Translators --add-location=file \
+    --package-name=rounded-window-corners \
     --msgid-bugs-address=https://github.com/ztrahmet/rounded-window-corners/issues \
     -o $POT prefs.js prefs/*.js
 for po in po/*.po; do

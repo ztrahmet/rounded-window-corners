@@ -169,9 +169,11 @@ export function addAppearanceGroups(page, appearance, customSubtitle, parent = n
         const started = appearance.get_user_value('custom-style') !== null;
         for (const row of drawn)
             row.visible = started;
+        // Translators: Keep the values in this order.
         outline.subtitle = _('Width %d px, opacity %s')
             .replace('%d', appearance.get_int('outline-width'))
             .replace('%s', percent.format(appearance.get_double('outline-opacity')));
+        // Translators: Keep the values in this order.
         shadow.subtitle = _('Light angle %d°, distance %d px, blur %d px, opacity %s')
             .replace('%d', appearance.get_int('shadow-angle'))
             .replace('%d', appearance.get_int('shadow-distance'))

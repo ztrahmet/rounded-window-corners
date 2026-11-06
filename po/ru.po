@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-05 12:36+0300\n"
+"POT-Creation-Date: 2026-11-05 17:43+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Russian\n"
@@ -15,268 +15,270 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: prefs/appChooser.js:47
+#: prefs/appChooser.js
 msgid "Add App"
 msgstr "Добавить приложение"
 
-#: prefs/appChooser.js:48
+#: prefs/appChooser.js
 msgid "Search apps"
 msgstr "Поиск приложений"
 
-#: prefs/appearanceGroups.js:59
+#: prefs/appearanceGroups.js
 msgid "Opacity"
 msgstr "Непрозрачность"
 
-#: prefs/appearanceGroups.js:111
+#: prefs/appearanceGroups.js
 msgid "App Border"
 msgstr "Рамка приложения"
 
-#: prefs/appearanceGroups.js:112
+#: prefs/appearanceGroups.js
 msgid "Many apps draw a thin border that the outline replaces"
 msgstr "Многие приложения рисуют тонкую рамку, которую заменяет контур"
 
-#: prefs/appearanceGroups.js:118
+#: prefs/appearanceGroups.js
 msgid "Hide App Border"
 msgstr "Скрывать рамку"
 
-#: prefs/appearanceGroups.js:119
+#: prefs/appearanceGroups.js
 msgid "Inherit"
 msgstr "Наследовать"
 
-#: prefs/appearanceGroups.js:119
+#: prefs/appearanceGroups.js
 msgid "Off"
 msgstr "Выключено"
 
-#: prefs/appearanceGroups.js:119
+#: prefs/appearanceGroups.js
 msgid "Extend"
 msgstr "Растянуть"
 
-#: prefs/appearanceGroups.js:119
+#: prefs/appearanceGroups.js
 msgid "Clip"
 msgstr "Обрезать"
 
-#: prefs/appearanceGroups.js:120
+#: prefs/appearanceGroups.js
 msgid "Extend paints over it, Clip cuts it off"
 msgstr "«Растянуть» её закрашивает, «Обрезать» срезает"
 
-#: prefs/appearanceGroups.js:121 prefs/appearanceGroups.js:147
+#: prefs/appearanceGroups.js
 msgid "Width"
 msgstr "Ширина"
 
-#: prefs/appearanceGroups.js:125
+#: prefs/appearanceGroups.js
 msgid "Style"
 msgstr "Стиль"
 
-#: prefs/appearanceGroups.js:128
+#: prefs/appearanceGroups.js
 msgid "Custom Style"
 msgstr "Свой стиль"
 
-#: prefs/appearanceGroups.js:140
+#: prefs/appearanceGroups.js
 msgid "Light Angle"
 msgstr "Угол света"
 
-#: prefs/appearanceGroups.js:142 prefs/appearanceGroups.js:143
+#: prefs/appearanceGroups.js
 msgid "Color"
 msgstr "Цвет"
 
-#: prefs/appearanceGroups.js:144
+#: prefs/appearanceGroups.js
 msgid "Position"
 msgstr "Положение"
 
-#: prefs/appearanceGroups.js:145
+#: prefs/appearanceGroups.js
 msgid "Inside"
 msgstr "Внутри"
 
-#: prefs/appearanceGroups.js:145
+#: prefs/appearanceGroups.js
 msgid "Center"
 msgstr "По центру"
 
-#: prefs/appearanceGroups.js:145
+#: prefs/appearanceGroups.js
 msgid "Outside"
 msgstr "Снаружи"
 
-#: prefs/appearanceGroups.js:146
+#: prefs/appearanceGroups.js
 msgid "Outline"
 msgstr "Контур"
 
-#: prefs/appearanceGroups.js:152
+#: prefs/appearanceGroups.js
 msgid "Shadow"
 msgstr "Тень"
 
-#: prefs/appearanceGroups.js:154
+#: prefs/appearanceGroups.js
 msgid "Distance"
 msgstr "Расстояние"
 
-#: prefs/appearanceGroups.js:155
+#: prefs/appearanceGroups.js
 msgid "Blur"
 msgstr "Размытие"
 
-#: prefs/appearanceGroups.js:159
+#: prefs/appearanceGroups.js
 msgid "Corner Radius"
 msgstr "Радиус углов"
 
-#: prefs/appearanceGroups.js:172
+#. Translators: Keep the values in this order.
+#: prefs/appearanceGroups.js
 #, javascript-format
 msgid "Width %d px, opacity %s"
 msgstr "Ширина %d пикс., непрозрачность %s"
 
-#: prefs/appearanceGroups.js:175
+#. Translators: Keep the values in this order.
+#: prefs/appearanceGroups.js
 #, javascript-format
 msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
 msgstr "Угол света %d°, расстояние %d пикс., размытие %d пикс., непрозрачность %s"
 
-#: prefs/appListGroup.js:22
+#: prefs/appListGroup.js
 msgid "libadwaita Apps"
 msgstr "Приложения libadwaita"
 
-#: prefs/appListGroup.js:23
+#: prefs/appListGroup.js
 msgid "libhandy Apps"
 msgstr "Приложения libhandy"
 
-#: prefs/appListGroup.js:24
+#: prefs/appListGroup.js
 msgid "Chromium and Electron Apps"
 msgstr "Приложения Chromium и Electron"
 
-#: prefs/appListGroup.js:25
+#: prefs/appListGroup.js
 msgid "Firefox and Thunderbird"
 msgstr "Firefox и Thunderbird"
 
-#: prefs/appListGroup.js:26
+#: prefs/appListGroup.js
 msgid "Java Apps"
 msgstr "Приложения Java"
 
-#: prefs/appListGroup.js:27
+#: prefs/appListGroup.js
 msgid "Qt Apps"
 msgstr "Приложения Qt"
 
-#: prefs/appListGroup.js:28
+#: prefs/appListGroup.js
 msgid "GTK 4 Apps"
 msgstr "Приложения GTK 4"
 
-#: prefs/appListGroup.js:29
+#: prefs/appListGroup.js
 msgid "GTK 3 Apps"
 msgstr "Приложения GTK 3"
 
-#: prefs/appListGroup.js:80
+#: prefs/appListGroup.js
 msgid "Add App…"
 msgstr "Добавить приложение…"
 
-#: prefs/appListGroup.js:81
+#: prefs/appListGroup.js
 msgid "Add Category"
 msgstr "Добавить категорию"
 
-#: prefs/appListGroup.js:135
+#: prefs/appListGroup.js
 msgid "Remove"
 msgstr "Удалить"
 
-#: prefs/appsPage.js:24
+#: prefs/appsPage.js
 msgid "Apps"
 msgstr "Приложения"
 
-#: prefs/appsPage.js:31
+#: prefs/appsPage.js
 msgid "Active List"
 msgstr "Активный список"
 
-#: prefs/appsPage.js:32
+#: prefs/appsPage.js
 msgid "Switching keeps both lists"
 msgstr "При переключении оба списка сохраняются"
 
-#: prefs/appsPage.js:33 prefs/appsPage.js:50
+#: prefs/appsPage.js
 msgid "Blacklist"
 msgstr "Чёрный список"
 
-#: prefs/appsPage.js:33 prefs/appsPage.js:54
+#: prefs/appsPage.js
 msgid "Whitelist"
 msgstr "Белый список"
 
-#: prefs/appsPage.js:51
+#: prefs/appsPage.js
 msgid "These apps are never rounded"
 msgstr "Эти приложения никогда не скругляются"
 
-#: prefs/appsPage.js:55
+#: prefs/appsPage.js
 msgid "Only these apps are rounded"
 msgstr "Скругляются только эти приложения"
 
-#: prefs/appStylesPage.js:26
+#: prefs/appStylesPage.js
 msgid "App Styles"
 msgstr "Стили"
 
-#: prefs/appStylesPage.js:31
+#: prefs/appStylesPage.js
 msgid "Apps and Categories"
 msgstr "Приложения и категории"
 
-#: prefs/appStylesPage.js:32
+#: prefs/appStylesPage.js
 msgid "An app’s style comes before its category’s"
 msgstr "Стиль приложения важнее стиля его категории"
 
-#: prefs/appStylesPage.js:34
+#: prefs/appStylesPage.js
 msgid "Needs Round libadwaita Apps"
 msgstr "Требуется параметр «Скруглять приложения libadwaita»"
 
-#: prefs/appStylesPage.js:35
+#: prefs/appStylesPage.js
 msgid "Needs Round libhandy Apps"
 msgstr "Требуется параметр «Скруглять приложения libhandy»"
 
-#: prefs/appStylesPage.js:40
+#: prefs/appStylesPage.js
 msgid "Replaces the category and general styles"
 msgstr "Заменяет стиль категории и общий стиль"
 
-#: prefs/appStylesPage.js:41
+#: prefs/appStylesPage.js
 msgid "Replaces the general style"
 msgstr "Заменяет общий стиль"
 
-#: prefs/generalPage.js:35
+#: prefs/generalPage.js
 msgid "General"
 msgstr "Общие"
 
-#: prefs/generalPage.js:37
+#: prefs/generalPage.js
 msgid "Windows"
 msgstr "Окна"
 
-#: prefs/generalPage.js:40
+#: prefs/generalPage.js
 msgid "Round libadwaita Apps"
 msgstr "Скруглять приложения libadwaita"
 
-#: prefs/generalPage.js:40
+#: prefs/generalPage.js
 msgid "Only needed for a custom style or when maximized"
 msgstr "Нужно только для своего стиля или развёрнутых окон"
 
-#: prefs/generalPage.js:41
+#: prefs/generalPage.js
 msgid "Round libhandy Apps"
 msgstr "Скруглять приложения libhandy"
 
-#: prefs/generalPage.js:41
+#: prefs/generalPage.js
 msgid "Not all of them round their own windows"
 msgstr "Не все из них скругляют свои окна сами"
 
-#: prefs/generalPage.js:42
+#: prefs/generalPage.js
 msgid "Round Maximized and Tiled Windows"
 msgstr "Скруглять развёрнутые и прикреплённые окна"
 
-#: prefs/generalPage.js:43
+#: prefs/generalPage.js
 msgid "Without a shadow, as in libadwaita; fullscreen stays square"
 msgstr "Без тени, как в libadwaita; полноэкранные окна не скругляются"
 
-#: prefs/generalPage.js:50
+#: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"
 msgstr "Заменяет стиль libadwaita и gtk.css"
 
-#: prefs/generalPage.js:52
+#: prefs/generalPage.js
 msgid "Reset All Settings…"
 msgstr "Сбросить все настройки…"
 
-#: prefs/generalPage.js:56
+#: prefs/generalPage.js
 msgid "Reset All Settings?"
 msgstr "Сбросить все настройки?"
 
-#: prefs/generalPage.js:57
+#: prefs/generalPage.js
 msgid "Every switch, list and style goes back to its default"
 msgstr "Все переключатели, списки и стили вернутся к значениям по умолчанию"
 
-#: prefs/generalPage.js:60
+#: prefs/generalPage.js
 msgid "Cancel"
 msgstr "Отмена"
 
-#: prefs/generalPage.js:61
+#: prefs/generalPage.js
 msgid "Reset"
 msgstr "Сбросить"

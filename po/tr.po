@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-05 12:36+0300\n"
+"POT-Creation-Date: 2026-11-05 17:43+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Turkish\n"
@@ -15,268 +15,270 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: prefs/appChooser.js:47
+#: prefs/appChooser.js
 msgid "Add App"
 msgstr "Uygulama Ekle"
 
-#: prefs/appChooser.js:48
+#: prefs/appChooser.js
 msgid "Search apps"
 msgstr "Uygulama ara"
 
-#: prefs/appearanceGroups.js:59
+#: prefs/appearanceGroups.js
 msgid "Opacity"
 msgstr "Opaklık"
 
-#: prefs/appearanceGroups.js:111
+#: prefs/appearanceGroups.js
 msgid "App Border"
 msgstr "Uygulama Kenarlığı"
 
-#: prefs/appearanceGroups.js:112
+#: prefs/appearanceGroups.js
 msgid "Many apps draw a thin border that the outline replaces"
 msgstr "Birçok uygulama ince bir kenarlık çizer, dış çizgi onun yerini alır"
 
-#: prefs/appearanceGroups.js:118
+#: prefs/appearanceGroups.js
 msgid "Hide App Border"
 msgstr "Kenarlığı Gizle"
 
-#: prefs/appearanceGroups.js:119
+#: prefs/appearanceGroups.js
 msgid "Inherit"
 msgstr "Devral"
 
-#: prefs/appearanceGroups.js:119
+#: prefs/appearanceGroups.js
 msgid "Off"
 msgstr "Kapalı"
 
-#: prefs/appearanceGroups.js:119
+#: prefs/appearanceGroups.js
 msgid "Extend"
 msgstr "Uzat"
 
-#: prefs/appearanceGroups.js:119
+#: prefs/appearanceGroups.js
 msgid "Clip"
 msgstr "Kırp"
 
-#: prefs/appearanceGroups.js:120
+#: prefs/appearanceGroups.js
 msgid "Extend paints over it, Clip cuts it off"
 msgstr "“Uzat” üstünü boyar, “Kırp” keser"
 
-#: prefs/appearanceGroups.js:121 prefs/appearanceGroups.js:147
+#: prefs/appearanceGroups.js
 msgid "Width"
 msgstr "Genişlik"
 
-#: prefs/appearanceGroups.js:125
+#: prefs/appearanceGroups.js
 msgid "Style"
 msgstr "Biçim"
 
-#: prefs/appearanceGroups.js:128
+#: prefs/appearanceGroups.js
 msgid "Custom Style"
 msgstr "Özel Biçim"
 
-#: prefs/appearanceGroups.js:140
+#: prefs/appearanceGroups.js
 msgid "Light Angle"
 msgstr "Işık Açısı"
 
-#: prefs/appearanceGroups.js:142 prefs/appearanceGroups.js:143
+#: prefs/appearanceGroups.js
 msgid "Color"
 msgstr "Renk"
 
-#: prefs/appearanceGroups.js:144
+#: prefs/appearanceGroups.js
 msgid "Position"
 msgstr "Konum"
 
-#: prefs/appearanceGroups.js:145
+#: prefs/appearanceGroups.js
 msgid "Inside"
 msgstr "İçeride"
 
-#: prefs/appearanceGroups.js:145
+#: prefs/appearanceGroups.js
 msgid "Center"
 msgstr "Ortada"
 
-#: prefs/appearanceGroups.js:145
+#: prefs/appearanceGroups.js
 msgid "Outside"
 msgstr "Dışarıda"
 
-#: prefs/appearanceGroups.js:146
+#: prefs/appearanceGroups.js
 msgid "Outline"
 msgstr "Dış Çizgi"
 
-#: prefs/appearanceGroups.js:152
+#: prefs/appearanceGroups.js
 msgid "Shadow"
 msgstr "Gölge"
 
-#: prefs/appearanceGroups.js:154
+#: prefs/appearanceGroups.js
 msgid "Distance"
 msgstr "Uzaklık"
 
-#: prefs/appearanceGroups.js:155
+#: prefs/appearanceGroups.js
 msgid "Blur"
 msgstr "Bulanıklık"
 
-#: prefs/appearanceGroups.js:159
+#: prefs/appearanceGroups.js
 msgid "Corner Radius"
 msgstr "Köşe Yarıçapı"
 
-#: prefs/appearanceGroups.js:172
+#. Translators: Keep the values in this order.
+#: prefs/appearanceGroups.js
 #, javascript-format
 msgid "Width %d px, opacity %s"
 msgstr "Genişlik %d px, opaklık %s"
 
-#: prefs/appearanceGroups.js:175
+#. Translators: Keep the values in this order.
+#: prefs/appearanceGroups.js
 #, javascript-format
 msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
 msgstr "Işık açısı %d°, uzaklık %d px, bulanıklık %d px, opaklık %s"
 
-#: prefs/appListGroup.js:22
+#: prefs/appListGroup.js
 msgid "libadwaita Apps"
 msgstr "libadwaita Uygulamaları"
 
-#: prefs/appListGroup.js:23
+#: prefs/appListGroup.js
 msgid "libhandy Apps"
 msgstr "libhandy Uygulamaları"
 
-#: prefs/appListGroup.js:24
+#: prefs/appListGroup.js
 msgid "Chromium and Electron Apps"
 msgstr "Chromium ve Electron Uygulamaları"
 
-#: prefs/appListGroup.js:25
+#: prefs/appListGroup.js
 msgid "Firefox and Thunderbird"
 msgstr "Firefox ve Thunderbird"
 
-#: prefs/appListGroup.js:26
+#: prefs/appListGroup.js
 msgid "Java Apps"
 msgstr "Java Uygulamaları"
 
-#: prefs/appListGroup.js:27
+#: prefs/appListGroup.js
 msgid "Qt Apps"
 msgstr "Qt Uygulamaları"
 
-#: prefs/appListGroup.js:28
+#: prefs/appListGroup.js
 msgid "GTK 4 Apps"
 msgstr "GTK 4 Uygulamaları"
 
-#: prefs/appListGroup.js:29
+#: prefs/appListGroup.js
 msgid "GTK 3 Apps"
 msgstr "GTK 3 Uygulamaları"
 
-#: prefs/appListGroup.js:80
+#: prefs/appListGroup.js
 msgid "Add App…"
 msgstr "Uygulama Ekle…"
 
-#: prefs/appListGroup.js:81
+#: prefs/appListGroup.js
 msgid "Add Category"
 msgstr "Kategori Ekle"
 
-#: prefs/appListGroup.js:135
+#: prefs/appListGroup.js
 msgid "Remove"
 msgstr "Kaldır"
 
-#: prefs/appsPage.js:24
+#: prefs/appsPage.js
 msgid "Apps"
 msgstr "Uygulamalar"
 
-#: prefs/appsPage.js:31
+#: prefs/appsPage.js
 msgid "Active List"
 msgstr "Etkin Liste"
 
-#: prefs/appsPage.js:32
+#: prefs/appsPage.js
 msgid "Switching keeps both lists"
 msgstr "Geçiş yapınca iki liste de korunur"
 
-#: prefs/appsPage.js:33 prefs/appsPage.js:50
+#: prefs/appsPage.js
 msgid "Blacklist"
 msgstr "Kara Liste"
 
-#: prefs/appsPage.js:33 prefs/appsPage.js:54
+#: prefs/appsPage.js
 msgid "Whitelist"
 msgstr "Beyaz Liste"
 
-#: prefs/appsPage.js:51
+#: prefs/appsPage.js
 msgid "These apps are never rounded"
 msgstr "Bu uygulamalar asla yuvarlatılmaz"
 
-#: prefs/appsPage.js:55
+#: prefs/appsPage.js
 msgid "Only these apps are rounded"
 msgstr "Yalnızca bu uygulamalar yuvarlatılır"
 
-#: prefs/appStylesPage.js:26
+#: prefs/appStylesPage.js
 msgid "App Styles"
 msgstr "Biçimler"
 
-#: prefs/appStylesPage.js:31
+#: prefs/appStylesPage.js
 msgid "Apps and Categories"
 msgstr "Uygulamalar ve Kategoriler"
 
-#: prefs/appStylesPage.js:32
+#: prefs/appStylesPage.js
 msgid "An app’s style comes before its category’s"
 msgstr "Uygulamanın biçimi, kategorisininkinden önce gelir"
 
-#: prefs/appStylesPage.js:34
+#: prefs/appStylesPage.js
 msgid "Needs Round libadwaita Apps"
 msgstr "“libadwaita Uygulamalarını Yuvarlat” gerekir"
 
-#: prefs/appStylesPage.js:35
+#: prefs/appStylesPage.js
 msgid "Needs Round libhandy Apps"
 msgstr "“libhandy Uygulamalarını Yuvarlat” gerekir"
 
-#: prefs/appStylesPage.js:40
+#: prefs/appStylesPage.js
 msgid "Replaces the category and general styles"
 msgstr "Kategori ve genel biçimler yerine kullanılır"
 
-#: prefs/appStylesPage.js:41
+#: prefs/appStylesPage.js
 msgid "Replaces the general style"
 msgstr "Genel biçim yerine kullanılır"
 
-#: prefs/generalPage.js:35
+#: prefs/generalPage.js
 msgid "General"
 msgstr "Genel"
 
-#: prefs/generalPage.js:37
+#: prefs/generalPage.js
 msgid "Windows"
 msgstr "Pencereler"
 
-#: prefs/generalPage.js:40
+#: prefs/generalPage.js
 msgid "Round libadwaita Apps"
 msgstr "libadwaita Uygulamalarını Yuvarlat"
 
-#: prefs/generalPage.js:40
+#: prefs/generalPage.js
 msgid "Only needed for a custom style or when maximized"
 msgstr "Yalnızca özel biçim için veya ekranı kaplayan pencerelerde gerekir"
 
-#: prefs/generalPage.js:41
+#: prefs/generalPage.js
 msgid "Round libhandy Apps"
 msgstr "libhandy Uygulamalarını Yuvarlat"
 
-#: prefs/generalPage.js:41
+#: prefs/generalPage.js
 msgid "Not all of them round their own windows"
 msgstr "Hepsi kendi pencerelerini yuvarlatmaz"
 
-#: prefs/generalPage.js:42
+#: prefs/generalPage.js
 msgid "Round Maximized and Tiled Windows"
 msgstr "Ekranı Kaplayan ve Döşenmiş Pencereleri Yuvarlat"
 
-#: prefs/generalPage.js:43
+#: prefs/generalPage.js
 msgid "Without a shadow, as in libadwaita; fullscreen stays square"
 msgstr "libadwaita’daki gibi gölgesiz; tam ekran köşeli kalır"
 
-#: prefs/generalPage.js:50
+#: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"
 msgstr "libadwaita biçimi ve gtk.css yerine kullanılır"
 
-#: prefs/generalPage.js:52
+#: prefs/generalPage.js
 msgid "Reset All Settings…"
 msgstr "Tüm Ayarları Sıfırla…"
 
-#: prefs/generalPage.js:56
+#: prefs/generalPage.js
 msgid "Reset All Settings?"
 msgstr "Tüm Ayarlar Sıfırlansın mı?"
 
-#: prefs/generalPage.js:57
+#: prefs/generalPage.js
 msgid "Every switch, list and style goes back to its default"
 msgstr "Tüm anahtarlar, listeler ve biçimler varsayılanlarına döner"
 
-#: prefs/generalPage.js:60
+#: prefs/generalPage.js
 msgid "Cancel"
 msgstr "İptal"
 
-#: prefs/generalPage.js:61
+#: prefs/generalPage.js
 msgid "Reset"
 msgstr "Sıfırla"
