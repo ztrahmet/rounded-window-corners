@@ -1,0 +1,284 @@
+# Japanese translations for Rounded Window Corners Native.
+# This file is distributed under the same license as the extension.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: rounded-window-corners\n"
+"Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
+"POT-Creation-Date: 2026-11-05 17:43+0300\n"
+"PO-Revision-Date: 2026-11-06 04:25+0300\n"
+"Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: prefs/appChooser.js
+msgid "Add App"
+msgstr "アプリを追加"
+
+#: prefs/appChooser.js
+msgid "Search apps"
+msgstr "アプリを検索"
+
+#: prefs/appearanceGroups.js
+msgid "Opacity"
+msgstr "不透明度"
+
+#: prefs/appearanceGroups.js
+msgid "App Border"
+msgstr "アプリの枠線"
+
+#: prefs/appearanceGroups.js
+msgid "Many apps draw a thin border that the outline replaces"
+msgstr "多くのアプリが描画する細い枠線を輪郭線で置き換えます"
+
+#: prefs/appearanceGroups.js
+msgid "Hide App Border"
+msgstr "枠線を隠す"
+
+#: prefs/appearanceGroups.js
+msgid "Inherit"
+msgstr "継承"
+
+#: prefs/appearanceGroups.js
+msgid "Off"
+msgstr "オフ"
+
+#: prefs/appearanceGroups.js
+msgid "Extend"
+msgstr "拡張"
+
+#: prefs/appearanceGroups.js
+msgid "Clip"
+msgstr "切り取り"
+
+#: prefs/appearanceGroups.js
+msgid "Extend paints over it, Clip cuts it off"
+msgstr "“拡張”は枠線を塗りつぶし、“切り取り”は切り落とします"
+
+#: prefs/appearanceGroups.js
+msgid "Width"
+msgstr "幅"
+
+#: prefs/appearanceGroups.js
+msgid "Style"
+msgstr "スタイル"
+
+#: prefs/appearanceGroups.js
+msgid "Custom Style"
+msgstr "カスタムスタイル"
+
+#: prefs/appearanceGroups.js
+msgid "Light Angle"
+msgstr "光の角度"
+
+#: prefs/appearanceGroups.js
+msgid "Color"
+msgstr "色"
+
+#: prefs/appearanceGroups.js
+msgid "Position"
+msgstr "位置"
+
+#: prefs/appearanceGroups.js
+msgid "Inside"
+msgstr "内側"
+
+#: prefs/appearanceGroups.js
+msgid "Center"
+msgstr "中央"
+
+#: prefs/appearanceGroups.js
+msgid "Outside"
+msgstr "外側"
+
+#: prefs/appearanceGroups.js
+msgid "Outline"
+msgstr "輪郭線"
+
+#: prefs/appearanceGroups.js
+msgid "Shadow"
+msgstr "影"
+
+#: prefs/appearanceGroups.js
+msgid "Distance"
+msgstr "距離"
+
+#: prefs/appearanceGroups.js
+msgid "Blur"
+msgstr "ぼかし"
+
+#: prefs/appearanceGroups.js
+msgid "Corner Radius"
+msgstr "角の半径"
+
+#. Translators: Keep the values in this order.
+#: prefs/appearanceGroups.js
+#, javascript-format
+msgid "Width %d px, opacity %s"
+msgstr "幅 %d px、不透明度 %s"
+
+#. Translators: Keep the values in this order.
+#: prefs/appearanceGroups.js
+#, javascript-format
+msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
+msgstr "光の角度 %d°、距離 %d px、ぼかし %d px、不透明度 %s"
+
+#: prefs/appListGroup.js
+msgid "libadwaita Apps"
+msgstr "libadwaita アプリ"
+
+#: prefs/appListGroup.js
+msgid "libhandy Apps"
+msgstr "libhandy アプリ"
+
+#: prefs/appListGroup.js
+msgid "Chromium and Electron Apps"
+msgstr "Chromium と Electron のアプリ"
+
+#: prefs/appListGroup.js
+msgid "Firefox and Thunderbird"
+msgstr "Firefox と Thunderbird"
+
+#: prefs/appListGroup.js
+msgid "Java Apps"
+msgstr "Java アプリ"
+
+#: prefs/appListGroup.js
+msgid "Qt Apps"
+msgstr "Qt アプリ"
+
+#: prefs/appListGroup.js
+msgid "GTK 4 Apps"
+msgstr "GTK 4 アプリ"
+
+#: prefs/appListGroup.js
+msgid "GTK 3 Apps"
+msgstr "GTK 3 アプリ"
+
+#: prefs/appListGroup.js
+msgid "Add App…"
+msgstr "アプリを追加…"
+
+#: prefs/appListGroup.js
+msgid "Add Category"
+msgstr "カテゴリを追加"
+
+#: prefs/appListGroup.js
+msgid "Remove"
+msgstr "削除"
+
+#: prefs/appsPage.js
+msgid "Apps"
+msgstr "アプリ"
+
+#: prefs/appsPage.js
+msgid "Active List"
+msgstr "有効なリスト"
+
+#: prefs/appsPage.js
+msgid "Switching keeps both lists"
+msgstr "切り替えても両方のリストは保持されます"
+
+#: prefs/appsPage.js
+msgid "Blacklist"
+msgstr "ブラックリスト"
+
+#: prefs/appsPage.js
+msgid "Whitelist"
+msgstr "ホワイトリスト"
+
+#: prefs/appsPage.js
+msgid "These apps are never rounded"
+msgstr "これらのアプリは角を丸めません"
+
+#: prefs/appsPage.js
+msgid "Only these apps are rounded"
+msgstr "これらのアプリだけ角を丸めます"
+
+#: prefs/appStylesPage.js
+msgid "App Styles"
+msgstr "スタイル"
+
+#: prefs/appStylesPage.js
+msgid "Apps and Categories"
+msgstr "アプリとカテゴリ"
+
+#: prefs/appStylesPage.js
+msgid "An app’s style comes before its category’s"
+msgstr "アプリのスタイルはカテゴリのスタイルより優先されます"
+
+#: prefs/appStylesPage.js
+msgid "Needs Round libadwaita Apps"
+msgstr "“libadwaita アプリの角を丸める”をオンにする必要があります"
+
+#: prefs/appStylesPage.js
+msgid "Needs Round libhandy Apps"
+msgstr "“libhandy アプリの角を丸める”をオンにする必要があります"
+
+#: prefs/appStylesPage.js
+msgid "Replaces the category and general styles"
+msgstr "カテゴリと全般のスタイルを置き換えます"
+
+#: prefs/appStylesPage.js
+msgid "Replaces the general style"
+msgstr "全般のスタイルを置き換えます"
+
+#: prefs/generalPage.js
+msgid "General"
+msgstr "全般"
+
+#: prefs/generalPage.js
+msgid "Windows"
+msgstr "ウィンドウ"
+
+#: prefs/generalPage.js
+msgid "Round libadwaita Apps"
+msgstr "libadwaita アプリの角を丸める"
+
+#: prefs/generalPage.js
+msgid "Only needed for a custom style or when maximized"
+msgstr "カスタムスタイルや最大化時にのみ必要です"
+
+#: prefs/generalPage.js
+msgid "Round libhandy Apps"
+msgstr "libhandy アプリの角を丸める"
+
+#: prefs/generalPage.js
+msgid "Not all of them round their own windows"
+msgstr "すべてのアプリが自分でウィンドウの角を丸めるわけではありません"
+
+#: prefs/generalPage.js
+msgid "Round Maximized and Tiled Windows"
+msgstr "最大化・タイル表示のウィンドウの角を丸める"
+
+#: prefs/generalPage.js
+msgid "Without a shadow, as in libadwaita; fullscreen stays square"
+msgstr "libadwaita と同様に影なし。全画面では角を丸めません"
+
+#: prefs/generalPage.js
+msgid "Replaces libadwaita’s style and gtk.css"
+msgstr "libadwaita のスタイルと gtk.css を置き換えます"
+
+#: prefs/generalPage.js
+msgid "Reset All Settings…"
+msgstr "すべての設定をリセット…"
+
+#: prefs/generalPage.js
+msgid "Reset All Settings?"
+msgstr "すべての設定をリセットしますか?"
+
+#: prefs/generalPage.js
+msgid "Every switch, list and style goes back to its default"
+msgstr "すべてのスイッチ、リスト、スタイルがデフォルトに戻ります"
+
+#: prefs/generalPage.js
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: prefs/generalPage.js
+msgid "Reset"
+msgstr "リセット"

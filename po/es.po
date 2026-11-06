@@ -257,7 +257,7 @@ msgstr "Redondear ventanas maximizadas y en mosaico"
 
 #: prefs/generalPage.js
 msgid "Without a shadow, as in libadwaita; fullscreen stays square"
-msgstr "Sin sombra, como en libadwaita; pantalla completa sin redondear"
+msgstr "Sin sombra, como en libadwaita; a pantalla completa no se redondean"
 
 #: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"

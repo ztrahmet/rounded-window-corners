@@ -1,0 +1,284 @@
+# Brazilian Portuguese translations for Rounded Window Corners Native.
+# This file is distributed under the same license as the extension.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: rounded-window-corners\n"
+"Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
+"POT-Creation-Date: 2026-11-05 17:43+0300\n"
+"PO-Revision-Date: 2026-11-06 04:03+0300\n"
+"Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
+"Language-Team: Brazilian Portuguese\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: prefs/appChooser.js
+msgid "Add App"
+msgstr "Adicionar aplicativo"
+
+#: prefs/appChooser.js
+msgid "Search apps"
+msgstr "Pesquisar aplicativos"
+
+#: prefs/appearanceGroups.js
+msgid "Opacity"
+msgstr "Opacidade"
+
+#: prefs/appearanceGroups.js
+msgid "App Border"
+msgstr "Borda do aplicativo"
+
+#: prefs/appearanceGroups.js
+msgid "Many apps draw a thin border that the outline replaces"
+msgstr "Muitos aplicativos desenham uma borda fina que o contorno substitui"
+
+#: prefs/appearanceGroups.js
+msgid "Hide App Border"
+msgstr "Ocultar a borda"
+
+#: prefs/appearanceGroups.js
+msgid "Inherit"
+msgstr "Herdar"
+
+#: prefs/appearanceGroups.js
+msgid "Off"
+msgstr "Desligado"
+
+#: prefs/appearanceGroups.js
+msgid "Extend"
+msgstr "Estender"
+
+#: prefs/appearanceGroups.js
+msgid "Clip"
+msgstr "Recortar"
+
+#: prefs/appearanceGroups.js
+msgid "Extend paints over it, Clip cuts it off"
+msgstr "“Estender” a cobre e “Recortar” a remove"
+
+#: prefs/appearanceGroups.js
+msgid "Width"
+msgstr "Largura"
+
+#: prefs/appearanceGroups.js
+msgid "Style"
+msgstr "Estilo"
+
+#: prefs/appearanceGroups.js
+msgid "Custom Style"
+msgstr "Estilo personalizado"
+
+#: prefs/appearanceGroups.js
+msgid "Light Angle"
+msgstr "Ângulo da luz"
+
+#: prefs/appearanceGroups.js
+msgid "Color"
+msgstr "Cor"
+
+#: prefs/appearanceGroups.js
+msgid "Position"
+msgstr "Posição"
+
+#: prefs/appearanceGroups.js
+msgid "Inside"
+msgstr "Dentro"
+
+#: prefs/appearanceGroups.js
+msgid "Center"
+msgstr "No centro"
+
+#: prefs/appearanceGroups.js
+msgid "Outside"
+msgstr "Fora"
+
+#: prefs/appearanceGroups.js
+msgid "Outline"
+msgstr "Contorno"
+
+#: prefs/appearanceGroups.js
+msgid "Shadow"
+msgstr "Sombra"
+
+#: prefs/appearanceGroups.js
+msgid "Distance"
+msgstr "Distância"
+
+#: prefs/appearanceGroups.js
+msgid "Blur"
+msgstr "Desfoque"
+
+#: prefs/appearanceGroups.js
+msgid "Corner Radius"
+msgstr "Raio dos cantos"
+
+#. Translators: Keep the values in this order.
+#: prefs/appearanceGroups.js
+#, javascript-format
+msgid "Width %d px, opacity %s"
+msgstr "Largura %d px, opacidade %s"
+
+#. Translators: Keep the values in this order.
+#: prefs/appearanceGroups.js
+#, javascript-format
+msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
+msgstr "Ângulo da luz %d°, distância %d px, desfoque %d px, opacidade %s"
+
+#: prefs/appListGroup.js
+msgid "libadwaita Apps"
+msgstr "Aplicativos libadwaita"
+
+#: prefs/appListGroup.js
+msgid "libhandy Apps"
+msgstr "Aplicativos libhandy"
+
+#: prefs/appListGroup.js
+msgid "Chromium and Electron Apps"
+msgstr "Aplicativos Chromium e Electron"
+
+#: prefs/appListGroup.js
+msgid "Firefox and Thunderbird"
+msgstr "Firefox e Thunderbird"
+
+#: prefs/appListGroup.js
+msgid "Java Apps"
+msgstr "Aplicativos Java"
+
+#: prefs/appListGroup.js
+msgid "Qt Apps"
+msgstr "Aplicativos Qt"
+
+#: prefs/appListGroup.js
+msgid "GTK 4 Apps"
+msgstr "Aplicativos GTK 4"
+
+#: prefs/appListGroup.js
+msgid "GTK 3 Apps"
+msgstr "Aplicativos GTK 3"
+
+#: prefs/appListGroup.js
+msgid "Add App…"
+msgstr "Adicionar aplicativo…"
+
+#: prefs/appListGroup.js
+msgid "Add Category"
+msgstr "Adicionar categoria"
+
+#: prefs/appListGroup.js
+msgid "Remove"
+msgstr "Remover"
+
+#: prefs/appsPage.js
+msgid "Apps"
+msgstr "Aplicativos"
+
+#: prefs/appsPage.js
+msgid "Active List"
+msgstr "Lista ativa"
+
+#: prefs/appsPage.js
+msgid "Switching keeps both lists"
+msgstr "Trocar de lista mantém as duas"
+
+#: prefs/appsPage.js
+msgid "Blacklist"
+msgstr "Lista negra"
+
+#: prefs/appsPage.js
+msgid "Whitelist"
+msgstr "Lista branca"
+
+#: prefs/appsPage.js
+msgid "These apps are never rounded"
+msgstr "Estes aplicativos nunca são arredondados"
+
+#: prefs/appsPage.js
+msgid "Only these apps are rounded"
+msgstr "Somente estes aplicativos são arredondados"
+
+#: prefs/appStylesPage.js
+msgid "App Styles"
+msgstr "Estilos"
+
+#: prefs/appStylesPage.js
+msgid "Apps and Categories"
+msgstr "Aplicativos e categorias"
+
+#: prefs/appStylesPage.js
+msgid "An app’s style comes before its category’s"
+msgstr "O estilo de um aplicativo tem prioridade sobre o da sua categoria"
+
+#: prefs/appStylesPage.js
+msgid "Needs Round libadwaita Apps"
+msgstr "Requer “Arredondar aplicativos libadwaita”"
+
+#: prefs/appStylesPage.js
+msgid "Needs Round libhandy Apps"
+msgstr "Requer “Arredondar aplicativos libhandy”"
+
+#: prefs/appStylesPage.js
+msgid "Replaces the category and general styles"
+msgstr "Substitui o estilo da categoria e o geral"
+
+#: prefs/appStylesPage.js
+msgid "Replaces the general style"
+msgstr "Substitui o estilo geral"
+
+#: prefs/generalPage.js
+msgid "General"
+msgstr "Geral"
+
+#: prefs/generalPage.js
+msgid "Windows"
+msgstr "Janelas"
+
+#: prefs/generalPage.js
+msgid "Round libadwaita Apps"
+msgstr "Arredondar aplicativos libadwaita"
+
+#: prefs/generalPage.js
+msgid "Only needed for a custom style or when maximized"
+msgstr "Só é necessário para um estilo personalizado ou com janelas maximizadas"
+
+#: prefs/generalPage.js
+msgid "Round libhandy Apps"
+msgstr "Arredondar aplicativos libhandy"
+
+#: prefs/generalPage.js
+msgid "Not all of them round their own windows"
+msgstr "Nem todos arredondam as próprias janelas"
+
+#: prefs/generalPage.js
+msgid "Round Maximized and Tiled Windows"
+msgstr "Arredondar janelas maximizadas e lado a lado"
+
+#: prefs/generalPage.js
+msgid "Without a shadow, as in libadwaita; fullscreen stays square"
+msgstr "Sem sombra, como na libadwaita; em tela cheia, não são arredondadas"
+
+#: prefs/generalPage.js
+msgid "Replaces libadwaita’s style and gtk.css"
+msgstr "Substitui o estilo da libadwaita e o gtk.css"
+
+#: prefs/generalPage.js
+msgid "Reset All Settings…"
+msgstr "Redefinir todas as configurações…"
+
+#: prefs/generalPage.js
+msgid "Reset All Settings?"
+msgstr "Redefinir todas as configurações?"
+
+#: prefs/generalPage.js
+msgid "Every switch, list and style goes back to its default"
+msgstr "Todas as opções, listas e estilos voltam ao padrão"
+
+#: prefs/generalPage.js
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: prefs/generalPage.js
+msgid "Reset"
+msgstr "Redefinir"

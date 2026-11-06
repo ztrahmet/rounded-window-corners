@@ -257,7 +257,7 @@ msgstr "Arrondir les fenêtres maximisées et juxtaposées"
 
 #: prefs/generalPage.js
 msgid "Without a shadow, as in libadwaita; fullscreen stays square"
-msgstr "Sans ombre, comme dans libadwaita ; plein écran non arrondi"
+msgstr "Sans ombre, comme dans libadwaita ; pas d’arrondi en plein écran"
 
 #: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"

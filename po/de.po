@@ -41,7 +41,7 @@ msgstr "Rand ausblenden"
 
 #: prefs/appearanceGroups.js
 msgid "Inherit"
-msgstr "Übernehmen"
+msgstr "Erben"
 
 #: prefs/appearanceGroups.js
 msgid "Off"
