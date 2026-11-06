@@ -59,12 +59,12 @@ apps, which round themselves.
 ```mermaid
 flowchart LR
     window([A window]) --> list{Active list}
-    list -- Whitelist --> whitelisted{Its app or toolkit<br>on the list?}
-    whitelisted -- Yes --> rounded1([Rounded])
-    whitelisted -- No --> left1([Left alone])
-    list -- Blacklist --> blacklisted{Its app or toolkit<br>on the list?}
-    blacklisted -- Yes --> left2([Left alone])
-    blacklisted -- No --> switch{A libadwaita or libhandy<br>app with its switch off?}
+    list -- Allowlist --> allowlisted{Its app or toolkit<br>on the list?}
+    allowlisted -- Yes --> rounded1([Rounded])
+    allowlisted -- No --> left1([Left alone])
+    list -- Blocklist --> blocklisted{Its app or toolkit<br>on the list?}
+    blocklisted -- Yes --> left2([Left alone])
+    blocklisted -- No --> switch{A libadwaita or libhandy<br>app with its switch off?}
     switch -- Yes --> left3([Left alone])
     switch -- No --> rounded2([Rounded])
 ```
@@ -72,7 +72,7 @@ flowchart LR
 - **Round libadwaita Apps** and **Round libhandy Apps**, on the General tab, are the
   switches. libhandy apps are rounded by default, since not all of them round their own
   windows.
-- The **Apps** tab holds the blacklist and the whitelist. Switching the active list keeps
+- The **Apps** tab holds the blocklist and the allowlist. Switching the active list keeps
   both.
 - **Round Maximized and Tiled Windows** keeps those windows rounded, with the look
   libadwaita gives them: no shadow when maximized, and a thin line around a tiled window.
@@ -95,7 +95,7 @@ flowchart LR
 So with none of them on, a window looks like a libadwaita window, following your
 `gtk.css`, light and dark, and high contrast. Styles only decide the look: a libadwaita or
 libhandy app with a style of its own still needs its switch on, or a place on the
-whitelist, to be rounded.
+allowlist, to be rounded.
 
 For example, say **GTK 3 Apps** has its custom style on, and you add a GTK 3 app with its
 own switch left off. That app keeps the GTK 3 style, but can still hide its border its own

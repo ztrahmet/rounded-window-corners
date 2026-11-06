@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-05 17:43+0300\n"
+"POT-Creation-Date: 2026-11-06 03:55+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Russian\n"
@@ -164,8 +164,8 @@ msgid "Add App…"
 msgstr "Добавить приложение…"
 
 #: prefs/appListGroup.js
-msgid "Add Category"
-msgstr "Добавить категорию"
+msgid "Add Toolkit"
+msgstr "Добавить инструментарий"
 
 #: prefs/appListGroup.js
 msgid "Remove"
@@ -184,12 +184,12 @@ msgid "Switching keeps both lists"
 msgstr "При переключении оба списка сохраняются"
 
 #: prefs/appsPage.js
-msgid "Blacklist"
-msgstr "Чёрный список"
+msgid "Blocklist"
+msgstr "Список запрещённых"
 
 #: prefs/appsPage.js
-msgid "Whitelist"
-msgstr "Белый список"
+msgid "Allowlist"
+msgstr "Список разрешённых"
 
 #: prefs/appsPage.js
 msgid "These apps are never rounded"
@@ -204,12 +204,12 @@ msgid "App Styles"
 msgstr "Стили"
 
 #: prefs/appStylesPage.js
-msgid "Apps and Categories"
-msgstr "Приложения и категории"
+msgid "Apps and Toolkits"
+msgstr "Приложения и инструментарии"
 
 #: prefs/appStylesPage.js
-msgid "An app’s style comes before its category’s"
-msgstr "Стиль приложения важнее стиля его категории"
+msgid "An app’s style comes before its toolkit’s"
+msgstr "Стиль приложения важнее стиля его инструментария"
 
 #: prefs/appStylesPage.js
 msgid "Needs Round libadwaita Apps"
@@ -220,8 +220,8 @@ msgid "Needs Round libhandy Apps"
 msgstr "Требуется параметр «Скруглять приложения libhandy»"
 
 #: prefs/appStylesPage.js
-msgid "Replaces the category and general styles"
-msgstr "Заменяет стиль категории и общий стиль"
+msgid "Replaces the toolkit and general styles"
+msgstr "Заменяет стиль инструментария и общий стиль"
 
 #: prefs/appStylesPage.js
 msgid "Replaces the general style"

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/"
 "issues\n"
-"POT-Creation-Date: 2026-11-05 17:43+0300\n"
+"POT-Creation-Date: 2026-11-06 03:55+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -167,7 +167,7 @@ msgid "Add App…"
 msgstr ""
 
 #: prefs/appListGroup.js
-msgid "Add Category"
+msgid "Add Toolkit"
 msgstr ""
 
 #: prefs/appListGroup.js
@@ -187,11 +187,11 @@ msgid "Switching keeps both lists"
 msgstr ""
 
 #: prefs/appsPage.js
-msgid "Blacklist"
+msgid "Blocklist"
 msgstr ""
 
 #: prefs/appsPage.js
-msgid "Whitelist"
+msgid "Allowlist"
 msgstr ""
 
 #: prefs/appsPage.js
@@ -207,11 +207,11 @@ msgid "App Styles"
 msgstr ""
 
 #: prefs/appStylesPage.js
-msgid "Apps and Categories"
+msgid "Apps and Toolkits"
 msgstr ""
 
 #: prefs/appStylesPage.js
-msgid "An app’s style comes before its category’s"
+msgid "An app’s style comes before its toolkit’s"
 msgstr ""
 
 #: prefs/appStylesPage.js
@@ -223,7 +223,7 @@ msgid "Needs Round libhandy Apps"
 msgstr ""
 
 #: prefs/appStylesPage.js
-msgid "Replaces the category and general styles"
+msgid "Replaces the toolkit and general styles"
 msgstr ""
 
 #: prefs/appStylesPage.js

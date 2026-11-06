@@ -1,5 +1,5 @@
 /**
- * Preferences for apps and app categories with a style of their own
+ * Preferences for apps and toolkits with a style of their own
  *
  * @author     Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>
  * @copyright  2026 Ahmet Öztürk
@@ -25,11 +25,11 @@ class AppStylesPage extends Adw.PreferencesPage {
     constructor(settings, appearance, entrySettings, window) {
         super({title: _('App Styles'), icon_name: 'preferences-desktop-appearance-symbolic'});
         countOnTab(this, settings,
-            () => settings.get_strv('styled-apps').length + settings.get_strv('styled-categories').length);
+            () => settings.get_strv('styled-apps').length + settings.get_strv('styled-toolkits').length);
 
-        this.add(new AppListGroup(settings, 'styled-apps', 'styled-categories', {
-            title: _('Apps and Categories'),
-            description: _('An app’s style comes before its category’s'),
+        this.add(new AppListGroup(settings, 'styled-apps', 'styled-toolkits', {
+            title: _('Apps and Toolkits'),
+            description: _('An app’s style comes before its toolkit’s'),
             notes: new Map([
                 ['libadwaita', _('Needs Round libadwaita Apps')],
                 ['libhandy', _('Needs Round libhandy Apps')],
@@ -37,7 +37,7 @@ class AppStylesPage extends Adw.PreferencesPage {
             open: (key, id, name) => {
                 const page = new Adw.PreferencesPage();
                 addAppearanceGroups(page, entrySettings.of(key, id), key === 'styled-apps'
-                    ? _('Replaces the category and general styles')
+                    ? _('Replaces the toolkit and general styles')
                     : _('Replaces the general style'), appearance);
                 const view = new Adw.ToolbarView({content: page});
                 view.add_top_bar(new Adw.HeaderBar());

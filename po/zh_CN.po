@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-05 17:43+0300\n"
+"POT-Creation-Date: 2026-11-06 03:55+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Chinese (simplified)\n"
@@ -164,8 +164,8 @@ msgid "Add App…"
 msgstr "添加应用…"
 
 #: prefs/appListGroup.js
-msgid "Add Category"
-msgstr "添加类别"
+msgid "Add Toolkit"
+msgstr "添加工具集"
 
 #: prefs/appListGroup.js
 msgid "Remove"
@@ -184,12 +184,12 @@ msgid "Switching keeps both lists"
 msgstr "切换时两个列表都会保留"
 
 #: prefs/appsPage.js
-msgid "Blacklist"
-msgstr "黑名单"
+msgid "Blocklist"
+msgstr "阻止列表"
 
 #: prefs/appsPage.js
-msgid "Whitelist"
-msgstr "白名单"
+msgid "Allowlist"
+msgstr "允许列表"
 
 #: prefs/appsPage.js
 msgid "These apps are never rounded"
@@ -204,12 +204,12 @@ msgid "App Styles"
 msgstr "样式"
 
 #: prefs/appStylesPage.js
-msgid "Apps and Categories"
-msgstr "应用和类别"
+msgid "Apps and Toolkits"
+msgstr "应用和工具集"
 
 #: prefs/appStylesPage.js
-msgid "An app’s style comes before its category’s"
-msgstr "应用的样式优先于其类别的样式"
+msgid "An app’s style comes before its toolkit’s"
+msgstr "应用的样式优先于其工具集的样式"
 
 #: prefs/appStylesPage.js
 msgid "Needs Round libadwaita Apps"
@@ -220,8 +220,8 @@ msgid "Needs Round libhandy Apps"
 msgstr "需要开启“为 libhandy 应用启用圆角”"
 
 #: prefs/appStylesPage.js
-msgid "Replaces the category and general styles"
-msgstr "替代类别样式和常规样式"
+msgid "Replaces the toolkit and general styles"
+msgstr "替代工具集样式和常规样式"
 
 #: prefs/appStylesPage.js
 msgid "Replaces the general style"

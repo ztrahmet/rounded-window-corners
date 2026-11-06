@@ -23,7 +23,7 @@ session with it. `--devkit` shows it in a window, and needs mutter's devkit
 ```bash
 ROOT=/tmp/rwc-dev
 mkdir -p $ROOT/{config,cache,data/gnome-shell/extensions}
-glib-compile-schemas schemas/
+./scripts/compile.sh
 ln -sfn "$PWD" $ROOT/data/gnome-shell/extensions/rounded-window-corners@ztrahmet.github.io
 
 XDG_CONFIG_HOME=$ROOT/config XDG_DATA_HOME=$ROOT/data XDG_CACHE_HOME=$ROOT/cache \
@@ -38,7 +38,8 @@ Start apps in it with `WAYLAND_DISPLAY=rwc-test`. For scripts, use
 `--headless --virtual-monitor 1400x900` instead of `--devkit`.
 
 > [!NOTE]
-> Run `glib-compile-schemas schemas/` again after changing the schema.
+> `./scripts/compile.sh` compiles the settings schema and the translations into the source
+> tree. Run it again after changing either.
 
 ## Tests
 
@@ -96,14 +97,8 @@ A new language starts from the template:
 msginit -i $POT -l <language> -o po/<language>.po
 ```
 
-To see the translations in a shell running from the source tree, compile them first:
-
-```bash
-for po in po/*.po; do
-    dir=locale/$(basename "$po" .po)/LC_MESSAGES
-    mkdir -p $dir && msgfmt -o $dir/rounded-window-corners@ztrahmet.github.io.mo "$po"
-done
-```
+To see the translations in a shell running from the source tree, compile them first with
+`./scripts/compile.sh`.
 
 ## Packaging
 

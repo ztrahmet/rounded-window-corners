@@ -14,9 +14,9 @@ import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions
 
 import {addAppearanceGroups, resetKeys} from './appearanceGroups.js';
 
-// The styles of apps and categories first, while their lists still name them.
+// The styles of apps and toolkits first, while their lists still name them.
 function resetAll(settings, appearance, entrySettings) {
-    for (const key of ['styled-apps', 'styled-categories']) {
+    for (const key of ['styled-apps', 'styled-toolkits']) {
         for (const id of settings.get_strv(key))
             resetKeys(entrySettings.of(key, id));
     }

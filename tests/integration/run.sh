@@ -295,15 +295,15 @@ chk "settings: and turned off, it is square again" "false" "$(wait_for false "$(
 ev "$wl.metaWindow.unmaximize(); 0" >/dev/null
 wait_for true "$(rounded "$wl")" >/dev/null
 
-eset blacklist "['$WL_APP']"
-chk "settings: a blacklisted app is not rounded" "false,true,false" "$(wait_for false,true,false "$states")"
-eset blacklist "[]"; eset blacklist-categories "['gtk3']"
-chk "settings: nor are the apps of a blacklisted toolkit" "false,false,false" "$(wait_for false,false,false "$states")"
-eset blacklist-categories "[]"; eset use-whitelist true; eset whitelist "['$WL_APP']"
-chk "settings: with the whitelist, only its apps are rounded" "true,false,false" "$(wait_for true,false,false "$states")"
-eset whitelist "[]"; eset whitelist-categories "['libadwaita']"
-chk "settings: a whitelisted toolkit is rounded whatever its switch" "false,false,true" "$(wait_for false,false,true "$states")"
-eset whitelist-categories "[]"; eset use-whitelist false
+eset blocklist "['$WL_APP']"
+chk "settings: a blocklisted app is not rounded" "false,true,false" "$(wait_for false,true,false "$states")"
+eset blocklist "[]"; eset blocklist-toolkits "['gtk3']"
+chk "settings: nor are the apps of a blocklisted toolkit" "false,false,false" "$(wait_for false,false,false "$states")"
+eset blocklist-toolkits "[]"; eset use-allowlist true; eset allowlist "['$WL_APP']"
+chk "settings: with the allowlist, only its apps are rounded" "true,false,false" "$(wait_for true,false,false "$states")"
+eset allowlist "[]"; eset allowlist-toolkits "['libadwaita']"
+chk "settings: an allowlisted toolkit is rounded whatever its switch" "false,false,true" "$(wait_for false,false,true "$states")"
+eset allowlist-toolkits "[]"; eset use-allowlist false
 
 # A window whose WM class changes moves to another app, and the lists must follow once the Shell has found it.
 reclass() { DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH python3 -c '
@@ -320,15 +320,15 @@ x.XCloseDisplay(d)' $XID "$1" "$2"; }
 X11_CLASS=($(val "const w=$x11.metaWindow; w.get_wm_class_instance()+' '+w.get_wm_class()"))
 x11_app="imports.gi.Shell.WindowTracker.get_default().get_window_app($x11.metaWindow).get_id()"
 ev "$wl.metaWindow.activate(global.get_current_time()); 0" >/dev/null
-eset blacklist "['org.gnome.Settings.desktop']"
+eset blocklist "['org.gnome.Settings.desktop']"
 reclass org.gnome.Settings org.gnome.Settings
 need org.gnome.Settings.desktop "$x11_app" "the X11 window did not move to org.gnome.Settings.desktop"
 # Read at once: the window syncs in the same signal as the Shell's change, and a later unrelated sync would hide a missed one.
-chk "settings: a window that becomes a blacklisted app is not rounded" "false" "$(val "$(rounded "$x11")")"
+chk "settings: a window that becomes a blocklisted app is not rounded" "false" "$(val "$(rounded "$x11")")"
 reclass "${X11_CLASS[@]}"
 need "$X11_APP" "$x11_app" "the X11 window did not move back to its own app"
 chk "settings: and it is rounded again once it changes back" "true" "$(val "$(rounded "$x11")")"
-eset blacklist "[]"
+eset blocklist "[]"
 
 # The Shell gives a dialog from another process, like the file chooser portal's, and that dialog's own dialog the app
 # they are over; their own app's settings apply.
@@ -339,12 +339,12 @@ need "$X11_APP,$X11_APP" "const d=($foreign)?.metaWindow, s=($sub)?.metaWindow, 
   d?.get_transient_for() === ($x11).metaWindow && s?.get_transient_for() === d ? [d, s].map(w => shell.get_window_app(w).get_id()).join() : 'none'" \
   "the Shell did not give the foreign dialog and its own dialog the X11 window's app"
 dialogs="[$x11,$foreign,$sub].map(rwcTest.rounded).join()"
-eset blacklist "['$X11_APP']"
-chk "settings: a dialog from another process, and its own dialog, do not follow the app they are over onto the blacklist" \
+eset blocklist "['$X11_APP']"
+chk "settings: a dialog from another process, and its own dialog, do not follow the app they are over onto the blocklist" \
   "false,true,true" "$(wait_for false,true,true "$dialogs")"
-eset blacklist "['org.gnome.Settings.desktop']"
+eset blocklist "['org.gnome.Settings.desktop']"
 chk "settings: but follow their own app onto it" "true,false,false" "$(wait_for true,false,false "$dialogs")"
-eset blacklist "[]"
+eset blocklist "[]"
 eset styled-apps "['$X11_APP']"; aset apps/$X11_APP custom-style true; aset apps/$X11_APP corner-radius 21
 chk "settings: nor take that app's style" "21,15,15" \
   "$(wait_for 21,15,15 "[$x11,$foreign,$sub].map(a=>rwcTest.effect(a).rwcArgs[1][0]).join()")"
@@ -370,8 +370,8 @@ rm -f $ROOT/config/gtk-4.0/gtk.css
 aset appearance custom-style true
 wait_for 9 "$radius" >/dev/null
 
-# The test windows are GTK 3, whose category is listed out of the box with the border left alone.
-eset styled-categories "[]"
+# The test windows are GTK 3, whose toolkit is listed out of the box with the border left alone.
+eset styled-toolkits "[]"
 aset appearance border-method "'clip'"; aset appearance border-width 3
 chk "settings: the border method reaches the effect" "clip|3" "$(wait_for 'clip|3' "rwcTest.effect($wl).rwcArgs.slice(6).join('|')")"
 # The outline covers the app's border, so drop it to measure the border alone.
@@ -397,7 +397,7 @@ else
     "$(awk -v o=$border_off -v c=$border_clip 'BEGIN { print ((o > 0.5) ? "shown" : "hidden " o) "|" ((c < 0.05) ? "hidden" : "showing " c) }')"
 fi
 
-eset styled-categories "['gtk3']"; aset categories/gtk3 custom-style true; aset categories/gtk3 corner-radius 4
+eset styled-toolkits "['gtk3']"; aset toolkits/gtk3 custom-style true; aset toolkits/gtk3 corner-radius 4
 eset styled-apps "['$X11_APP', '$ADW_APP']"; aset apps/$X11_APP custom-style true; aset apps/$X11_APP corner-radius 21
 entries="[$wl,$x11,$adw].map(a=>rwcTest.rounded(a) && rwcTest.effect(a).rwcArgs[1][0]).join()"
 # The X11 app's own style comes before its toolkit's, and an entry doesn't round the libadwaita app; its switch does.
@@ -417,7 +417,7 @@ ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
 chk "settings: they apply again after disable and enable" "4,21,9" \
   "$(wait_for 4,21,9 "[$wl,$x11,$adw].map(a=>rwcTest.rounded(a) && !rwcTest.effect(a).rwcStale && rwcTest.effect(a).rwcArgs[1][0]).join()")"
 
-for path in appearance categories/gtk3 apps/$X11_APP apps/$ADW_APP; do
+for path in appearance toolkits/gtk3 apps/$X11_APP apps/$ADW_APP; do
   gset --schemadir $EXT/schemas reset-recursively $SCHEMA.appearance:$SCHEMA_PATH/$path/
 done
 gset --schemadir $EXT/schemas reset-recursively $SCHEMA
@@ -431,7 +431,7 @@ aset apps/$WL_APP border-method "'clip'"
 chk "settings: until it sets its own" "clip,off" "$(wait_for clip,off "$borders")"
 gset --schemadir $EXT/schemas reset-recursively $SCHEMA.appearance:$SCHEMA_PATH/apps/$WL_APP/
 eset styled-apps "[]"
-eset styled-categories "[]"
+eset styled-toolkits "[]"
 
 # At fractional scales the app's border must stay hidden at every position (#10).
 monitor_scale="''+global.display.get_monitor_scale(0)"

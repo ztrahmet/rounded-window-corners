@@ -1,5 +1,5 @@
 /**
- * Preferences for which apps are rounded: the blacklist and the whitelist
+ * Preferences for which apps are rounded: the blocklist and the allowlist
  *
  * @author     Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>
  * @copyright  2026 Ahmet Öztürk
@@ -23,41 +23,41 @@ class AppsPage extends Adw.PreferencesPage {
     constructor(settings) {
         super({title: _('Apps'), icon_name: 'view-app-grid-symbolic'});
         countOnTab(this, settings, () => {
-            const list = settings.get_boolean('use-whitelist') ? 'whitelist' : 'blacklist';
-            return settings.get_strv(list).length + settings.get_strv(`${list}-categories`).length;
+            const list = settings.get_boolean('use-allowlist') ? 'allowlist' : 'blocklist';
+            return settings.get_strv(list).length + settings.get_strv(`${list}-toolkits`).length;
         });
 
         const mode = new Adw.ComboRow({
             title: _('Active List'),
             subtitle: _('Switching keeps both lists'),
-            model: Gtk.StringList.new([_('Blacklist'), _('Whitelist')]),
+            model: Gtk.StringList.new([_('Blocklist'), _('Allowlist')]),
         });
         const refresh = () => {
-            mode.selected = settings.get_boolean('use-whitelist') ? 1 : 0;
+            mode.selected = settings.get_boolean('use-allowlist') ? 1 : 0;
         };
-        const changed = settings.connect('changed::use-whitelist', refresh);
+        const changed = settings.connect('changed::use-allowlist', refresh);
         this.connect('destroy', () => settings.disconnect(changed));
         refresh();
         mode.connect('notify::selected', () => {
-            if ((mode.selected === 1) !== settings.get_boolean('use-whitelist'))
-                settings.set_boolean('use-whitelist', mode.selected === 1);
+            if ((mode.selected === 1) !== settings.get_boolean('use-allowlist'))
+                settings.set_boolean('use-allowlist', mode.selected === 1);
         });
         const group = new Adw.PreferencesGroup();
         group.add(mode);
         this.add(group);
 
-        const blacklist = new AppListGroup(settings, 'blacklist', 'blacklist-categories', {
-            title: _('Blacklist'),
+        const blocklist = new AppListGroup(settings, 'blocklist', 'blocklist-toolkits', {
+            title: _('Blocklist'),
             description: _('These apps are never rounded'),
         });
-        const whitelist = new AppListGroup(settings, 'whitelist', 'whitelist-categories', {
-            title: _('Whitelist'),
+        const allowlist = new AppListGroup(settings, 'allowlist', 'allowlist-toolkits', {
+            title: _('Allowlist'),
             description: _('Only these apps are rounded'),
         });
-        settings.bind('use-whitelist', blacklist, 'visible',
+        settings.bind('use-allowlist', blocklist, 'visible',
             Gio.SettingsBindFlags.GET | Gio.SettingsBindFlags.INVERT_BOOLEAN);
-        settings.bind('use-whitelist', whitelist, 'visible', Gio.SettingsBindFlags.GET);
-        this.add(blacklist);
-        this.add(whitelist);
+        settings.bind('use-allowlist', allowlist, 'visible', Gio.SettingsBindFlags.GET);
+        this.add(blocklist);
+        this.add(allowlist);
     }
 });
