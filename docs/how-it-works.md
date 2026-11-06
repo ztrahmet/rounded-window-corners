@@ -54,6 +54,9 @@ At a radius of 0, a window keeps its outline and shadow, as libadwaita's do.
 - An app that draws larger corners than the radius keeps its own corners. For GTK apps,
   give them the same radius in `gtk.css`, as the tip in [Customization](customization.md)
   shows.
+- Toolkits are recognized by the libraries an app has loaded, which Linux hides for apps
+  that guard their memory. Their windows are still rounded, but toolkit lists and styles
+  don't apply to them.
 - At fractional scales, windows are slightly blurred in the overview
   ([#2](https://github.com/ztrahmet/rounded-window-corners/issues/2)) and while rounded
   ([#20](https://github.com/ztrahmet/rounded-window-corners/issues/20)). Both come from
@@ -61,10 +64,11 @@ At a radius of 0, a window keeps its outline and shadow, as libadwaita's do.
 
 ## Performance
 
-A rounded window is drawn through a buffer the size of the window and its shadow, and
-only while the window repaints. Windows that aren't repainting cost nothing to draw, and
-neither do maximized and fullscreen windows while they are left square. Rounding
-maximized windows gives each of them a buffer the size of the screen.
+A rounded window is drawn through a buffer the size of the window and its shadow. On a
+GPU this takes a fraction of a millisecond per frame, even for a window that repaints
+all the time, so apps stay as smooth as without the extension.
+
+Maximized and fullscreen windows cost nothing extra while they are left square.
 
 ## Turning it off
 
