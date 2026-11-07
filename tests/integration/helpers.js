@@ -166,7 +166,7 @@ const rwcTest = {
             return painted && width === (Math.round(volume.get_width()) + 3) * scale &&
                 height === (Math.round(volume.get_height()) + 3) * scale;
         }
-        const place = effect._rendered;
+        const place = effect._buffers[0]?.place;
         return !!place && place.width >= Math.ceil(volume.get_width() * place.densityX) &&
             place.height >= Math.ceil(volume.get_height() * place.densityY);
     },
@@ -180,8 +180,65 @@ const rwcTest = {
             const want = scale % 1 === 0 ? 0 : 1;
             return effect._smear === want ? '' : `smear ${effect._smear} at ${scale}`;
         }
-        const density = effect._rendered?.densityX;
+        const density = effect._buffers[0]?.place?.densityX;
         return Math.abs(density - scale) < 1e-3 ? '' : `buffered at ${density} for ${scale}`;
+    },
+
+    // Scales an actor over 400 ms, frame by frame, even where the Shell turns its animations off.
+    animateScale(actor, from, to) {
+        const timeline = new imports.gi.Clutter.Timeline({actor, duration: 400});
+        timeline.connect('new-frame', () => {
+            const scale = from + (to - from) * timeline.get_progress();
+            actor.set_scale(scale, scale);
+        });
+        timeline.connect('completed', () => actor.set_scale(to, to));
+        // Held, so it isn't collected while it runs.
+        rwcTest.timeline = timeline;
+        timeline.start();
+    },
+
+    // Slides a clone of an actor by dx over 400 ms, as the overview slides its window previews.
+    slideClone(actor, dx) {
+        const {Clutter} = imports.gi;
+        const clone = new Clutter.Clone({source: actor, x: 1000, y: 100});
+        global.stage.add_child(clone);
+        const timeline = new Clutter.Timeline({actor: clone, duration: 400});
+        timeline.connect('new-frame', () => clone.set_translation(dx * timeline.get_progress(), 0, 0));
+        timeline.connect('completed', () => clone.set_translation(dx, 0, 0));
+        rwcTest.clone = clone;
+        rwcTest.timeline = timeline;
+        timeline.start();
+    },
+
+    // Counts what the sharp effect does from now on: buffers made, buffers moved to another place, draws scaled from
+    // another density, and those scaled up from a less sharp one.
+    countBuffers(actor) {
+        const proto = Object.getPrototypeOf(actor.get_effect(`${NAME}-sharp`));
+        rwcTest.newBuffers = 0;
+        rwcTest.placed = 0;
+        rwcTest.scaledDraws = 0;
+        rwcTest.upscaledDraws = 0;
+        if (proto.rwcCounted)
+            return;
+        const newBuffer = proto._newBuffer;
+        const place = proto._place;
+        const draw = proto._draw;
+        proto._newBuffer = function () {
+            rwcTest.newBuffers++;
+            return newBuffer.call(this);
+        };
+        proto._place = function (buffer, where) {
+            rwcTest.placed++;
+            return place.call(this, buffer, where);
+        };
+        proto._draw = function (node, buffer, texelScale, smear) {
+            if (texelScale !== buffer.place.texelScale)
+                rwcTest.scaledDraws++;
+            if (texelScale > buffer.place.texelScale + 1e-3)
+                rwcTest.upscaledDraws++;
+            return draw.call(this, node, buffer, texelScale, smear);
+        };
+        proto.rwcCounted = true;
     },
     // sharp-windows end
 

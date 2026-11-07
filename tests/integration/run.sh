@@ -504,6 +504,27 @@ chk "settings: and turned on again, the sharp effect does" "rounded-window-corne
   "$(wait_for 'rounded-window-corners-room,rounded-window-corners-sharp|ok' "$drawing+'|'+(rwcTest.boundsError($wl) || 'ok')")"
 chk "settings: switching keeps the effects' order" "rounded-window-corners-room,rounded-window-corners,rounded-window-corners-sharp" \
   "$(val "$order")"
+
+# An animation draws from the buffer already there, not a new one each frame, and ends as sharp as before.
+ev "rwcTest.countBuffers($wl); rwcTest.animateScale($wl, 1, 0.8); 0" >/dev/null
+sleep 1
+ev "rwcTest.animateScale($wl, 0.8, 1); 0" >/dev/null
+sleep 1
+chk "an animated scale draws from the buffer there, not a new one each frame, and ends sharp" "true|true|ok" \
+  "$(wait_for 'true|true|ok' "(rwcTest.scaledDraws > 10) + '|' + (rwcTest.newBuffers <= 3) + '|' +
+     (rwcTest.followsScale($wl) || 'ok')")"
+# As a window that has just appeared animates in, with no buffer yet, it's never drawn from a less sharp one.
+ev "rwcTest.countBuffers($wl); rwcTest.effect($wl)._release(); rwcTest.animateScale($wl, 0.5, 1); 0" >/dev/null
+sleep 1
+chk "a new window animating in is drawn scaled down, never up, and ends sharp" "true|0|ok" \
+  "$(wait_for 'true|0|ok' "(rwcTest.scaledDraws > 10) + '|' + rwcTest.upscaledDraws + '|' +
+     (rwcTest.followsScale($wl) || 'ok')")"
+# A window sliding by parts of a pixel, as in the overview, is drawn from its buffer and rendered again where it stops.
+ev "rwcTest.countBuffers($wl); rwcTest.slideClone($wl, 7.5); 0" >/dev/null
+sleep 1
+chk "a sliding window is drawn from its buffer, and rendered again where it stops" "true|0.5" \
+  "$(wait_for 'true|0.5' "(rwcTest.placed > 0 && rwcTest.placed <= 3) + '|' + rwcTest.effect($wl)._buffers[0].place.shiftX.toFixed(1)")"
+ev 'rwcTest.clone.destroy(); 0' >/dev/null
 # sharp-windows end
 
 # Windows that leave no room of their own still get the whole shadow (#14), and on X11 only ours.
