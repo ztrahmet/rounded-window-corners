@@ -45,7 +45,8 @@ values from the settings.
 
 By default, maximized, tiled and fullscreen windows are left square, as libadwaita leaves
 its own. As in libadwaita, a window's look changes once the app has drawn its new size,
-not the moment its state changes, so there is no flash of the wrong corners.
+not the moment its state changes, so there is no flash of the wrong corners. A window that
+already fills the screen when it goes fullscreen or maximized changes at once.
 
 At a radius of 0, a window keeps its outline and shadow, as libadwaita's do.
 
