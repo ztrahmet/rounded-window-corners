@@ -4,7 +4,12 @@ const NAME = 'rounded-window-corners';
 
 const rwcTest = {
     tracker: () => Main.extensionManager.lookup(UUID).stateObj._tracker,
-    effect: actor => actor.get_effect(NAME),
+    // sharp-windows removed
+    // effect: actor => actor.get_effect(NAME),
+    // sharp-windows start: the effect drawing the window.
+    effect: actor => [actor.get_effect(`${NAME}-sharp`), actor.get_effect(NAME)].find(e => e?.enabled) ??
+        actor.get_effect(NAME),
+    // sharp-windows end
     ours: actor => actor.get_effects().filter(e => e.get_name().startsWith(NAME)).length,
     rounded: actor => actor.get_effects().filter(e => e.get_name().startsWith(NAME) && e.enabled).length === 2,
     isX11: actor => actor.metaWindow.get_client_type() === Meta.WindowClientType.X11,
@@ -148,6 +153,37 @@ const rwcTest = {
             return [data[i], data[i + 1], data[i + 2]];
         };
     },
+
+    // sharp-windows start
+    // Whether the effect has painted, into a buffer that holds the whole paint volume. Clutter's offscreen effect
+    // pads it by 3 pixels, which the shader relies on.
+    buffered(actor) {
+        const effect = rwcTest.effect(actor);
+        const volume = actor.get_paint_volume();
+        if (effect instanceof imports.gi.Clutter.OffscreenEffect) {
+            const [painted, width, height] = effect.get_target_size();
+            const scale = actor.get_resource_scale();
+            return painted && width === (Math.round(volume.get_width()) + 3) * scale &&
+                height === (Math.round(volume.get_height()) + 3) * scale;
+        }
+        const place = effect._rendered;
+        return !!place && place.width >= Math.ceil(volume.get_width() * place.densityX) &&
+            place.height >= Math.ceil(volume.get_height() * place.densityY);
+    },
+
+    // Empty when the effect handles the monitor's scale: Clutter's offscreen effect smears at fractional scales,
+    // the sharp effect buffers the window at the monitor's scale.
+    followsScale(actor) {
+        const effect = rwcTest.effect(actor);
+        const scale = global.display.get_monitor_scale(0);
+        if (effect instanceof imports.gi.Clutter.OffscreenEffect) {
+            const want = scale % 1 === 0 ? 0 : 1;
+            return effect._smear === want ? '' : `smear ${effect._smear} at ${scale}`;
+        }
+        const density = effect._rendered?.densityX;
+        return Math.abs(density - scale) < 1e-3 ? '' : `buffered at ${density} for ${scale}`;
+    },
+    // sharp-windows end
 
     // The room must come just before the effect, or its framebuffer lacks it.
     roomError(actor) {

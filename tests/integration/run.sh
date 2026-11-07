@@ -133,7 +133,12 @@ ev 'global.get_window_actors().filter(a => a.metaWindow.get_title() === "rwc-pop
     .forEach(a => a.metaWindow.delete(global.get_current_time())); 0' >/dev/null
 need 3 "$windows" "the popover windows did not close"
 
-ev "rwcTest.spy(rwcTest.effect($wl)); rwcTest.tracker()._syncAll(); 0" >/dev/null
+# sharp-windows removed
+# ev "rwcTest.spy(rwcTest.effect($wl)); rwcTest.tracker()._syncAll(); 0" >/dev/null
+# sharp-windows start
+ev "rwcTest.spy($wl.get_effect('rounded-window-corners')); rwcTest.spy($wl.get_effect('rounded-window-corners-sharp'));
+    rwcTest.tracker()._syncAll(); 0" >/dev/null
+# sharp-windows end
 chk "Wayland: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
 chk "X11: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
 # On X11 the effect goes on the window actor too, so it replaces mutter's own shadow.
@@ -169,8 +174,14 @@ ev "$wl.add_effect_with_name('foreign-dimmer', new imports.gi.Clutter.Brightness
 wait_for false "$(rounded "$wl")" >/dev/null
 ev "$wl.metaWindow.unmaximize(); 0" >/dev/null
 wait_for true "$(rounded "$wl")" >/dev/null
-chk "a later offscreen effect stays after ours" "rounded-window-corners-room,rounded-window-corners,foreign-dimmer" \
+# sharp-windows removed
+# chk "a later offscreen effect stays after ours" "rounded-window-corners-room,rounded-window-corners,foreign-dimmer" \
+#   "$(val "$wl.get_effects().map(e=>e.get_name()).join()")"
+# sharp-windows start
+chk "a later offscreen effect stays after ours" \
+  "rounded-window-corners-room,rounded-window-corners,rounded-window-corners-sharp,foreign-dimmer" \
   "$(val "$wl.get_effects().map(e=>e.get_name()).join()")"
+# sharp-windows end
 ev "$wl.remove_effect_by_name('foreign-dimmer'); 0" >/dev/null
 
 for size in "700 500" "900 650" "800 600"; do
@@ -194,11 +205,16 @@ chk "X11: an unfocused window that becomes a utility window is not rounded" "fal
 retype NORMAL
 chk "X11: it is rounded again once it becomes a normal window" "true" "$(wait_for true "$(rounded "$x11")")"
 
-# The shader relies on Clutter's framebuffer padding, which no API exposes, so catch it changing.
-chk "offscreen padding is still +3, and the effect has painted" "true|true" \
-  "$(wait_for 'true|true' "const a=$wl; const r=rwcTest.effect(a).get_target_size();
-     const v=a.get_paint_volume(); const s=a.get_resource_scale();
-     \`\${r[0]}|\${r[1]===(Math.round(v.get_width())+3)*s && r[2]===(Math.round(v.get_height())+3)*s}\`")"
+# sharp-windows removed
+# # The shader relies on Clutter's framebuffer padding, which no API exposes, so catch it changing.
+# chk "offscreen padding is still +3, and the effect has painted" "true|true" \
+#   "$(wait_for 'true|true' "const a=$wl; const r=rwcTest.effect(a).get_target_size();
+#      const v=a.get_paint_volume(); const s=a.get_resource_scale();
+#      \`\${r[0]}|\${r[1]===(Math.round(v.get_width())+3)*s && r[2]===(Math.round(v.get_height())+3)*s}\`")"
+# sharp-windows start
+# The shader relies on where its buffer sits, which for Clutter's offscreen effect no API exposes, so catch it changing.
+chk "the effect has painted, into a buffer that holds the whole window" "true" "$(wait_for true "''+rwcTest.buffered($wl)")"
+# sharp-windows end
 
 # gtk.css edits must reach the effect live. At a radius of 0 the window keeps its outline and shadow, as in libadwaita.
 mkdir -p $ROOT/config/gtk-4.0
@@ -249,10 +265,14 @@ layers="rwcTest.effect($wl).rwcArgs[5].filter(s => s.color[3] > 0).map(s => s.sh
 chk "each shadow layer keeps its own offset, in GTK's order" "0 3 1 4.5|0 0 1 0" "$(wait_for '0 3 1 4.5|0 0 1 0' "$layers")"
 # A wider shadow grows the window's framebuffer, which must be drawn again, not reused from before.
 printf 'window { box-shadow: 0 8px 40px 12px rgba(0,0,0,.6); }\n' > $ROOT/config/gtk-4.0/gtk.css
-chk "a wider shadow redraws an idle window at its new size" "true" \
-  "$(wait_for true "const a=$wl; const r=rwcTest.effect(a).get_target_size();
-     const v=a.get_paint_volume(); const s=a.get_resource_scale();
-     ''+(r[1]===(Math.round(v.get_width())+3)*s && r[2]===(Math.round(v.get_height())+3)*s)")"
+# sharp-windows removed
+# chk "a wider shadow redraws an idle window at its new size" "true" \
+#   "$(wait_for true "const a=$wl; const r=rwcTest.effect(a).get_target_size();
+#      const v=a.get_paint_volume(); const s=a.get_resource_scale();
+#      ''+(r[1]===(Math.round(v.get_width())+3)*s && r[2]===(Math.round(v.get_height())+3)*s)")"
+# sharp-windows start
+chk "a wider shadow redraws an idle window at its new size" "true" "$(wait_for true "''+rwcTest.buffered($wl)")"
+# sharp-windows end
 
 # libadwaita ignores the GTK theme, so the extension must too.
 theme=$(for t in Yaru Arc-Dark Breeze; do [ -e /usr/share/themes/$t/gtk-4.0/gtk.css ] && echo $t && break; done)
@@ -435,7 +455,8 @@ eset styled-toolkits "[]"
 
 # At fractional scales the app's border must stay hidden at every position (#10).
 monitor_scale="''+global.display.get_monitor_scale(0)"
-smear="''+rwcTest.effect($wl)._smear"
+# sharp-windows removed
+# smear="''+rwcTest.effect($wl)._smear"
 for scale in 1.25 1.5; do
   ev "rwcTest.setScale($scale); 0" >/dev/null
   wait_for $scale "$monitor_scale" >/dev/null
@@ -448,8 +469,13 @@ for scale in 1.25 1.5; do
     [ "$shown" = unsupported ] && break
     worst=$(awk -v a=$worst -v b=$shown 'BEGIN { print (b > a) ? b : a }')
   done
-  chk "at $scale: smear handling is on and the bounds match" "1|ok" \
-    "$(val "$smear+'|'+(rwcTest.boundsError($wl) || 'ok')")"
+  # sharp-windows removed
+  # chk "at $scale: smear handling is on and the bounds match" "1|ok" \
+  #   "$(val "$smear+'|'+(rwcTest.boundsError($wl) || 'ok')")"
+  # sharp-windows start
+  chk "at $scale: the effect follows the scale and the bounds match" "ok|ok" \
+    "$(val "(rwcTest.followsScale($wl) || 'ok')+'|'+(rwcTest.boundsError($wl) || 'ok')")"
+  # sharp-windows end
   if [ "$shown" = unsupported ]; then
     echo "  SKIP  at $scale: the app's border stays hidden (needs --privileged)"
   elif [ "$colors" != ok ]; then
@@ -461,7 +487,24 @@ for scale in 1.25 1.5; do
 done
 ev "rwcTest.setScale(1); 0" >/dev/null
 wait_for 1 "$monitor_scale" >/dev/null
-chk "back at 100%: smear handling is off" "0" "$(wait_for 0 "$smear")"
+# sharp-windows removed
+# chk "back at 100%: smear handling is off" "0" "$(wait_for 0 "$smear")"
+# sharp-windows start
+chk "back at 100%: the effect follows the scale" "ok" "$(wait_for ok "rwcTest.followsScale($wl) || 'ok'")"
+
+# The setting picks which of the two effects draws the window, live and without changing their order.
+drawing="$wl.get_effects().filter(e => e.enabled).map(e => e.get_name()).join()"
+order="$wl.get_effects().map(e => e.get_name()).join()"
+eset sharp-windows false
+chk "settings: with Keep Windows Sharp off, the effect draws the window, at the right bounds" \
+  "rounded-window-corners-room,rounded-window-corners|ok" \
+  "$(wait_for 'rounded-window-corners-room,rounded-window-corners|ok' "$drawing+'|'+(rwcTest.boundsError($wl) || 'ok')")"
+eset sharp-windows true
+chk "settings: and turned on again, the sharp effect does" "rounded-window-corners-room,rounded-window-corners-sharp|ok" \
+  "$(wait_for 'rounded-window-corners-room,rounded-window-corners-sharp|ok' "$drawing+'|'+(rwcTest.boundsError($wl) || 'ok')")"
+chk "settings: switching keeps the effects' order" "rounded-window-corners-room,rounded-window-corners,rounded-window-corners-sharp" \
+  "$(val "$order")"
+# sharp-windows end
 
 # Windows that leave no room of their own still get the whole shadow (#14), and on X11 only ours.
 RWC_BARE=1 WAYLAND_DISPLAY=rwc-ci GDK_BACKEND=wayland gjs $CLIENT >/dev/null 2>&1 &

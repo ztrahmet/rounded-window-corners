@@ -15,6 +15,13 @@
       <summary>Keep maximized and tiled windows rounded</summary>
       <description>Their outline and shadow follow libadwaita. Fullscreen windows stay square.</description>
     </key>
+    <!-- sharp-windows start -->
+    <key name="sharp-windows" type="b">
+      <default>true</default>
+      <summary>Keep windows sharp at fractional scales and in the overview</summary>
+      <description>Draws rounded windows at the scale they are shown at, not through a buffer at the next whole scale, which blurs them.</description>
+    </key>
+    <!-- sharp-windows end -->
     <key name="use-allowlist" type="b">
       <default>false</default>
       <summary>Use the allowlist instead of the blocklist</summary>
