@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 03:55+0300\n"
+"POT-Creation-Date: 2026-11-06 17:13+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Chinese (simplified)\n"
@@ -258,6 +258,14 @@ msgstr "为最大化和平铺的窗口启用圆角"
 #: prefs/generalPage.js
 msgid "Without a shadow, as in libadwaita; fullscreen stays square"
 msgstr "不带阴影，与 libadwaita 一致；全屏窗口保持直角"
+
+#: prefs/generalPage.js
+msgid "Keep Windows Sharp"
+msgstr "保持窗口清晰"
+
+#: prefs/generalPage.js
+msgid "At fractional scales and in the overview"
+msgstr "在小数缩放比例和概览中"
 
 #: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"

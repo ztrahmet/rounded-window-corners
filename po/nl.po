@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 03:55+0300\n"
+"POT-Creation-Date: 2026-11-06 17:13+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Dutch\n"
@@ -258,6 +258,14 @@ msgstr "Gemaximaliseerde en getegelde vensters afronden"
 #: prefs/generalPage.js
 msgid "Without a shadow, as in libadwaita; fullscreen stays square"
 msgstr "Zonder schaduw, zoals in libadwaita; volledig scherm blijft hoekig"
+
+#: prefs/generalPage.js
+msgid "Keep Windows Sharp"
+msgstr "Vensters scherp houden"
+
+#: prefs/generalPage.js
+msgid "At fractional scales and in the overview"
+msgstr "Bij fractionele schaling en in het overzicht"
 
 #: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"

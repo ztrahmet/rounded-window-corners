@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 03:55+0300\n"
+"POT-Creation-Date: 2026-11-06 17:13+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Italian\n"
@@ -258,6 +258,14 @@ msgstr "Arrotonda le finestre massimizzate e affiancate"
 #: prefs/generalPage.js
 msgid "Without a shadow, as in libadwaita; fullscreen stays square"
 msgstr "Senza ombra, come in libadwaita; a schermo intero restano squadrate"
+
+#: prefs/generalPage.js
+msgid "Keep Windows Sharp"
+msgstr "Mantieni nitide le finestre"
+
+#: prefs/generalPage.js
+msgid "At fractional scales and in the overview"
+msgstr "Con scale frazionarie e nella panoramica"
 
 #: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"
