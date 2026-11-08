@@ -14,11 +14,12 @@ import Gtk from 'gi://Gtk';
 
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
+import {TOOLKITS} from '../lib/toolkitProbe.js';
 import {appRow, chooseApp, installedApps} from './appChooser.js';
 
-// The toolkits the extension recognizes.
-function toolkits() {
-    return [
+// The names of the toolkits the extension recognizes.
+function toolkitNames() {
+    return new Map([
         ['libadwaita', _('libadwaita Apps')],
         ['libhandy', _('libhandy Apps')],
         ['chromium', _('Chromium and Electron Apps')],
@@ -27,27 +28,7 @@ function toolkits() {
         ['qt', _('Qt Apps')],
         ['gtk4', _('GTK 4 Apps')],
         ['gtk3', _('GTK 3 Apps')],
-    ];
-}
-
-/**
- * Shows how many entries a page has as a badge on its tab.
- *
- * @param {Adw.PreferencesPage} page
- * @param {Gio.Settings} settings
- * @param {Function} count - Returns the number of entries.
- */
-export function countOnTab(page, settings, count) {
-    // The preferences window keeps its pages in a view stack, whose pages carry the badges.
-    const refresh = () => {
-        const stack = page.get_parent();
-        if (stack instanceof Adw.ViewStack)
-            stack.get_page(page).badge_number = count();
-    };
-    const changed = settings.connect('changed', refresh);
-    page.connect('destroy', () => settings.disconnect(changed));
-    page.connect('notify::parent', refresh);
-    refresh();
+    ]);
 }
 
 export const AppListGroup = GObject.registerClass(
@@ -126,7 +107,9 @@ class AppListGroup extends Adw.PreferencesGroup {
 
         const added = this._ids(this._toolkitKey);
         const menu = new Gio.Menu();
-        for (const [id, name] of toolkits()) {
+        const names = toolkitNames();
+        for (const [id] of TOOLKITS) {
+            const name = names.get(id);
             if (added.includes(id)) {
                 const row = new Adw.ActionRow({title: name, subtitle: this._notes.get(id) ?? '', use_markup: false});
                 const image = Gtk.Image.new_from_icon_name('view-app-grid-symbolic');

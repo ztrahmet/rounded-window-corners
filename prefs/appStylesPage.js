@@ -12,7 +12,7 @@ import GObject from 'gi://GObject';
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 import {EntryStyle, addStyleGroups} from './styleGroups.js';
-import {AppListGroup, countOnTab} from './appListGroup.js';
+import {AppListGroup} from './appListGroup.js';
 
 export const AppStylesPage = GObject.registerClass(
 class AppStylesPage extends Adw.PreferencesPage {
@@ -23,9 +23,6 @@ class AppStylesPage extends Adw.PreferencesPage {
      */
     constructor(settings, general, window) {
         super({title: _('App Styles'), icon_name: 'preferences-desktop-appearance-symbolic'});
-        countOnTab(this, settings,
-            () => Object.keys(settings.get_value('app-styles').deepUnpack()).length +
-                Object.keys(settings.get_value('toolkit-styles').deepUnpack()).length);
 
         this.add(new AppListGroup(settings, 'app-styles', 'toolkit-styles', {
             title: _('Apps and Toolkits'),
