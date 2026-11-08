@@ -3,6 +3,9 @@
 Each rounded window gets one shader effect, and a small helper effect that makes room for
 its shadow. Nothing in GNOME Shell is patched or replaced.
 
+With **Keep Windows Sharp** on, as it is by default, a second shader effect draws the
+window instead, at the scale it's shown at.
+
 ## Drawing a window
 
 The shader draws each window in four steps:
@@ -57,10 +60,11 @@ At a radius of 0, a window keeps its outline and shadow, as libadwaita's do.
 - Toolkits are recognized by the libraries an app has loaded, which Linux hides for apps
   that guard their memory. Their windows are still rounded, but toolkit lists and styles
   don't apply to them.
-- At fractional scales, windows are slightly blurred in the overview
-  ([#2](https://github.com/ztrahmet/rounded-window-corners/issues/2)) and while rounded
-  ([#20](https://github.com/ztrahmet/rounded-window-corners/issues/20)). Both come from
-  mutter and are tracked upstream.
+- Mutter slightly blurs windows drawn through an effect, in the overview
+  ([#2](https://github.com/ztrahmet/rounded-window-corners/issues/2)) and at fractional
+  scales ([#20](https://github.com/ztrahmet/rounded-window-corners/issues/20)). Both are
+  tracked upstream. Until they're fixed, **Keep Windows Sharp**, on by default, works
+  around them.
 
 ## Performance
 
