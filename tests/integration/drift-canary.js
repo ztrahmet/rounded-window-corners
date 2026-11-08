@@ -6,7 +6,7 @@ import Gio from 'gi://Gio';
 import Pango from 'gi://Pango';
 import Adw from 'gi://Adw?version=1';
 
-import {FALLBACK_CSS, readWindowStyle} from '../../lib/cssParse.js';
+import {FALLBACK_CSS, parseStylesheet, readWindowStyle} from '../../lib/cssParse.js';
 
 // The first call loads the library, which registers its resources.
 const version = `${Adw.get_major_version()}.${Adw.get_minor_version()}.${Adw.get_micro_version()}`;
@@ -40,8 +40,9 @@ let failed = 0;
 for (const dark of [false, true]) {
     for (const highContrast of [false, true]) {
         const env = {dark, highContrast, colorName};
-        const got = JSON.stringify([readWindowStyle([css], env), readWindowStyle([css, CURRENT], env).outlineColor]);
-        const want = JSON.stringify([readWindowStyle([FALLBACK_CSS], env), readWindowStyle([FALLBACK_CSS, CURRENT], env).outlineColor]);
+        const read = sheets => readWindowStyle(sheets.map(parseStylesheet), env);
+        const got = JSON.stringify([read([css]), read([css, CURRENT]).normal.focused.outlineColor]);
+        const want = JSON.stringify([read([FALLBACK_CSS]), read([FALLBACK_CSS, CURRENT]).normal.focused.outlineColor]);
         const label = `dark=${dark} highContrast=${highContrast}`;
         if (got === want) {
             print(`  PASS  ${label}`);

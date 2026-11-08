@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {FALLBACK_CSS, parseBoxShadow, readWindowStyle} from './cssParse.js';
+import {FALLBACK_CSS, parseBoxShadow, parseStylesheet, readWindowStyle} from './cssParse.js';
+
+const read = (sheets, env) => readWindowStyle(sheets.map(parseStylesheet), env);
 
 // Stands in for Pango, which GTK asks for color names.
 const PANGO = new Map([['white', [1, 1, 1, 1]], ['black', [0, 0, 0, 1]], ['red', [1, 0, 0, 1]], ['green', [0, 128 / 255, 0, 1]]]);
@@ -9,7 +11,7 @@ const CURRENT = [0.1, 0.2, 0.3, 1];
 const names = name => name.toLowerCase() === 'currentcolor' ? CURRENT : colorName(name);
 
 const LIGHT = {dark: false, highContrast: false, colorName};
-const styleOf = (...sheets) => readWindowStyle(sheets, LIGHT);
+const styleOf = (...sheets) => read(sheets, LIGHT);
 const radiiOf = (...sheets) => styleOf(...sheets).normal.radii;
 const lookOf = (...sheets) => styleOf(...sheets).normal.focused;
 const round = s => JSON.parse(JSON.stringify(s, (k, v) => typeof v === 'number' ? Number(v.toFixed(6)) : v));
@@ -51,7 +53,7 @@ test('the fallback sheet gives libadwaita\'s window style', () => {
     for (const dark of [false, true]) {
         for (const [highContrast, alpha, outline, opacity] of [[false, 0.05, 0.07, 0.15], [true, 0.8, 0.3, 0.5]]) {
             const outlined = layers => ({outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, outline], shadow: layers});
-            assert.deepEqual(round(readWindowStyle([FALLBACK_CSS], {...LIGHT, dark, highContrast})), round({
+            assert.deepEqual(round(read([FALLBACK_CSS], {...LIGHT, dark, highContrast})), round({
                 normal: rounded(outlined(shadow(alpha)), outlined(backdrop(alpha))),
                 tiled: flat(dark, line(dark, opacity)),
                 maximized: flat(dark, []),
@@ -60,7 +62,7 @@ test('the fallback sheet gives libadwaita\'s window style', () => {
     }
 
     // currentColor is the window's color.
-    const outline = dark => readWindowStyle([FALLBACK_CSS, 'window { outline-color: currentColor; }'], {...LIGHT, dark}).normal.focused.outlineColor;
+    const outline = dark => read([FALLBACK_CSS, 'window { outline-color: currentColor; }'], {...LIGHT, dark}).normal.focused.outlineColor;
     assert.deepEqual(round(outline(false)), [0, 0, round(6 / 255), 0.8]);
     assert.deepEqual(outline(true), [1, 1, 1, 1]);
 });
@@ -100,9 +102,9 @@ test('media queries: GTK\'s features, and no media types', () => {
     const css = `@media (prefers-color-scheme: dark) { window { border-radius: 1px; } }
         @media (prefers-contrast: more) and (prefers-color-scheme: light) { window { border-radius: 2px; } }
         @media screen { window { border-radius: 3px; } }`;
-    assert.equal(readWindowStyle([css], {...LIGHT, dark: true}).normal.radii[0], 1);
-    assert.equal(readWindowStyle([css], {...LIGHT, highContrast: true}).normal.radii[0], 2);
-    assert.equal(readWindowStyle([css], LIGHT).normal.radii[0], 0);
+    assert.equal(read([css], {...LIGHT, dark: true}).normal.radii[0], 1);
+    assert.equal(read([css], {...LIGHT, highContrast: true}).normal.radii[0], 2);
+    assert.equal(read([css], LIGHT).normal.radii[0], 0);
 });
 
 test('selectors: those GTK matches to a libadwaita window apply', () => {
@@ -114,8 +116,8 @@ test('selectors: those GTK matches to a libadwaita window apply', () => {
 
 test('selectors: :dir() follows the text direction', () => {
     const css = 'window:dir(ltr) { border-radius: 4px; } window:not(:dir(ltr)) { border-radius: 6px; }';
-    assert.equal(readWindowStyle([css], LIGHT).normal.radii[0], 4);
-    assert.equal(readWindowStyle([css], {...LIGHT, rtl: true}).normal.radii[0], 6);
+    assert.equal(read([css], LIGHT).normal.radii[0], 4);
+    assert.equal(read([css], {...LIGHT, rtl: true}).normal.radii[0], 6);
     assert.equal(radiiOf('window:not(:not(.csd)) { border-radius: 7px; }')[0], 0, 'GTK does not nest :not()');
 });
 
@@ -158,8 +160,8 @@ test('colors: libadwaita\'s computed accent color reaches the window, clamped wh
         @media (prefers-color-scheme: dark) { :root { --standalone: max(l, 0.85) a b; } }`;
     const sheets = [adw, '@define-color accent_bg_color #3584e4;', 'window { outline: 2px solid var(--accent-color); }'];
     const near = (got, want) => assert.ok(got.every((v, i) => Math.abs(v - want[i]) < 1e-4), `${got}`);
-    near(readWindowStyle(sheets, LIGHT).normal.focused.outlineColor, [0.01646, 0.37937, 0.74356, 1]);
-    near(readWindowStyle(sheets, {...LIGHT, dark: true}).normal.focused.outlineColor, [0.50431, 0.81723, 1, 1]);
+    near(read(sheets, LIGHT).normal.focused.outlineColor, [0.01646, 0.37937, 0.74356, 1]);
+    near(read(sheets, {...LIGHT, dark: true}).normal.focused.outlineColor, [0.50431, 0.81723, 1, 1]);
     assert.equal(lookOf('window { outline: calc(1px + 2px) solid red; outline-offset: calc(-2px * 2); }').outlineWidth, 3);
 });
 
@@ -169,10 +171,10 @@ test('@define-color: names resolve across stylesheets and media queries, as liba
         @media (prefers-color-scheme: dark) { @define-color window_fg_color #fff; }`;
     const accent = '@define-color accent_bg_color #3584e4;';
     const user = 'window { outline: 2px solid var(--accent-bg-color); box-shadow: 0 0 2px @window_fg_color; }';
-    const light = readWindowStyle([adw, accent, user], LIGHT).normal.focused;
+    const light = read([adw, accent, user], LIGHT).normal.focused;
     assert.deepEqual(light.outlineColor, [0x35 / 255, 0x84 / 255, 0xe4 / 255, 1]);
     assert.deepEqual(light.shadow[0].color, [0, 0, 0, 1]);
-    assert.deepEqual(readWindowStyle([adw, accent, user], {...LIGHT, dark: true}).normal.focused.shadow[0].color, [1, 1, 1, 1]);
+    assert.deepEqual(read([adw, accent, user], {...LIGHT, dark: true}).normal.focused.shadow[0].color, [1, 1, 1, 1]);
 
     const loop = '@define-color a @b; @define-color b @a; window { outline-color: #fff; outline-color: @a; }';
     assert.deepEqual(lookOf(loop).outlineColor, [1, 1, 1, 1]);
@@ -246,4 +248,17 @@ test('tiled and maximized: their own rules apply, and no shadow shows around a m
     assert.deepEqual([normal.radii[0], normal.focused.outlineWidth, normal.focused.shadow[0].blur], [8, 1, 4]);
     assert.deepEqual([tiled.radii[0], tiled.focused.outlineWidth, tiled.focused.shadow], [2, 2, [{dx: 0, dy: 0, blur: 0, spread: 1, color: [1, 0, 0, 1]}]]);
     assert.deepEqual([maximized.radii[0], maximized.focused.outlineWidth, maximized.focused.shadow, maximized.backdrop.shadow], [0, 3, [], []]);
+});
+
+test('parsing keeps only what can reach the window, and parsed sheets serve every environment', () => {
+    const css = `${FALLBACK_CSS}
+        headerbar { border-radius: 9px; } .card > row { color: red; } @media (prefers-color-scheme: dark) { button { color: red; } }
+        @define-color window_fg_color #000; window:dir(rtl) { border-radius: 3px; }`;
+    const items = parseStylesheet(css);
+    assert.equal(items.filter(item => !item.define).length, parseStylesheet(FALLBACK_CSS).length + 1, 'only the :dir(rtl) rule joins');
+    assert.equal(items.filter(item => item.define).length, 1);
+    for (const env of [LIGHT, {...LIGHT, dark: true, highContrast: true, rtl: true}, LIGHT])
+        assert.deepEqual(readWindowStyle([items], env), read([css], env));
+    assert.equal(readWindowStyle([items], {...LIGHT, rtl: true}).normal.radii[0], 3);
+    assert.equal(readWindowStyle([items], LIGHT).normal.radii[0], 15);
 });

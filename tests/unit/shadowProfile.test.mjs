@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {FALLBACK_CSS, readWindowStyle} from './cssParse.js';
+import {FALLBACK_CSS, parseStylesheet, readWindowStyle} from './cssParse.js';
 import {SHADOW_SLOTS, compileShadow, compileStyle, shadowExtent} from './shadowProfile.js';
+
+const read = (sheets, env) => readWindowStyle(sheets.map(parseStylesheet), env);
 
 const adwaita = [
     {dx: 0, dy: 0, blur: 14, spread: 5, color: [0, 0, 0, 0.15]},
@@ -55,7 +57,7 @@ test('more layers than slots leaves out the faintest and keeps the order', () =>
 });
 
 test('a compiled style has each look\'s slots, and room for both looks of each state', () => {
-    const style = readWindowStyle([FALLBACK_CSS], {dark: false, highContrast: false, rtl: false, colorName: () => null});
+    const style = read([FALLBACK_CSS], {dark: false, highContrast: false, rtl: false, colorName: () => null});
     const {normal, tiled, maximized} = compileStyle(style);
     assert.deepEqual([normal.reach, tiled.reach, maximized.reach], [27, 2, 1], 'the shadow, the tiled line, nothing; and a pixel');
     assert.deepEqual(normal.focused.slots, compileShadow(style.normal.focused.shadow));

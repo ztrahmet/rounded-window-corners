@@ -227,6 +227,15 @@ printf 'window.csd { border-radius: 20px 20px 0 0; }\n' > $ROOT/config/gtk-4.0/g
 chk "each corner keeps its own radius" "20,20,0,0" "$(wait_for 20,20,0,0 "$radii")"
 rm -f $ROOT/config/gtk-4.0/gtk.css
 chk "removing it restores libadwaita's radius" "15,15,15,15" "$(wait_for 15,15,15,15 "$radii")"
+# A save reloads the style once, and touching the file doesn't.
+ev "globalThis.rwcReloads = 0; const r = rwcTest.tracker()._styles; const reload = r._reload.bind(r); r._reload = () => { rwcReloads++; return reload(); }; 0" >/dev/null
+printf 'window.csd { border-radius: 8px; }\n' > $ROOT/config/gtk-4.0/gtk.css
+wait_for 8,8,8,8 "$radii" >/dev/null
+touch $ROOT/config/gtk-4.0/gtk.css
+sleep 1
+chk "a gtk.css save reloads the style once, touching it doesn't" "1" "$(val "''+rwcReloads")"
+rm -f $ROOT/config/gtk-4.0/gtk.css
+wait_for 15,15,15,15 "$radii" >/dev/null
 
 # libadwaita's values as the effect is given them, following the system settings.
 outline="const [, r, l]=rwcTest.effect($wl).rwcArgs; \`\${r[0]}|\${l.outlineWidth}|\${l.outlineOffset}|\${l.outlineColor.map(v=>v.toFixed(2))}\`"
@@ -384,8 +393,7 @@ eset outline-position "'inside'"
 radius="''+rwcTest.effect($wl).rwcArgs[1][0]"
 printf 'window.csd { border-radius: 7px; }\n' > $ROOT/config/gtk-4.0/gtk.css
 sleep 1.5
-chk "settings: the custom style stops reading gtk.css" "9|15" \
-  "$(val "$radius+'|'+rwcTest.tracker()._styles.style.normal.radii[0]")"
+chk "settings: the custom style stops reading gtk.css" "9|null" "$(val "$radius+'|'+rwcTest.tracker()._styles")"
 eset custom-style false
 chk "settings: and turned off, gtk.css counts again" "7" "$(wait_for 7 "$radius")"
 rm -f $ROOT/config/gtk-4.0/gtk.css

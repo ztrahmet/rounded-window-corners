@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readWindowStyle} from './cssParse.js';
+import {parseStylesheet, readWindowStyle} from './cssParse.js';
 import {compileShadow, compileStyle, shadowExtent} from './shadowProfile.js';
+
+const read = (sheets, env) => readWindowStyle(sheets.map(parseStylesheet), env);
 
 // Malformed gtk.css must never throw or hand the shader out-of-range values. Seeded, so failures reproduce.
 function random(seed) {
@@ -64,7 +66,7 @@ test('malformed stylesheets never throw and only give sane values', () => {
     for (let i = 0; i < 3000; i++) {
         const css = stylesheet(next);
         for (const env of ENVS) {
-            const s = readWindowStyle([css, stylesheet(next)], env);
+            const s = read([css, stylesheet(next)], env);
             const states = [s.normal, s.tiled, s.maximized];
             for (const {reach} of Object.values(compileStyle(s)))
                 assert.ok(Number.isFinite(reach) && reach >= 1, css);
@@ -113,7 +115,7 @@ test('a large stylesheet still parses quickly', () => {
         .card > row:selected label { color: #3584e4; }`;
     const css = rule.repeat(40000);
     const start = performance.now();
-    const s = readWindowStyle([css], {dark: true, highContrast: false, colorName});
+    const s = read([css], {dark: true, highContrast: false, colorName});
     const ms = performance.now() - start;
     assert.deepEqual(s.normal.radii, [15, 15, 15, 15]);
     assert.ok(ms < 10000, `took ${ms.toFixed(0)}ms for ${(css.length / 1e6).toFixed(1)} MB`);
