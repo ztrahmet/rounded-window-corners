@@ -54,23 +54,21 @@ export const AppListGroup = GObject.registerClass(
 class AppListGroup extends Adw.PreferencesGroup {
     /**
      * @param {Gio.Settings} settings
-     * @param {string} key - The key holding the apps' desktop IDs.
-     * @param {string} toolkitKey - The key holding the toolkits.
+     * @param {string} key - The key holding the apps, by desktop ID: a list, or styles by ID.
+     * @param {string} toolkitKey - The key holding the toolkits, as key holds the apps.
      * @param {object} params
      * @param {string} params.title
      * @param {string} params.description
      * @param {Map<string, string>} [params.notes] - Notes on some toolkits.
      * @param {?function(string, string, string): void} [params.open] - Opens an entry's page from its key, ID and name.
-     * @param {function(string, string): void} [params.removed] - Called with the key and ID of a removed entry.
      */
-    constructor(settings, key, toolkitKey, {title, description, notes = new Map(), open = null, removed = () => {}}) {
+    constructor(settings, key, toolkitKey, {title, description, notes = new Map(), open = null}) {
         super({title, description});
         this._settings = settings;
         this._key = key;
         this._toolkitKey = toolkitKey;
         this._notes = notes;
         this._open = open;
-        this._removed = removed;
         this._rows = [];
 
         this._add = new Adw.SplitButton({
@@ -94,12 +92,31 @@ class AppListGroup extends Adw.PreferencesGroup {
         this._fill();
     }
 
+    // Lists of apps or toolkits are string arrays, their styles dictionaries by ID.
     _ids(key) {
-        return this._settings.get_strv(key);
+        const value = this._settings.get_value(key).deepUnpack();
+        return Array.isArray(value) ? value : Object.keys(value);
     }
 
     _append(key, id) {
-        this._settings.set_strv(key, [...this._ids(key), id]);
+        const value = this._settings.get_value(key).deepUnpack();
+        if (Array.isArray(value)) {
+            this._settings.set_strv(key, [...value, id]);
+            return;
+        }
+        // A style starts as the key's default one, if it has one.
+        value[id] = this._settings.get_default_value(key).deepUnpack()[id] ?? {};
+        this._settings.set_value(key, new GLib.Variant('a{sa{sv}}', value));
+    }
+
+    _remove(key, id) {
+        const value = this._settings.get_value(key).deepUnpack();
+        if (Array.isArray(value)) {
+            this._settings.set_strv(key, value.filter(other => other !== id));
+            return;
+        }
+        delete value[id];
+        this._settings.set_value(key, new GLib.Variant('a{sa{sv}}', value));
     }
 
     _fill() {
@@ -134,10 +151,7 @@ class AppListGroup extends Adw.PreferencesGroup {
             css_classes: ['flat'],
             valign: Gtk.Align.CENTER,
         });
-        remove.connect('clicked', () => {
-            this._settings.set_strv(key, this._ids(key).filter(other => other !== id));
-            this._removed(key, id);
-        });
+        remove.connect('clicked', () => this._remove(key, id));
         row.add_suffix(remove);
 
         if (this._open) {

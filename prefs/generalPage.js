@@ -12,26 +12,15 @@ import GObject from 'gi://GObject';
 
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import {addAppearanceGroups, resetKeys} from './appearanceGroups.js';
-
-// The styles of apps and toolkits first, while their lists still name them.
-function resetAll(settings, appearance, entrySettings) {
-    for (const key of ['styled-apps', 'styled-toolkits']) {
-        for (const id of settings.get_strv(key))
-            resetKeys(entrySettings.of(key, id));
-    }
-    resetKeys(appearance);
-    resetKeys(settings);
-}
+import {addStyleGroups} from './styleGroups.js';
 
 export const GeneralPage = GObject.registerClass(
 class GeneralPage extends Adw.PreferencesPage {
     /**
      * @param {Gio.Settings} settings
-     * @param {Gio.Settings} appearance - The general style.
-     * @param {EntrySettings} entrySettings
+     * @param {GeneralStyle} general
      */
-    constructor(settings, appearance, entrySettings) {
+    constructor(settings, general) {
         super({title: _('General'), icon_name: 'preferences-system-symbolic'});
 
         const windows = new Adw.PreferencesGroup({title: _('Windows')});
@@ -47,7 +36,7 @@ class GeneralPage extends Adw.PreferencesPage {
             windows.add(row);
         }
 
-        addAppearanceGroups(this, appearance, _('Replaces libadwaita’s style and gtk.css'));
+        addStyleGroups(this, general, _('Replaces libadwaita’s style and gtk.css'));
 
         const reset = new Adw.ButtonRow({title: _('Reset All Settings…')});
         reset.add_css_class('destructive-action');
@@ -62,7 +51,7 @@ class GeneralPage extends Adw.PreferencesPage {
             dialog.set_response_appearance('reset', Adw.ResponseAppearance.DESTRUCTIVE);
             dialog.connect('response', (_dialog, response) => {
                 if (response === 'reset')
-                    resetAll(settings, appearance, entrySettings);
+                    settings.settings_schema.list_keys().forEach(key => settings.reset(key));
             });
             dialog.present(this);
         });

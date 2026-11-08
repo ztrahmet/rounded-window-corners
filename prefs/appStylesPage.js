@@ -11,23 +11,23 @@ import GObject from 'gi://GObject';
 
 import {gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import {addAppearanceGroups, resetKeys} from './appearanceGroups.js';
+import {EntryStyle, addStyleGroups} from './styleGroups.js';
 import {AppListGroup, countOnTab} from './appListGroup.js';
 
 export const AppStylesPage = GObject.registerClass(
 class AppStylesPage extends Adw.PreferencesPage {
     /**
      * @param {Gio.Settings} settings
-     * @param {Gio.Settings} appearance - The general style, which entries come after.
-     * @param {EntrySettings} entrySettings
+     * @param {GeneralStyle} general - The style that app and toolkit styles come before.
      * @param {Adw.PreferencesWindow} window - Shows the page of each entry.
      */
-    constructor(settings, appearance, entrySettings, window) {
+    constructor(settings, general, window) {
         super({title: _('App Styles'), icon_name: 'preferences-desktop-appearance-symbolic'});
         countOnTab(this, settings,
-            () => settings.get_strv('styled-apps').length + settings.get_strv('styled-toolkits').length);
+            () => Object.keys(settings.get_value('app-styles').deepUnpack()).length +
+                Object.keys(settings.get_value('toolkit-styles').deepUnpack()).length);
 
-        this.add(new AppListGroup(settings, 'styled-apps', 'styled-toolkits', {
+        this.add(new AppListGroup(settings, 'app-styles', 'toolkit-styles', {
             title: _('Apps and Toolkits'),
             description: _('An app’s style comes before its toolkit’s'),
             notes: new Map([
@@ -36,15 +36,13 @@ class AppStylesPage extends Adw.PreferencesPage {
             ]),
             open: (key, id, name) => {
                 const page = new Adw.PreferencesPage();
-                addAppearanceGroups(page, entrySettings.of(key, id), key === 'styled-apps'
+                addStyleGroups(page, new EntryStyle(settings, key, id), key === 'app-styles'
                     ? _('Replaces the toolkit and general styles')
-                    : _('Replaces the general style'), appearance);
+                    : _('Replaces the general style'), general);
                 const view = new Adw.ToolbarView({content: page});
                 view.add_top_bar(new Adw.HeaderBar());
                 window.push_subpage(new Adw.NavigationPage({title: name, child: view}));
             },
-            // So an entry added again starts afresh.
-            removed: (key, id) => resetKeys(entrySettings.of(key, id)),
         }));
     }
 });

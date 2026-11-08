@@ -268,10 +268,8 @@ rm -f $ROOT/config/gtk-4.0/gtk.css
 
 # The settings apply live, as when the preferences change them.
 SCHEMA=org.gnome.shell.extensions.rounded-window-corners-native
-SCHEMA_PATH=/org/gnome/shell/extensions/rounded-window-corners-native
 eset() { gset --schemadir $EXT/schemas set $SCHEMA "$@"; }
-aset() { gset --schemadir $EXT/schemas set $SCHEMA.appearance:$SCHEMA_PATH/$1/ "${@:2}"; }
-aget() { gset --schemadir $EXT/schemas get $SCHEMA.appearance:$SCHEMA_PATH/$1/ "${@:2}"; }
+eget() { gset --schemadir $EXT/schemas get $SCHEMA "$@"; }
 app_of() { val "imports.gi.Shell.WindowTracker.get_default().get_window_app(($1).metaWindow).get_id()"; }
 WL_APP=$(app_of "$wl"); X11_APP=$(app_of "$x11"); ADW_APP=$(app_of "$adw")
 # Whether the Wayland, X11 and libadwaita windows are rounded.
@@ -345,41 +343,41 @@ chk "settings: a dialog from another process, and its own dialog, do not follow 
 eset blocklist "['org.gnome.Settings.desktop']"
 chk "settings: but follow their own app onto it" "true,false,false" "$(wait_for true,false,false "$dialogs")"
 eset blocklist "[]"
-eset styled-apps "['$X11_APP']"; aset apps/$X11_APP custom-style true; aset apps/$X11_APP corner-radius 21
+eset app-styles "{'$X11_APP': {'custom-style': <true>, 'corner-radius': <21>}}"
 chk "settings: nor take that app's style" "21,15,15" \
   "$(wait_for 21,15,15 "[$x11,$foreign,$sub].map(a=>rwcTest.effect(a).rwcArgs[1][0]).join()")"
-eset styled-apps "[]"
+eset app-styles "{}"
 ev "($foreign).metaWindow.delete(global.get_current_time()); 0" >/dev/null
 need 3 "$windows" "the foreign dialog did not close"
 
-aset appearance custom-style true; aset appearance corner-radius 9
-aset appearance outline-color "'rgb(255,0,0)'"; aset appearance outline-opacity 0.5
+eset custom-style true; eset corner-radius 9
+eset outline-color "'rgb(255,0,0)'"; eset outline-opacity 0.5
 chk "settings: the custom style reaches the effect" "9|1|-1|1.00,0.00,0.00,0.50" "$(wait_for '9|1|-1|1.00,0.00,0.00,0.50' "$outline")"
-aset appearance outline-position "'outside'"
+eset outline-position "'outside'"
 chk "settings: the outline position reaches the effect" "9|1|0|1.00,0.00,0.00,0.50" "$(wait_for '9|1|0|1.00,0.00,0.00,0.50' "$outline")"
-aset appearance outline-position "'inside'"
+eset outline-position "'inside'"
 # With the custom style gtk.css is not read, and an edit made meanwhile counts once it is off again.
 radius="''+rwcTest.effect($wl).rwcArgs[1][0]"
 printf 'window.csd { border-radius: 7px; }\n' > $ROOT/config/gtk-4.0/gtk.css
 sleep 1.5
 chk "settings: the custom style stops reading gtk.css" "9|15" \
   "$(val "$radius+'|'+rwcTest.tracker()._styles.style.radii[0]")"
-aset appearance custom-style false
+eset custom-style false
 chk "settings: and turned off, gtk.css counts again" "7" "$(wait_for 7 "$radius")"
 rm -f $ROOT/config/gtk-4.0/gtk.css
-aset appearance custom-style true
+eset custom-style true
 wait_for 9 "$radius" >/dev/null
 
 # The test windows are GTK 3, whose toolkit is listed out of the box with the border left alone.
-eset styled-toolkits "[]"
-aset appearance border-method "'clip'"; aset appearance border-width 3
+eset toolkit-styles "{}"
+eset border-method "'clip'"; eset border-width 3
 chk "settings: the border method reaches the effect" "clip|3" "$(wait_for 'clip|3' "rwcTest.effect($wl).rwcArgs.slice(6).join('|')")"
 # The outline covers the app's border, so drop it to measure the border alone.
-aset appearance outline-width 0
+eset outline-width 0
 ev "const w = ($wl).metaWindow; w.move_resize_frame(true, 40, 40, 400, 300); w.activate(global.get_current_time()); 0" >/dev/null
 wait_for ok "rwcTest.boundsError($wl) || 'ok'" >/dev/null
 border_with() {
-  aset appearance border-method "'$1'"
+  eset border-method "'$1'"
   wait_for "$1" "rwcTest.effect($wl).rwcArgs[6]" >/dev/null
   sleep 0.5
   measure "rwcTest.borderShowing($wl)"
@@ -397,18 +395,18 @@ else
     "$(awk -v o=$border_off -v c=$border_clip 'BEGIN { print ((o > 0.5) ? "shown" : "hidden " o) "|" ((c < 0.05) ? "hidden" : "showing " c) }')"
 fi
 
-eset styled-toolkits "['gtk3']"; aset toolkits/gtk3 custom-style true; aset toolkits/gtk3 corner-radius 4
-eset styled-apps "['$X11_APP', '$ADW_APP']"; aset apps/$X11_APP custom-style true; aset apps/$X11_APP corner-radius 21
+eset toolkit-styles "{'gtk3': {'custom-style': <true>, 'corner-radius': <4>}}"
+eset app-styles "{'$X11_APP': {'custom-style': <true>, 'corner-radius': <21>}, '$ADW_APP': {}}"
 entries="[$wl,$x11,$adw].map(a=>rwcTest.rounded(a) && rwcTest.effect(a).rwcArgs[1][0]).join()"
 # The X11 app's own style comes before its toolkit's, and an entry doesn't round the libadwaita app; its switch does.
 chk "settings: app and toolkit styles come before the general one" "4,21,false" "$(wait_for 4,21,false "$entries")"
 eset round-libadwaita-apps true
 chk "settings: and the libadwaita app's entry styles it once its switch is on" "4,21,9" "$(wait_for 4,21,9 "$entries")"
-# The entries' settings are reused, since GJS can deadlock collecting one while dconf delivers a change.
-ev "globalThis.rwcEntries = rwcTest.tracker()._watchedEntries; 0" >/dev/null
-eset styled-apps "['$ADW_APP', '$X11_APP']"
-chk "settings: a list change keeps every entry's settings" "true" \
-  "$(wait_for true "const s = rwcTest.tracker()._watchedEntries; ''+(s !== rwcEntries && s.length === rwcEntries.length && s.every(e => rwcEntries.includes(e)))")"
+# Values of the wrong type or out of range keep their defaults.
+eset toolkit-styles "{'gtk3': {'custom-style': <true>, 'corner-radius': <'4'>, 'outline-width': <99>, 'outline-position': <'nowhere'>}}"
+chk "settings: an app or toolkit style's invalid values keep their defaults" "15|1|-1" \
+  "$(wait_for '15|1|-1' "const a = rwcTest.effect($wl).rwcArgs; a[1][0] + '|' + a[2] + '|' + a[3]")"
+eset toolkit-styles "{'gtk3': {'custom-style': <true>, 'corner-radius': <4>}}"
 # Marks the effects, so the next check sees only those made after enabling again.
 ev "[$wl,$x11,$adw].forEach(a => { rwcTest.effect(a).rwcStale = true; }); 0" >/dev/null
 ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
@@ -417,21 +415,17 @@ ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
 chk "settings: they apply again after disable and enable" "4,21,9" \
   "$(wait_for 4,21,9 "[$wl,$x11,$adw].map(a=>rwcTest.rounded(a) && !rwcTest.effect(a).rwcStale && rwcTest.effect(a).rwcArgs[1][0]).join()")"
 
-for path in appearance toolkits/gtk3 apps/$X11_APP apps/$ADW_APP; do
-  gset --schemadir $EXT/schemas reset-recursively $SCHEMA.appearance:$SCHEMA_PATH/$path/
-done
 gset --schemadir $EXT/schemas reset-recursively $SCHEMA
 chk "settings: resetting them all restores libadwaita's style" "15,15,false" \
   "$(wait_for 15,15,false "[$wl,$x11,$adw].map(a=>rwcTest.rounded(a) && rwcTest.effect(a).rwcArgs[1][0]).join()")"
 borders="[$wl,$x11].map(a=>rwcTest.effect(a).rwcArgs[6]).join()"
 chk "settings: GTK 3 apps start with their border left alone" "off,off" "$(wait_for off,off "$borders")"
-eset styled-apps "['$WL_APP']"
-chk "settings: an app's entry inherits how its toolkit hides the border" "off,off" "$(wait_for off,off "$borders")"
-aset apps/$WL_APP border-method "'clip'"
+eset app-styles "{'$WL_APP': {}}"
+chk "settings: an app's style inherits how its toolkit hides the border" "off,off" "$(wait_for off,off "$borders")"
+eset app-styles "{'$WL_APP': {'border-method': <'clip'>}}"
 chk "settings: until it sets its own" "clip,off" "$(wait_for clip,off "$borders")"
-gset --schemadir $EXT/schemas reset-recursively $SCHEMA.appearance:$SCHEMA_PATH/apps/$WL_APP/
-eset styled-apps "[]"
-eset styled-toolkits "[]"
+eset app-styles "{}"
+eset toolkit-styles "{}"
 
 # At fractional scales the app's border must stay hidden at every position (#10).
 monitor_scale="''+global.display.get_monitor_scale(0)"
@@ -536,16 +530,16 @@ chk "enabling again restores every effect" "ok" "$(wait_for ok 'rwcTest.audit()'
 
 # The preferences find every file they import, or they open as an error page.
 prefs='global.get_window_actors().find(a=>a.metaWindow.get_wm_class()==="org.gnome.Shell.Extensions")'
-# The preferences must show these without writing them back: colors spelled unlike GTK, an inherit the general style
-# doesn't offer, and a custom style switch never used.
-aset appearance outline-color "'#ffffff'"; aset appearance shadow-color "'red'"; aset appearance border-method "'inherit'"
+# The preferences must show these without writing them back: colors spelled unlike GTK, a style that inherits the
+# border, and a custom style switch never used.
+eset outline-color "'#ffffff'"; eset shadow-color "'red'"; eset toolkit-styles "{'gtk3': {}}"
 DBUS_SESSION_BUS_ADDRESS=$BUS gnome-extensions prefs $UUID >/dev/null 2>&1
 name=$(val "Main.extensionManager.lookup('$UUID').metadata.name")
 chk "the preferences open" "$name" "$(wait_for "$name" "($prefs)?.metaWindow.get_title() ?? 'no window'")"
 sleep 1
-chk "opening the preferences leaves the stored values alone" "'#ffffff'|'red'|'inherit'|unset" \
-  "$(aget appearance outline-color)|$(aget appearance shadow-color)|$(aget appearance border-method)|$(val "rwcTest.tracker()._appearance.get_user_value('custom-style') ?? 'unset'")"
-gset --schemadir $EXT/schemas reset-recursively $SCHEMA.appearance:$SCHEMA_PATH/appearance/
+chk "opening the preferences leaves the stored values alone" "'#ffffff'|'red'|{'gtk3': @a{sv} {}}|unset" \
+  "$(eget outline-color)|$(eget shadow-color)|$(eget toolkit-styles)|$(val "rwcTest.tracker()._settings.get_user_value('custom-style') ?? 'unset'")"
+gset --schemadir $EXT/schemas reset-recursively $SCHEMA
 ev "$prefs.metaWindow.delete(global.get_current_time()); 0" >/dev/null
 need false "''+!!($prefs)" "the preferences did not close"
 

@@ -3,22 +3,10 @@ import assert from 'node:assert/strict';
 import {readFileSync, readdirSync} from 'node:fs';
 import {customStyle} from './customStyle.js';
 
-// The appearance schema's defaults, keyed as customStyle() takes them.
+// The schema's defaults, by key as customStyle() takes them.
 const xml = readFileSync(readdirSync('.').find(f => f.endsWith('.gschema.xml')), 'utf8');
-const keys = [...xml.slice(xml.indexOf('.appearance">')).matchAll(/<key name="([\w-]+)" type="(\w)">[\s\S]*?<default>(.*?)<\/default>/g)];
-const schema = Object.fromEntries(keys.map(([, name, type, value]) => [name, type === 's' ? value.slice(1, -1) : Number(value)]));
-const DEFAULTS = {
-    radius: schema['corner-radius'],
-    outlineWidth: schema['outline-width'],
-    outlinePosition: schema['outline-position'],
-    outlineColor: schema['outline-color'],
-    outlineOpacity: schema['outline-opacity'],
-    shadowAngle: schema['shadow-angle'],
-    shadowDistance: schema['shadow-distance'],
-    shadowBlur: schema['shadow-blur'],
-    shadowColor: schema['shadow-color'],
-    shadowOpacity: schema['shadow-opacity'],
-};
+const keys = [...xml.matchAll(/<key name="([\w-]+)" type="(\w)">[\s\S]*?<default>(.*?)<\/default>/g)];
+const DEFAULTS = Object.fromEntries(keys.map(([, name, type, value]) => [name, type === 's' ? value.slice(1, -1) : Number(value)]));
 const styleWith = values => customStyle({...DEFAULTS, ...values});
 const round = v => JSON.parse(JSON.stringify(v, (k, x) => typeof x === 'number' ? Number(x.toFixed(4)) : x));
 
@@ -49,47 +37,47 @@ test('the schema defaults give libadwaita\'s light style', () => {
 });
 
 test('the radius is every corner\'s, and the outline sits inside the edge in both looks', () => {
-    const s = styleWith({radius: 7, outlineWidth: 3});
+    const s = styleWith({'corner-radius': 7, 'outline-width': 3});
     assert.deepEqual(s.radii, [7, 7, 7, 7]);
     assert.deepEqual([s.outlineWidth, s.outlineOffset, s.backdrop.outlineWidth, s.backdrop.outlineOffset], [3, -3, 3, -3]);
 });
 
 test('the shadow moves away from where the light comes from', () => {
-    const offset = angle => round(styleWith({shadowAngle: angle, shadowDistance: 10}).shadow.map(l => [l.dx, l.dy]));
+    const offset = angle => round(styleWith({'shadow-angle': angle, 'shadow-distance': 10}).shadow.map(l => [l.dx, l.dy]));
     assert.deepEqual(offset(90), [[0, 10], [0, 10], [0, 10]], 'light from above');
     assert.deepEqual(offset(0), [[-10, 0], [-10, 0], [-10, 0]], 'light from the right');
     assert.deepEqual(offset(180), [[10, 0], [10, 0], [10, 0]], 'light from the left');
 });
 
 test('blur and opacity scale libadwaita\'s layers in proportion', () => {
-    const s = styleWith({shadowBlur: 28, shadowOpacity: 0.3});
+    const s = styleWith({'shadow-blur': 28, 'shadow-opacity': 0.3});
     assert.deepEqual(round(s.shadow.map(l => [l.blur, l.color[3]])), [[28, 0.3], [10, 0.2], [0, 0.1]]);
     assert.deepEqual(round(s.backdrop.shadow.map(l => [l.blur, l.color[3]])), [[20, 0.16], [0, 0.1]]);
-    const none = styleWith({shadowOpacity: 0});
+    const none = styleWith({'shadow-opacity': 0});
     assert.deepEqual([none.shadow, none.backdrop.shadow], [[], []], 'transparent layers are left out');
 });
 
 test('colors: as drawn, and libadwaita\'s when they cannot be read', () => {
-    const s = styleWith({outlineColor: 'rgba(255, 0, 0, 0.5)', outlineOpacity: 0.5, shadowColor: '#203040'});
+    const s = styleWith({'outline-color': 'rgba(255, 0, 0, 0.5)', 'outline-opacity': 0.5, 'shadow-color': '#203040'});
     assert.deepEqual(s.outlineColor, [1, 0, 0, 0.25], 'the color\'s alpha times the opacity');
     assert.deepEqual(round(s.shadow[0].color.slice(0, 3)), round([0x20 / 255, 0x30 / 255, 0x40 / 255]));
-    assert.ok(styleWith({outlineColor: 'oklch(0.9 0.4 30)'}).outlineColor.every(v => v >= 0 && v <= 1), 'clamped to sRGB');
+    assert.ok(styleWith({'outline-color': 'oklch(0.9 0.4 30)'}).outlineColor.every(v => v >= 0 && v <= 1), 'clamped to sRGB');
     for (const unreadable of ['red', 'nosuch', '']) {
-        const fallback = round(styleWith({outlineColor: unreadable, shadowColor: unreadable}));
+        const fallback = round(styleWith({'outline-color': unreadable, 'shadow-color': unreadable}));
         assert.deepEqual([fallback.outlineColor, fallback.shadow.map(l => l.color)],
             [LIBADWAITA.outlineColor, LIBADWAITA.shadow.map(l => l.color)], unreadable);
     }
 });
 
 test('tiled and maximized: no outline, and the tiled line takes the shadow\'s color and opacity but not its light', () => {
-    const s = styleWith({outlineWidth: 4, shadowColor: '#ff0000', shadowOpacity: 0.3, shadowDistance: 10, shadowBlur: 28});
+    const s = styleWith({'outline-width': 4, 'shadow-color': '#ff0000', 'shadow-opacity': 0.3, 'shadow-distance': 10, 'shadow-blur': 28});
     assert.deepEqual([s.tiled.outlineWidth, s.maximized.outlineWidth], [0, 0]);
     assert.deepEqual(round(s.tiled.shadow), [{dx: 0, dy: 0, blur: 0, spread: 1, color: [1, 0, 0, 0.24]}]);
     assert.deepEqual([s.maximized.shadow, s.maximized.backdrop.shadow], [[], []]);
-    assert.deepEqual(styleWith({shadowOpacity: 0}).tiled.shadow, [], 'no shadow, no line');
+    assert.deepEqual(styleWith({'shadow-opacity': 0}).tiled.shadow, [], 'no shadow, no line');
 });
 
 test('the outline sits inside, across or outside the window\'s edge', () => {
-    const offset = position => styleWith({outlineWidth: 4, outlinePosition: position}).outlineOffset;
+    const offset = position => styleWith({'outline-width': 4, 'outline-position': position}).outlineOffset;
     assert.deepEqual(['inside', 'center', 'outside'].map(offset), [-4, -2, 0]);
 });

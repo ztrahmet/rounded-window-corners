@@ -30,31 +30,17 @@
     <key name="blocklist-toolkits" type="as">
       <default>[]</default>
       <summary>Toolkits whose apps are not rounded</summary>
-      <description>Named as in styled-toolkits.</description>
+      <description>Toolkits: libadwaita, libhandy, chromium, firefox, java, qt, gtk4 and gtk3.</description>
     </key>
     <key name="allowlist-toolkits" type="as">
       <default>[]</default>
       <summary>Toolkits whose apps are rounded with the allowlist</summary>
-      <description>Named as in styled-toolkits.</description>
+      <description>Toolkits as in blocklist-toolkits.</description>
     </key>
-    <key name="styled-apps" type="as">
-      <default>[]</default>
-      <summary>Desktop IDs of the apps with a style of their own</summary>
-      <description>Each style is stored under apps/ID/.</description>
-    </key>
-    <key name="styled-toolkits" type="as">
-      <default>['chromium', 'firefox', 'gtk4', 'gtk3']</default>
-      <summary>Toolkits whose apps share a style of their own</summary>
-      <description>Each style is stored under toolkits/TOOLKIT/. Those listed by default start with the app's border left alone, the others inherit how it is hidden. Toolkits: libadwaita, libhandy, chromium, firefox, java, qt, gtk4 and gtk3.</description>
-    </key>
-    <child name="appearance" schema="org.gnome.shell.extensions.rounded-window-corners-native.appearance"/>
-  </schema>
-
-  <schema id="org.gnome.shell.extensions.rounded-window-corners-native.appearance">
     <key name="custom-style" type="b">
       <default>false</default>
-      <summary>Use this style instead of the next one</summary>
-      <description>An app's style comes first, then its toolkit's, then the general one, then libadwaita's style and gtk.css.</description>
+      <summary>Use this style instead of libadwaita’s style and gtk.css</summary>
+      <description>An app’s style comes first, then its toolkit’s, then this one.</description>
     </key>
     <key name="corner-radius" type="i">
       <range min="0" max="48"/>
@@ -73,7 +59,7 @@
         <choice value="outside"/>
       </choices>
       <default>'inside'</default>
-      <summary>Where the outline sits against the window's edge</summary>
+      <summary>Where the outline sits against the window’s edge</summary>
     </key>
     <key name="outline-color" type="s">
       <default>'rgb(255,255,255)'</default>
@@ -100,7 +86,7 @@
       <range min="0" max="48"/>
       <default>14</default>
       <summary>Blur of the shadow, in pixels</summary>
-      <description>Of libadwaita's main shadow layer. Its other layers follow in proportion.</description>
+      <description>Of libadwaita’s main shadow layer. Its other layers follow in proportion.</description>
     </key>
     <key name="shadow-color" type="s">
       <default>'rgb(0,0,0)'</default>
@@ -111,33 +97,32 @@
       <range min="0" max="1"/>
       <default>0.15</default>
       <summary>Opacity of the shadow</summary>
-      <description>Of libadwaita's main shadow layer. Its other layers follow in proportion.</description>
+      <description>Of libadwaita’s main shadow layer. Its other layers follow in proportion.</description>
     </key>
     <key name="border-method" type="s">
       <choices>
-        <choice value="inherit"/>
         <choice value="off"/>
         <choice value="extend"/>
         <choice value="clip"/>
       </choices>
       <default>'extend'</default>
-      <summary>How the app's own border is hidden</summary>
-      <description>inherit takes the method and width from the toolkit's style, then the general one, where it means extend. off leaves it, extend paints over it with the pixels next to it, and clip cuts it off.</description>
+      <summary>How the app’s own border is hidden</summary>
+      <description>off leaves it, extend paints over it with the pixels next to it, and clip cuts it off.</description>
     </key>
     <key name="border-width" type="i">
       <range min="1" max="8"/>
       <default>1</default>
-      <summary>Width of the app's own border, in pixels</summary>
+      <summary>Width of the app’s own border, in pixels</summary>
     </key>
-  </schema>
-
-  <schema id="org.gnome.shell.extensions.rounded-window-corners-native.appearance-border-inherit"
-          extends="org.gnome.shell.extensions.rounded-window-corners-native.appearance">
-    <override name="border-method">'inherit'</override>
-  </schema>
-
-  <schema id="org.gnome.shell.extensions.rounded-window-corners-native.appearance-border-off"
-          extends="org.gnome.shell.extensions.rounded-window-corners-native.appearance">
-    <override name="border-method">'off'</override>
+    <key name="app-styles" type="a{sa{sv}}">
+      <default>{}</default>
+      <summary>Styles of their own, by the apps’ desktop IDs</summary>
+      <description>Each holds any of the keys from custom-style to border-width that it sets; the others keep their defaults. Without a border-method, the toolkit’s style decides how the app’s border is hidden, then the general one.</description>
+    </key>
+    <key name="toolkit-styles" type="a{sa{sv}}">
+      <default>{'chromium': {'border-method': &lt;'off'&gt;}, 'firefox': {'border-method': &lt;'off'&gt;}, 'gtk4': {'border-method': &lt;'off'&gt;}, 'gtk3': {'border-method': &lt;'off'&gt;}}</default>
+      <summary>Styles of their own, by toolkit</summary>
+      <description>As in app-styles, by the toolkits in blocklist-toolkits. Those listed by default draw little or no border of their own, so they leave it alone.</description>
+    </key>
   </schema>
 </schemalist>

@@ -8,18 +8,17 @@
 
 import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import {EntrySettings} from './lib/entrySettings.js';
 import {AppsPage} from './prefs/appsPage.js';
 import {AppStylesPage} from './prefs/appStylesPage.js';
 import {GeneralPage} from './prefs/generalPage.js';
+import {GeneralStyle} from './prefs/styleGroups.js';
 
 export default class RoundedWindowCornersPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
-        const appearance = settings.get_child('appearance');
-        const entrySettings = new EntrySettings(settings, this.path);
-        window.add(new GeneralPage(settings, appearance, entrySettings));
+        const general = new GeneralStyle(settings);
+        window.add(new GeneralPage(settings, general));
         window.add(new AppsPage(settings));
-        window.add(new AppStylesPage(settings, appearance, entrySettings, window));
+        window.add(new AppStylesPage(settings, general, window));
     }
 }
