@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 03:55+0300\n"
+"POT-Creation-Date: 2026-11-09 02:54+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Ukrainian\n"
@@ -22,110 +22,6 @@ msgstr "Додати програму"
 #: prefs/appChooser.js
 msgid "Search apps"
 msgstr "Шукати серед програм"
-
-#: prefs/appearanceGroups.js
-msgid "Opacity"
-msgstr "Непрозорість"
-
-#: prefs/appearanceGroups.js
-msgid "App Border"
-msgstr "Рамка програми"
-
-#: prefs/appearanceGroups.js
-msgid "Many apps draw a thin border that the outline replaces"
-msgstr "Багато програм малюють тонку рамку, яку замінює контур"
-
-#: prefs/appearanceGroups.js
-msgid "Hide App Border"
-msgstr "Приховувати рамку"
-
-#: prefs/appearanceGroups.js
-msgid "Inherit"
-msgstr "Успадковувати"
-
-#: prefs/appearanceGroups.js
-msgid "Off"
-msgstr "Вимкнено"
-
-#: prefs/appearanceGroups.js
-msgid "Extend"
-msgstr "Розтягнути"
-
-#: prefs/appearanceGroups.js
-msgid "Clip"
-msgstr "Обрізати"
-
-#: prefs/appearanceGroups.js
-msgid "Extend paints over it, Clip cuts it off"
-msgstr "«Розтягнути» її зафарбовує, «Обрізати» — зрізає"
-
-#: prefs/appearanceGroups.js
-msgid "Width"
-msgstr "Ширина"
-
-#: prefs/appearanceGroups.js
-msgid "Style"
-msgstr "Стиль"
-
-#: prefs/appearanceGroups.js
-msgid "Custom Style"
-msgstr "Власний стиль"
-
-#: prefs/appearanceGroups.js
-msgid "Light Angle"
-msgstr "Кут світла"
-
-#: prefs/appearanceGroups.js
-msgid "Color"
-msgstr "Колір"
-
-#: prefs/appearanceGroups.js
-msgid "Position"
-msgstr "Розташування"
-
-#: prefs/appearanceGroups.js
-msgid "Inside"
-msgstr "Усередині"
-
-#: prefs/appearanceGroups.js
-msgid "Center"
-msgstr "По центру"
-
-#: prefs/appearanceGroups.js
-msgid "Outside"
-msgstr "Зовні"
-
-#: prefs/appearanceGroups.js
-msgid "Outline"
-msgstr "Контур"
-
-#: prefs/appearanceGroups.js
-msgid "Shadow"
-msgstr "Тінь"
-
-#: prefs/appearanceGroups.js
-msgid "Distance"
-msgstr "Відстань"
-
-#: prefs/appearanceGroups.js
-msgid "Blur"
-msgstr "Розмиття"
-
-#: prefs/appearanceGroups.js
-msgid "Corner Radius"
-msgstr "Радіус кутів"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Width %d px, opacity %s"
-msgstr "Ширина %d пікс., непрозорість %s"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
-msgstr "Кут світла %d°, відстань %d пікс., розмиття %d пікс., непрозорість %s"
 
 #: prefs/appListGroup.js
 msgid "libadwaita Apps"
@@ -282,3 +178,107 @@ msgstr "Скасувати"
 #: prefs/generalPage.js
 msgid "Reset"
 msgstr "Скинути"
+
+#: prefs/styleGroups.js
+msgid "Opacity"
+msgstr "Непрозорість"
+
+#: prefs/styleGroups.js
+msgid "App Border"
+msgstr "Рамка програми"
+
+#: prefs/styleGroups.js
+msgid "Many apps draw a thin border that the outline replaces"
+msgstr "Багато програм малюють тонку рамку, яку замінює контур"
+
+#: prefs/styleGroups.js
+msgid "Hide App Border"
+msgstr "Приховувати рамку"
+
+#: prefs/styleGroups.js
+msgid "Extend paints over it, Clip cuts it off"
+msgstr "«Розтягнути» її зафарбовує, «Обрізати» — зрізає"
+
+#: prefs/styleGroups.js
+msgid "Inherit"
+msgstr "Успадковувати"
+
+#: prefs/styleGroups.js
+msgid "Off"
+msgstr "Вимкнено"
+
+#: prefs/styleGroups.js
+msgid "Extend"
+msgstr "Розтягнути"
+
+#: prefs/styleGroups.js
+msgid "Clip"
+msgstr "Обрізати"
+
+#: prefs/styleGroups.js
+msgid "Width"
+msgstr "Ширина"
+
+#: prefs/styleGroups.js
+msgid "Style"
+msgstr "Стиль"
+
+#: prefs/styleGroups.js
+msgid "Custom Style"
+msgstr "Власний стиль"
+
+#: prefs/styleGroups.js
+msgid "Light Angle"
+msgstr "Кут світла"
+
+#: prefs/styleGroups.js
+msgid "Outline"
+msgstr "Контур"
+
+#: prefs/styleGroups.js
+msgid "Position"
+msgstr "Розташування"
+
+#: prefs/styleGroups.js
+msgid "Inside"
+msgstr "Усередині"
+
+#: prefs/styleGroups.js
+msgid "Center"
+msgstr "По центру"
+
+#: prefs/styleGroups.js
+msgid "Outside"
+msgstr "Зовні"
+
+#: prefs/styleGroups.js
+msgid "Color"
+msgstr "Колір"
+
+#: prefs/styleGroups.js
+msgid "Shadow"
+msgstr "Тінь"
+
+#: prefs/styleGroups.js
+msgid "Distance"
+msgstr "Відстань"
+
+#: prefs/styleGroups.js
+msgid "Blur"
+msgstr "Розмиття"
+
+#: prefs/styleGroups.js
+msgid "Corner Radius"
+msgstr "Радіус кутів"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Width %d px, opacity %s"
+msgstr "Ширина %d пікс., непрозорість %s"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
+msgstr "Кут світла %d°, відстань %d пікс., розмиття %d пікс., непрозорість %s"

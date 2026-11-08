@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 03:55+0300\n"
+"POT-Creation-Date: 2026-11-09 02:54+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Italian\n"
@@ -22,110 +22,6 @@ msgstr "Aggiungi applicazione"
 #: prefs/appChooser.js
 msgid "Search apps"
 msgstr "Cerca applicazioni"
-
-#: prefs/appearanceGroups.js
-msgid "Opacity"
-msgstr "Opacità"
-
-#: prefs/appearanceGroups.js
-msgid "App Border"
-msgstr "Bordo dell'applicazione"
-
-#: prefs/appearanceGroups.js
-msgid "Many apps draw a thin border that the outline replaces"
-msgstr "Molte applicazioni disegnano un bordo sottile che il contorno sostituisce"
-
-#: prefs/appearanceGroups.js
-msgid "Hide App Border"
-msgstr "Nascondi il bordo"
-
-#: prefs/appearanceGroups.js
-msgid "Inherit"
-msgstr "Eredita"
-
-#: prefs/appearanceGroups.js
-msgid "Off"
-msgstr "Disattivato"
-
-#: prefs/appearanceGroups.js
-msgid "Extend"
-msgstr "Estendi"
-
-#: prefs/appearanceGroups.js
-msgid "Clip"
-msgstr "Ritaglia"
-
-#: prefs/appearanceGroups.js
-msgid "Extend paints over it, Clip cuts it off"
-msgstr "«Estendi» lo copre, «Ritaglia» lo rimuove"
-
-#: prefs/appearanceGroups.js
-msgid "Width"
-msgstr "Larghezza"
-
-#: prefs/appearanceGroups.js
-msgid "Style"
-msgstr "Stile"
-
-#: prefs/appearanceGroups.js
-msgid "Custom Style"
-msgstr "Stile personalizzato"
-
-#: prefs/appearanceGroups.js
-msgid "Light Angle"
-msgstr "Angolo della luce"
-
-#: prefs/appearanceGroups.js
-msgid "Color"
-msgstr "Colore"
-
-#: prefs/appearanceGroups.js
-msgid "Position"
-msgstr "Posizione"
-
-#: prefs/appearanceGroups.js
-msgid "Inside"
-msgstr "Interno"
-
-#: prefs/appearanceGroups.js
-msgid "Center"
-msgstr "Centrato"
-
-#: prefs/appearanceGroups.js
-msgid "Outside"
-msgstr "Esterno"
-
-#: prefs/appearanceGroups.js
-msgid "Outline"
-msgstr "Contorno"
-
-#: prefs/appearanceGroups.js
-msgid "Shadow"
-msgstr "Ombra"
-
-#: prefs/appearanceGroups.js
-msgid "Distance"
-msgstr "Distanza"
-
-#: prefs/appearanceGroups.js
-msgid "Blur"
-msgstr "Sfocatura"
-
-#: prefs/appearanceGroups.js
-msgid "Corner Radius"
-msgstr "Raggio degli angoli"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Width %d px, opacity %s"
-msgstr "Larghezza %d px, opacità %s"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
-msgstr "Angolo della luce %d°, distanza %d px, sfocatura %d px, opacità %s"
 
 #: prefs/appListGroup.js
 msgid "libadwaita Apps"
@@ -282,3 +178,107 @@ msgstr "Annulla"
 #: prefs/generalPage.js
 msgid "Reset"
 msgstr "Ripristina"
+
+#: prefs/styleGroups.js
+msgid "Opacity"
+msgstr "Opacità"
+
+#: prefs/styleGroups.js
+msgid "App Border"
+msgstr "Bordo dell'applicazione"
+
+#: prefs/styleGroups.js
+msgid "Many apps draw a thin border that the outline replaces"
+msgstr "Molte applicazioni disegnano un bordo sottile che il contorno sostituisce"
+
+#: prefs/styleGroups.js
+msgid "Hide App Border"
+msgstr "Nascondi il bordo"
+
+#: prefs/styleGroups.js
+msgid "Extend paints over it, Clip cuts it off"
+msgstr "«Estendi» lo copre, «Ritaglia» lo rimuove"
+
+#: prefs/styleGroups.js
+msgid "Inherit"
+msgstr "Eredita"
+
+#: prefs/styleGroups.js
+msgid "Off"
+msgstr "Disattivato"
+
+#: prefs/styleGroups.js
+msgid "Extend"
+msgstr "Estendi"
+
+#: prefs/styleGroups.js
+msgid "Clip"
+msgstr "Ritaglia"
+
+#: prefs/styleGroups.js
+msgid "Width"
+msgstr "Larghezza"
+
+#: prefs/styleGroups.js
+msgid "Style"
+msgstr "Stile"
+
+#: prefs/styleGroups.js
+msgid "Custom Style"
+msgstr "Stile personalizzato"
+
+#: prefs/styleGroups.js
+msgid "Light Angle"
+msgstr "Angolo della luce"
+
+#: prefs/styleGroups.js
+msgid "Outline"
+msgstr "Contorno"
+
+#: prefs/styleGroups.js
+msgid "Position"
+msgstr "Posizione"
+
+#: prefs/styleGroups.js
+msgid "Inside"
+msgstr "Interno"
+
+#: prefs/styleGroups.js
+msgid "Center"
+msgstr "Centrato"
+
+#: prefs/styleGroups.js
+msgid "Outside"
+msgstr "Esterno"
+
+#: prefs/styleGroups.js
+msgid "Color"
+msgstr "Colore"
+
+#: prefs/styleGroups.js
+msgid "Shadow"
+msgstr "Ombra"
+
+#: prefs/styleGroups.js
+msgid "Distance"
+msgstr "Distanza"
+
+#: prefs/styleGroups.js
+msgid "Blur"
+msgstr "Sfocatura"
+
+#: prefs/styleGroups.js
+msgid "Corner Radius"
+msgstr "Raggio degli angoli"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Width %d px, opacity %s"
+msgstr "Larghezza %d px, opacità %s"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
+msgstr "Angolo della luce %d°, distanza %d px, sfocatura %d px, opacità %s"

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 03:55+0300\n"
+"POT-Creation-Date: 2026-11-09 02:54+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Russian\n"
@@ -22,110 +22,6 @@ msgstr "Добавить приложение"
 #: prefs/appChooser.js
 msgid "Search apps"
 msgstr "Поиск приложений"
-
-#: prefs/appearanceGroups.js
-msgid "Opacity"
-msgstr "Непрозрачность"
-
-#: prefs/appearanceGroups.js
-msgid "App Border"
-msgstr "Рамка приложения"
-
-#: prefs/appearanceGroups.js
-msgid "Many apps draw a thin border that the outline replaces"
-msgstr "Многие приложения рисуют тонкую рамку, которую заменяет контур"
-
-#: prefs/appearanceGroups.js
-msgid "Hide App Border"
-msgstr "Скрывать рамку"
-
-#: prefs/appearanceGroups.js
-msgid "Inherit"
-msgstr "Наследовать"
-
-#: prefs/appearanceGroups.js
-msgid "Off"
-msgstr "Выключено"
-
-#: prefs/appearanceGroups.js
-msgid "Extend"
-msgstr "Растянуть"
-
-#: prefs/appearanceGroups.js
-msgid "Clip"
-msgstr "Обрезать"
-
-#: prefs/appearanceGroups.js
-msgid "Extend paints over it, Clip cuts it off"
-msgstr "«Растянуть» её закрашивает, «Обрезать» срезает"
-
-#: prefs/appearanceGroups.js
-msgid "Width"
-msgstr "Ширина"
-
-#: prefs/appearanceGroups.js
-msgid "Style"
-msgstr "Стиль"
-
-#: prefs/appearanceGroups.js
-msgid "Custom Style"
-msgstr "Свой стиль"
-
-#: prefs/appearanceGroups.js
-msgid "Light Angle"
-msgstr "Угол света"
-
-#: prefs/appearanceGroups.js
-msgid "Color"
-msgstr "Цвет"
-
-#: prefs/appearanceGroups.js
-msgid "Position"
-msgstr "Положение"
-
-#: prefs/appearanceGroups.js
-msgid "Inside"
-msgstr "Внутри"
-
-#: prefs/appearanceGroups.js
-msgid "Center"
-msgstr "По центру"
-
-#: prefs/appearanceGroups.js
-msgid "Outside"
-msgstr "Снаружи"
-
-#: prefs/appearanceGroups.js
-msgid "Outline"
-msgstr "Контур"
-
-#: prefs/appearanceGroups.js
-msgid "Shadow"
-msgstr "Тень"
-
-#: prefs/appearanceGroups.js
-msgid "Distance"
-msgstr "Расстояние"
-
-#: prefs/appearanceGroups.js
-msgid "Blur"
-msgstr "Размытие"
-
-#: prefs/appearanceGroups.js
-msgid "Corner Radius"
-msgstr "Радиус углов"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Width %d px, opacity %s"
-msgstr "Ширина %d пикс., непрозрачность %s"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
-msgstr "Угол света %d°, расстояние %d пикс., размытие %d пикс., непрозрачность %s"
 
 #: prefs/appListGroup.js
 msgid "libadwaita Apps"
@@ -282,3 +178,107 @@ msgstr "Отмена"
 #: prefs/generalPage.js
 msgid "Reset"
 msgstr "Сбросить"
+
+#: prefs/styleGroups.js
+msgid "Opacity"
+msgstr "Непрозрачность"
+
+#: prefs/styleGroups.js
+msgid "App Border"
+msgstr "Рамка приложения"
+
+#: prefs/styleGroups.js
+msgid "Many apps draw a thin border that the outline replaces"
+msgstr "Многие приложения рисуют тонкую рамку, которую заменяет контур"
+
+#: prefs/styleGroups.js
+msgid "Hide App Border"
+msgstr "Скрывать рамку"
+
+#: prefs/styleGroups.js
+msgid "Extend paints over it, Clip cuts it off"
+msgstr "«Растянуть» её закрашивает, «Обрезать» срезает"
+
+#: prefs/styleGroups.js
+msgid "Inherit"
+msgstr "Наследовать"
+
+#: prefs/styleGroups.js
+msgid "Off"
+msgstr "Выключено"
+
+#: prefs/styleGroups.js
+msgid "Extend"
+msgstr "Растянуть"
+
+#: prefs/styleGroups.js
+msgid "Clip"
+msgstr "Обрезать"
+
+#: prefs/styleGroups.js
+msgid "Width"
+msgstr "Ширина"
+
+#: prefs/styleGroups.js
+msgid "Style"
+msgstr "Стиль"
+
+#: prefs/styleGroups.js
+msgid "Custom Style"
+msgstr "Свой стиль"
+
+#: prefs/styleGroups.js
+msgid "Light Angle"
+msgstr "Угол света"
+
+#: prefs/styleGroups.js
+msgid "Outline"
+msgstr "Контур"
+
+#: prefs/styleGroups.js
+msgid "Position"
+msgstr "Положение"
+
+#: prefs/styleGroups.js
+msgid "Inside"
+msgstr "Внутри"
+
+#: prefs/styleGroups.js
+msgid "Center"
+msgstr "По центру"
+
+#: prefs/styleGroups.js
+msgid "Outside"
+msgstr "Снаружи"
+
+#: prefs/styleGroups.js
+msgid "Color"
+msgstr "Цвет"
+
+#: prefs/styleGroups.js
+msgid "Shadow"
+msgstr "Тень"
+
+#: prefs/styleGroups.js
+msgid "Distance"
+msgstr "Расстояние"
+
+#: prefs/styleGroups.js
+msgid "Blur"
+msgstr "Размытие"
+
+#: prefs/styleGroups.js
+msgid "Corner Radius"
+msgstr "Радиус углов"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Width %d px, opacity %s"
+msgstr "Ширина %d пикс., непрозрачность %s"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
+msgstr "Угол света %d°, расстояние %d пикс., размытие %d пикс., непрозрачность %s"

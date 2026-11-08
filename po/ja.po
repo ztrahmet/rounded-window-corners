@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 03:55+0300\n"
+"POT-Creation-Date: 2026-11-09 02:54+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Japanese\n"
@@ -22,110 +22,6 @@ msgstr "アプリを追加"
 #: prefs/appChooser.js
 msgid "Search apps"
 msgstr "アプリを検索"
-
-#: prefs/appearanceGroups.js
-msgid "Opacity"
-msgstr "不透明度"
-
-#: prefs/appearanceGroups.js
-msgid "App Border"
-msgstr "アプリの枠線"
-
-#: prefs/appearanceGroups.js
-msgid "Many apps draw a thin border that the outline replaces"
-msgstr "多くのアプリが描画する細い枠線を輪郭線で置き換えます"
-
-#: prefs/appearanceGroups.js
-msgid "Hide App Border"
-msgstr "枠線を隠す"
-
-#: prefs/appearanceGroups.js
-msgid "Inherit"
-msgstr "継承"
-
-#: prefs/appearanceGroups.js
-msgid "Off"
-msgstr "オフ"
-
-#: prefs/appearanceGroups.js
-msgid "Extend"
-msgstr "拡張"
-
-#: prefs/appearanceGroups.js
-msgid "Clip"
-msgstr "切り取り"
-
-#: prefs/appearanceGroups.js
-msgid "Extend paints over it, Clip cuts it off"
-msgstr "“拡張”は枠線を塗りつぶし、“切り取り”は切り落とします"
-
-#: prefs/appearanceGroups.js
-msgid "Width"
-msgstr "幅"
-
-#: prefs/appearanceGroups.js
-msgid "Style"
-msgstr "スタイル"
-
-#: prefs/appearanceGroups.js
-msgid "Custom Style"
-msgstr "カスタムスタイル"
-
-#: prefs/appearanceGroups.js
-msgid "Light Angle"
-msgstr "光の角度"
-
-#: prefs/appearanceGroups.js
-msgid "Color"
-msgstr "色"
-
-#: prefs/appearanceGroups.js
-msgid "Position"
-msgstr "位置"
-
-#: prefs/appearanceGroups.js
-msgid "Inside"
-msgstr "内側"
-
-#: prefs/appearanceGroups.js
-msgid "Center"
-msgstr "中央"
-
-#: prefs/appearanceGroups.js
-msgid "Outside"
-msgstr "外側"
-
-#: prefs/appearanceGroups.js
-msgid "Outline"
-msgstr "輪郭線"
-
-#: prefs/appearanceGroups.js
-msgid "Shadow"
-msgstr "影"
-
-#: prefs/appearanceGroups.js
-msgid "Distance"
-msgstr "距離"
-
-#: prefs/appearanceGroups.js
-msgid "Blur"
-msgstr "ぼかし"
-
-#: prefs/appearanceGroups.js
-msgid "Corner Radius"
-msgstr "角の半径"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Width %d px, opacity %s"
-msgstr "幅 %d px、不透明度 %s"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
-msgstr "光の角度 %d°、距離 %d px、ぼかし %d px、不透明度 %s"
 
 #: prefs/appListGroup.js
 msgid "libadwaita Apps"
@@ -282,3 +178,107 @@ msgstr "キャンセル"
 #: prefs/generalPage.js
 msgid "Reset"
 msgstr "リセット"
+
+#: prefs/styleGroups.js
+msgid "Opacity"
+msgstr "不透明度"
+
+#: prefs/styleGroups.js
+msgid "App Border"
+msgstr "アプリの枠線"
+
+#: prefs/styleGroups.js
+msgid "Many apps draw a thin border that the outline replaces"
+msgstr "多くのアプリが描画する細い枠線を輪郭線で置き換えます"
+
+#: prefs/styleGroups.js
+msgid "Hide App Border"
+msgstr "枠線を隠す"
+
+#: prefs/styleGroups.js
+msgid "Extend paints over it, Clip cuts it off"
+msgstr "“拡張”は枠線を塗りつぶし、“切り取り”は切り落とします"
+
+#: prefs/styleGroups.js
+msgid "Inherit"
+msgstr "継承"
+
+#: prefs/styleGroups.js
+msgid "Off"
+msgstr "オフ"
+
+#: prefs/styleGroups.js
+msgid "Extend"
+msgstr "拡張"
+
+#: prefs/styleGroups.js
+msgid "Clip"
+msgstr "切り取り"
+
+#: prefs/styleGroups.js
+msgid "Width"
+msgstr "幅"
+
+#: prefs/styleGroups.js
+msgid "Style"
+msgstr "スタイル"
+
+#: prefs/styleGroups.js
+msgid "Custom Style"
+msgstr "カスタムスタイル"
+
+#: prefs/styleGroups.js
+msgid "Light Angle"
+msgstr "光の角度"
+
+#: prefs/styleGroups.js
+msgid "Outline"
+msgstr "輪郭線"
+
+#: prefs/styleGroups.js
+msgid "Position"
+msgstr "位置"
+
+#: prefs/styleGroups.js
+msgid "Inside"
+msgstr "内側"
+
+#: prefs/styleGroups.js
+msgid "Center"
+msgstr "中央"
+
+#: prefs/styleGroups.js
+msgid "Outside"
+msgstr "外側"
+
+#: prefs/styleGroups.js
+msgid "Color"
+msgstr "色"
+
+#: prefs/styleGroups.js
+msgid "Shadow"
+msgstr "影"
+
+#: prefs/styleGroups.js
+msgid "Distance"
+msgstr "距離"
+
+#: prefs/styleGroups.js
+msgid "Blur"
+msgstr "ぼかし"
+
+#: prefs/styleGroups.js
+msgid "Corner Radius"
+msgstr "角の半径"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Width %d px, opacity %s"
+msgstr "幅 %d px、不透明度 %s"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
+msgstr "光の角度 %d°、距離 %d px、ぼかし %d px、不透明度 %s"

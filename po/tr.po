@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 03:55+0300\n"
+"POT-Creation-Date: 2026-11-09 02:54+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Turkish\n"
@@ -22,110 +22,6 @@ msgstr "Uygulama Ekle"
 #: prefs/appChooser.js
 msgid "Search apps"
 msgstr "Uygulama ara"
-
-#: prefs/appearanceGroups.js
-msgid "Opacity"
-msgstr "Opaklık"
-
-#: prefs/appearanceGroups.js
-msgid "App Border"
-msgstr "Uygulama Kenarlığı"
-
-#: prefs/appearanceGroups.js
-msgid "Many apps draw a thin border that the outline replaces"
-msgstr "Birçok uygulama ince bir kenarlık çizer, dış çizgi onun yerini alır"
-
-#: prefs/appearanceGroups.js
-msgid "Hide App Border"
-msgstr "Kenarlığı Gizle"
-
-#: prefs/appearanceGroups.js
-msgid "Inherit"
-msgstr "Devral"
-
-#: prefs/appearanceGroups.js
-msgid "Off"
-msgstr "Kapalı"
-
-#: prefs/appearanceGroups.js
-msgid "Extend"
-msgstr "Uzat"
-
-#: prefs/appearanceGroups.js
-msgid "Clip"
-msgstr "Kırp"
-
-#: prefs/appearanceGroups.js
-msgid "Extend paints over it, Clip cuts it off"
-msgstr "“Uzat” üstünü boyar, “Kırp” keser"
-
-#: prefs/appearanceGroups.js
-msgid "Width"
-msgstr "Genişlik"
-
-#: prefs/appearanceGroups.js
-msgid "Style"
-msgstr "Biçim"
-
-#: prefs/appearanceGroups.js
-msgid "Custom Style"
-msgstr "Özel Biçim"
-
-#: prefs/appearanceGroups.js
-msgid "Light Angle"
-msgstr "Işık Açısı"
-
-#: prefs/appearanceGroups.js
-msgid "Color"
-msgstr "Renk"
-
-#: prefs/appearanceGroups.js
-msgid "Position"
-msgstr "Konum"
-
-#: prefs/appearanceGroups.js
-msgid "Inside"
-msgstr "İçeride"
-
-#: prefs/appearanceGroups.js
-msgid "Center"
-msgstr "Ortada"
-
-#: prefs/appearanceGroups.js
-msgid "Outside"
-msgstr "Dışarıda"
-
-#: prefs/appearanceGroups.js
-msgid "Outline"
-msgstr "Dış Çizgi"
-
-#: prefs/appearanceGroups.js
-msgid "Shadow"
-msgstr "Gölge"
-
-#: prefs/appearanceGroups.js
-msgid "Distance"
-msgstr "Uzaklık"
-
-#: prefs/appearanceGroups.js
-msgid "Blur"
-msgstr "Bulanıklık"
-
-#: prefs/appearanceGroups.js
-msgid "Corner Radius"
-msgstr "Köşe Yarıçapı"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Width %d px, opacity %s"
-msgstr "Genişlik %d px, opaklık %s"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
-msgstr "Işık açısı %d°, uzaklık %d px, bulanıklık %d px, opaklık %s"
 
 #: prefs/appListGroup.js
 msgid "libadwaita Apps"
@@ -282,3 +178,107 @@ msgstr "İptal"
 #: prefs/generalPage.js
 msgid "Reset"
 msgstr "Sıfırla"
+
+#: prefs/styleGroups.js
+msgid "Opacity"
+msgstr "Opaklık"
+
+#: prefs/styleGroups.js
+msgid "App Border"
+msgstr "Uygulama Kenarlığı"
+
+#: prefs/styleGroups.js
+msgid "Many apps draw a thin border that the outline replaces"
+msgstr "Birçok uygulama ince bir kenarlık çizer, dış çizgi onun yerini alır"
+
+#: prefs/styleGroups.js
+msgid "Hide App Border"
+msgstr "Kenarlığı Gizle"
+
+#: prefs/styleGroups.js
+msgid "Extend paints over it, Clip cuts it off"
+msgstr "“Uzat” üstünü boyar, “Kırp” keser"
+
+#: prefs/styleGroups.js
+msgid "Inherit"
+msgstr "Devral"
+
+#: prefs/styleGroups.js
+msgid "Off"
+msgstr "Kapalı"
+
+#: prefs/styleGroups.js
+msgid "Extend"
+msgstr "Uzat"
+
+#: prefs/styleGroups.js
+msgid "Clip"
+msgstr "Kırp"
+
+#: prefs/styleGroups.js
+msgid "Width"
+msgstr "Genişlik"
+
+#: prefs/styleGroups.js
+msgid "Style"
+msgstr "Biçim"
+
+#: prefs/styleGroups.js
+msgid "Custom Style"
+msgstr "Özel Biçim"
+
+#: prefs/styleGroups.js
+msgid "Light Angle"
+msgstr "Işık Açısı"
+
+#: prefs/styleGroups.js
+msgid "Outline"
+msgstr "Dış Çizgi"
+
+#: prefs/styleGroups.js
+msgid "Position"
+msgstr "Konum"
+
+#: prefs/styleGroups.js
+msgid "Inside"
+msgstr "İçeride"
+
+#: prefs/styleGroups.js
+msgid "Center"
+msgstr "Ortada"
+
+#: prefs/styleGroups.js
+msgid "Outside"
+msgstr "Dışarıda"
+
+#: prefs/styleGroups.js
+msgid "Color"
+msgstr "Renk"
+
+#: prefs/styleGroups.js
+msgid "Shadow"
+msgstr "Gölge"
+
+#: prefs/styleGroups.js
+msgid "Distance"
+msgstr "Uzaklık"
+
+#: prefs/styleGroups.js
+msgid "Blur"
+msgstr "Bulanıklık"
+
+#: prefs/styleGroups.js
+msgid "Corner Radius"
+msgstr "Köşe Yarıçapı"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Width %d px, opacity %s"
+msgstr "Genişlik %d px, opaklık %s"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
+msgstr "Işık açısı %d°, uzaklık %d px, bulanıklık %d px, opaklık %s"

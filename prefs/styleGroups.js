@@ -140,7 +140,7 @@ function expanderRow(title, rows) {
  * @param {?GeneralStyle} [parent] - The style it comes after; none for the general style.
  */
 export function addStyleGroups(page, style, customSubtitle, parent = null) {
-    // How each row shows the stored values. Setting a row writes nothing back, since set() skips equal values.
+    // Shows the stored values in each row; set() skips equal values, so this writes nothing.
     const shows = [];
 
     const spinRow = (key, title, lower, upper) => {
@@ -208,7 +208,7 @@ export function addStyleGroups(page, style, customSubtitle, parent = null) {
     });
     page.add(border);
 
-    // Only app and toolkit styles inherit, from the style after them; inheriting the method takes its width too.
+    // App and toolkit styles can inherit the method, and its width with it.
     const methods = parent ? [null, 'off', 'extend', 'clip'] : ['off', 'extend', 'clip'];
     const method = new Adw.ComboRow({
         title: _('Hide App Border'),
@@ -231,7 +231,7 @@ export function addStyleGroups(page, style, customSubtitle, parent = null) {
     const group = new Adw.PreferencesGroup({title: _('Style')});
     page.add(group);
 
-    // A style switched on for the first time starts from the custom one it comes after, else from its defaults.
+    // Switched on for the first time, a style starts from its parent's custom style.
     const custom = new Adw.SwitchRow({title: _('Custom Style'), subtitle: customSubtitle});
     custom.connect('notify::active', () => {
         const values = {'custom-style': custom.active};

@@ -41,7 +41,7 @@ class AppListGroup extends Adw.PreferencesGroup {
      * @param {string} params.title
      * @param {string} params.description
      * @param {Map<string, string>} [params.notes] - Notes on some toolkits.
-     * @param {?function(string, string, string): void} [params.open] - Opens an entry's page from its key, ID and name.
+     * @param {?function(string, string, string): void} [params.open] - Opens an entry's page: key, ID, name.
      */
     constructor(settings, key, toolkitKey, {title, description, notes = new Map(), open = null}) {
         super({title, description});

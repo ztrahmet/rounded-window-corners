@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 03:55+0300\n"
+"POT-Creation-Date: 2026-11-09 02:54+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Chinese (simplified)\n"
@@ -22,110 +22,6 @@ msgstr "添加应用"
 #: prefs/appChooser.js
 msgid "Search apps"
 msgstr "搜索应用"
-
-#: prefs/appearanceGroups.js
-msgid "Opacity"
-msgstr "不透明度"
-
-#: prefs/appearanceGroups.js
-msgid "App Border"
-msgstr "应用边框"
-
-#: prefs/appearanceGroups.js
-msgid "Many apps draw a thin border that the outline replaces"
-msgstr "许多应用自带细边框，轮廓会将其取代"
-
-#: prefs/appearanceGroups.js
-msgid "Hide App Border"
-msgstr "隐藏边框"
-
-#: prefs/appearanceGroups.js
-msgid "Inherit"
-msgstr "继承"
-
-#: prefs/appearanceGroups.js
-msgid "Off"
-msgstr "关"
-
-#: prefs/appearanceGroups.js
-msgid "Extend"
-msgstr "延伸"
-
-#: prefs/appearanceGroups.js
-msgid "Clip"
-msgstr "裁剪"
-
-#: prefs/appearanceGroups.js
-msgid "Extend paints over it, Clip cuts it off"
-msgstr "“延伸”会覆盖边框，“裁剪”会将其切除"
-
-#: prefs/appearanceGroups.js
-msgid "Width"
-msgstr "宽度"
-
-#: prefs/appearanceGroups.js
-msgid "Style"
-msgstr "样式"
-
-#: prefs/appearanceGroups.js
-msgid "Custom Style"
-msgstr "自定义样式"
-
-#: prefs/appearanceGroups.js
-msgid "Light Angle"
-msgstr "光照角度"
-
-#: prefs/appearanceGroups.js
-msgid "Color"
-msgstr "颜色"
-
-#: prefs/appearanceGroups.js
-msgid "Position"
-msgstr "位置"
-
-#: prefs/appearanceGroups.js
-msgid "Inside"
-msgstr "内侧"
-
-#: prefs/appearanceGroups.js
-msgid "Center"
-msgstr "居中"
-
-#: prefs/appearanceGroups.js
-msgid "Outside"
-msgstr "外侧"
-
-#: prefs/appearanceGroups.js
-msgid "Outline"
-msgstr "轮廓"
-
-#: prefs/appearanceGroups.js
-msgid "Shadow"
-msgstr "阴影"
-
-#: prefs/appearanceGroups.js
-msgid "Distance"
-msgstr "距离"
-
-#: prefs/appearanceGroups.js
-msgid "Blur"
-msgstr "模糊"
-
-#: prefs/appearanceGroups.js
-msgid "Corner Radius"
-msgstr "圆角半径"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Width %d px, opacity %s"
-msgstr "宽度 %d 像素，不透明度 %s"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
-msgstr "光照角度 %d°，距离 %d 像素，模糊 %d 像素，不透明度 %s"
 
 #: prefs/appListGroup.js
 msgid "libadwaita Apps"
@@ -282,3 +178,107 @@ msgstr "取消"
 #: prefs/generalPage.js
 msgid "Reset"
 msgstr "重置"
+
+#: prefs/styleGroups.js
+msgid "Opacity"
+msgstr "不透明度"
+
+#: prefs/styleGroups.js
+msgid "App Border"
+msgstr "应用边框"
+
+#: prefs/styleGroups.js
+msgid "Many apps draw a thin border that the outline replaces"
+msgstr "许多应用自带细边框，轮廓会将其取代"
+
+#: prefs/styleGroups.js
+msgid "Hide App Border"
+msgstr "隐藏边框"
+
+#: prefs/styleGroups.js
+msgid "Extend paints over it, Clip cuts it off"
+msgstr "“延伸”会覆盖边框，“裁剪”会将其切除"
+
+#: prefs/styleGroups.js
+msgid "Inherit"
+msgstr "继承"
+
+#: prefs/styleGroups.js
+msgid "Off"
+msgstr "关"
+
+#: prefs/styleGroups.js
+msgid "Extend"
+msgstr "延伸"
+
+#: prefs/styleGroups.js
+msgid "Clip"
+msgstr "裁剪"
+
+#: prefs/styleGroups.js
+msgid "Width"
+msgstr "宽度"
+
+#: prefs/styleGroups.js
+msgid "Style"
+msgstr "样式"
+
+#: prefs/styleGroups.js
+msgid "Custom Style"
+msgstr "自定义样式"
+
+#: prefs/styleGroups.js
+msgid "Light Angle"
+msgstr "光照角度"
+
+#: prefs/styleGroups.js
+msgid "Outline"
+msgstr "轮廓"
+
+#: prefs/styleGroups.js
+msgid "Position"
+msgstr "位置"
+
+#: prefs/styleGroups.js
+msgid "Inside"
+msgstr "内侧"
+
+#: prefs/styleGroups.js
+msgid "Center"
+msgstr "居中"
+
+#: prefs/styleGroups.js
+msgid "Outside"
+msgstr "外侧"
+
+#: prefs/styleGroups.js
+msgid "Color"
+msgstr "颜色"
+
+#: prefs/styleGroups.js
+msgid "Shadow"
+msgstr "阴影"
+
+#: prefs/styleGroups.js
+msgid "Distance"
+msgstr "距离"
+
+#: prefs/styleGroups.js
+msgid "Blur"
+msgstr "模糊"
+
+#: prefs/styleGroups.js
+msgid "Corner Radius"
+msgstr "圆角半径"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Width %d px, opacity %s"
+msgstr "宽度 %d 像素，不透明度 %s"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
+msgstr "光照角度 %d°，距离 %d 像素，模糊 %d 像素，不透明度 %s"

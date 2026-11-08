@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 03:55+0300\n"
+"POT-Creation-Date: 2026-11-09 02:54+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Dutch\n"
@@ -22,110 +22,6 @@ msgstr "Toepassing toevoegen"
 #: prefs/appChooser.js
 msgid "Search apps"
 msgstr "Toepassingen zoeken"
-
-#: prefs/appearanceGroups.js
-msgid "Opacity"
-msgstr "Dekking"
-
-#: prefs/appearanceGroups.js
-msgid "App Border"
-msgstr "Toepassingsrand"
-
-#: prefs/appearanceGroups.js
-msgid "Many apps draw a thin border that the outline replaces"
-msgstr "Veel toepassingen tekenen een dunne rand die door de omlijning wordt vervangen"
-
-#: prefs/appearanceGroups.js
-msgid "Hide App Border"
-msgstr "Rand verbergen"
-
-#: prefs/appearanceGroups.js
-msgid "Inherit"
-msgstr "Overnemen"
-
-#: prefs/appearanceGroups.js
-msgid "Off"
-msgstr "Uit"
-
-#: prefs/appearanceGroups.js
-msgid "Extend"
-msgstr "Uitbreiden"
-
-#: prefs/appearanceGroups.js
-msgid "Clip"
-msgstr "Bijsnijden"
-
-#: prefs/appearanceGroups.js
-msgid "Extend paints over it, Clip cuts it off"
-msgstr "‘Uitbreiden’ verft eroverheen, ‘Bijsnijden’ snijdt hem weg"
-
-#: prefs/appearanceGroups.js
-msgid "Width"
-msgstr "Breedte"
-
-#: prefs/appearanceGroups.js
-msgid "Style"
-msgstr "Stijl"
-
-#: prefs/appearanceGroups.js
-msgid "Custom Style"
-msgstr "Aangepaste stijl"
-
-#: prefs/appearanceGroups.js
-msgid "Light Angle"
-msgstr "Lichthoek"
-
-#: prefs/appearanceGroups.js
-msgid "Color"
-msgstr "Kleur"
-
-#: prefs/appearanceGroups.js
-msgid "Position"
-msgstr "Positie"
-
-#: prefs/appearanceGroups.js
-msgid "Inside"
-msgstr "Binnen"
-
-#: prefs/appearanceGroups.js
-msgid "Center"
-msgstr "Midden"
-
-#: prefs/appearanceGroups.js
-msgid "Outside"
-msgstr "Buiten"
-
-#: prefs/appearanceGroups.js
-msgid "Outline"
-msgstr "Omlijning"
-
-#: prefs/appearanceGroups.js
-msgid "Shadow"
-msgstr "Schaduw"
-
-#: prefs/appearanceGroups.js
-msgid "Distance"
-msgstr "Afstand"
-
-#: prefs/appearanceGroups.js
-msgid "Blur"
-msgstr "Vervaging"
-
-#: prefs/appearanceGroups.js
-msgid "Corner Radius"
-msgstr "Hoekstraal"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Width %d px, opacity %s"
-msgstr "Breedte %d px, dekking %s"
-
-#. Translators: Keep the values in this order.
-#: prefs/appearanceGroups.js
-#, javascript-format
-msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
-msgstr "Lichthoek %d°, afstand %d px, vervaging %d px, dekking %s"
 
 #: prefs/appListGroup.js
 msgid "libadwaita Apps"
@@ -282,3 +178,107 @@ msgstr "Annuleren"
 #: prefs/generalPage.js
 msgid "Reset"
 msgstr "Herstellen"
+
+#: prefs/styleGroups.js
+msgid "Opacity"
+msgstr "Dekking"
+
+#: prefs/styleGroups.js
+msgid "App Border"
+msgstr "Toepassingsrand"
+
+#: prefs/styleGroups.js
+msgid "Many apps draw a thin border that the outline replaces"
+msgstr "Veel toepassingen tekenen een dunne rand die door de omlijning wordt vervangen"
+
+#: prefs/styleGroups.js
+msgid "Hide App Border"
+msgstr "Rand verbergen"
+
+#: prefs/styleGroups.js
+msgid "Extend paints over it, Clip cuts it off"
+msgstr "‘Uitbreiden’ verft eroverheen, ‘Bijsnijden’ snijdt hem weg"
+
+#: prefs/styleGroups.js
+msgid "Inherit"
+msgstr "Overnemen"
+
+#: prefs/styleGroups.js
+msgid "Off"
+msgstr "Uit"
+
+#: prefs/styleGroups.js
+msgid "Extend"
+msgstr "Uitbreiden"
+
+#: prefs/styleGroups.js
+msgid "Clip"
+msgstr "Bijsnijden"
+
+#: prefs/styleGroups.js
+msgid "Width"
+msgstr "Breedte"
+
+#: prefs/styleGroups.js
+msgid "Style"
+msgstr "Stijl"
+
+#: prefs/styleGroups.js
+msgid "Custom Style"
+msgstr "Aangepaste stijl"
+
+#: prefs/styleGroups.js
+msgid "Light Angle"
+msgstr "Lichthoek"
+
+#: prefs/styleGroups.js
+msgid "Outline"
+msgstr "Omlijning"
+
+#: prefs/styleGroups.js
+msgid "Position"
+msgstr "Positie"
+
+#: prefs/styleGroups.js
+msgid "Inside"
+msgstr "Binnen"
+
+#: prefs/styleGroups.js
+msgid "Center"
+msgstr "Midden"
+
+#: prefs/styleGroups.js
+msgid "Outside"
+msgstr "Buiten"
+
+#: prefs/styleGroups.js
+msgid "Color"
+msgstr "Kleur"
+
+#: prefs/styleGroups.js
+msgid "Shadow"
+msgstr "Schaduw"
+
+#: prefs/styleGroups.js
+msgid "Distance"
+msgstr "Afstand"
+
+#: prefs/styleGroups.js
+msgid "Blur"
+msgstr "Vervaging"
+
+#: prefs/styleGroups.js
+msgid "Corner Radius"
+msgstr "Hoekstraal"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Width %d px, opacity %s"
+msgstr "Breedte %d px, dekking %s"
+
+#. Translators: Keep the values in this order.
+#: prefs/styleGroups.js
+#, javascript-format
+msgid "Light angle %d°, distance %d px, blur %d px, opacity %s"
+msgstr "Lichthoek %d°, afstand %d px, vervaging %d px, dekking %s"
