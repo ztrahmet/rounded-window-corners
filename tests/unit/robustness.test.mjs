@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readWindowStyle} from './cssParse.js';
-import {compileShadow, shadowExtent} from './shadowProfile.js';
+import {compileShadow, compileStyle, shadowExtent} from './shadowProfile.js';
 
 // Malformed gtk.css must never throw or hand the shader out-of-range values. Seeded, so failures reproduce.
 function random(seed) {
@@ -65,8 +65,12 @@ test('malformed stylesheets never throw and only give sane values', () => {
         const css = stylesheet(next);
         for (const env of ENVS) {
             const s = readWindowStyle([css, stylesheet(next)], env);
-            assert.ok(s.radii.length === 4 && s.radii.every(r => Number.isFinite(r) && r >= 0), css);
-            for (const look of [s, s.backdrop, s.tiled, s.tiled.backdrop, s.maximized, s.maximized.backdrop]) {
+            const states = [s.normal, s.tiled, s.maximized];
+            for (const {reach} of Object.values(compileStyle(s)))
+                assert.ok(Number.isFinite(reach) && reach >= 1, css);
+            for (const {radii} of states)
+                assert.ok(radii.length === 4 && radii.every(r => Number.isFinite(r) && r >= 0), css);
+            for (const look of states.flatMap(state => [state.focused, state.backdrop])) {
                 assert.ok(Number.isFinite(look.outlineWidth) && look.outlineWidth >= 0, css);
                 assert.ok(Number.isFinite(look.outlineOffset), css);
                 assert.ok(inUnitRange(look.outlineColor), css);
@@ -111,6 +115,6 @@ test('a large stylesheet still parses quickly', () => {
     const start = performance.now();
     const s = readWindowStyle([css], {dark: true, highContrast: false, colorName});
     const ms = performance.now() - start;
-    assert.deepEqual(s.radii, [15, 15, 15, 15]);
+    assert.deepEqual(s.normal.radii, [15, 15, 15, 15]);
     assert.ok(ms < 10000, `took ${ms.toFixed(0)}ms for ${(css.length / 1e6).toFixed(1)} MB`);
 });

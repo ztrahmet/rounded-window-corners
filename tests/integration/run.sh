@@ -214,7 +214,7 @@ rm -f $ROOT/config/gtk-4.0/gtk.css
 chk "removing it restores libadwaita's radius" "15,15,15,15" "$(wait_for 15,15,15,15 "$radii")"
 
 # libadwaita's values as the effect is given them, following the system settings.
-outline="const a=rwcTest.effect($wl).rwcArgs; \`\${a[1][0]}|\${a[2]}|\${a[3]}|\${a[4].map(v=>v.toFixed(2))}\`"
+outline="const [, r, l]=rwcTest.effect($wl).rwcArgs; \`\${r[0]}|\${l.outlineWidth}|\${l.outlineOffset}|\${l.outlineColor.map(v=>v.toFixed(2))}\`"
 chk "libadwaita: radius, outline and offset" "15|1|-1|1.00,1.00,1.00,0.07" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.07' "$outline")"
 gset set org.gnome.desktop.a11y.interface high-contrast true
 chk "high contrast: libadwaita's outline" "15|1|-1|1.00,1.00,1.00,0.30" "$(wait_for '15|1|-1|1.00,1.00,1.00,0.30' "$outline")"
@@ -245,7 +245,7 @@ chk "the desktop's accent_color reaches the effect" "15|1|-1|0.13,0.56,0.64,1.00
 gset reset org.gnome.desktop.interface accent-color
 
 printf 'window { box-shadow: 0 3px 9px 1px rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.75); }\n' > $ROOT/config/gtk-4.0/gtk.css
-layers="rwcTest.effect($wl).rwcArgs[5].filter(s => s.color[3] > 0).map(s => s.shape.join(' ')).join('|')"
+layers="rwcTest.effect($wl).rwcArgs[2].slots.filter(s => s.color[3] > 0).map(s => s.shape.join(' ')).join('|')"
 chk "each shadow layer keeps its own offset, in GTK's order" "0 3 1 4.5|0 0 1 0" "$(wait_for '0 3 1 4.5|0 0 1 0' "$layers")"
 # A wider shadow grows the window's framebuffer, which must be drawn again, not reused from before.
 printf 'window { box-shadow: 0 8px 40px 12px rgba(0,0,0,.6); }\n' > $ROOT/config/gtk-4.0/gtk.css
@@ -261,7 +261,7 @@ if [ -z "$theme" ]; then
 else
   gset set org.gnome.desktop.interface gtk-theme $theme
   printf 'window { outline-width: 3px; }\n' > $ROOT/config/gtk-4.0/gtk.css
-  chk "the GTK theme is ignored" "15|3" "$(wait_for '15|3' "const a=rwcTest.effect($wl).rwcArgs; a[1][0]+'|'+a[2]")"
+  chk "the GTK theme is ignored" "15|3" "$(wait_for '15|3' "const a=rwcTest.effect($wl).rwcArgs; a[1][0]+'|'+a[2].outlineWidth")"
   gset reset org.gnome.desktop.interface gtk-theme
 fi
 rm -f $ROOT/config/gtk-4.0/gtk.css
@@ -281,7 +281,7 @@ chk "settings: and turned off, leaves it alone again" "true,true,false" "$(wait_
 
 eset round-maximized true
 # They take libadwaita's look for them: no outline, and only a 1 px line around a tiled window.
-look="(() => { const a = rwcTest.effect($wl).rwcArgs; return a[2] + '|' + a[5].filter(s => s.color[3] > 0).map(s => s.shape.join(' ')).join(); })()"
+look="(() => { const a = rwcTest.effect($wl).rwcArgs; return a[2].outlineWidth + '|' + a[2].slots.filter(s => s.color[3] > 0).map(s => s.shape.join(' ')).join(); })()"
 ev "$wl.metaWindow.set_maximize_flags(Meta.MaximizeFlags.VERTICAL); 0" >/dev/null
 chk "settings: a tiled window stays rounded, with libadwaita's line for its outline and shadow" "true|0|0 0 1 0" \
   "$(wait_for 'true|0|0 0 1 0' "$(rounded "$wl")+'|'+$look")"
@@ -361,7 +361,7 @@ radius="''+rwcTest.effect($wl).rwcArgs[1][0]"
 printf 'window.csd { border-radius: 7px; }\n' > $ROOT/config/gtk-4.0/gtk.css
 sleep 1.5
 chk "settings: the custom style stops reading gtk.css" "9|15" \
-  "$(val "$radius+'|'+rwcTest.tracker()._styles.style.radii[0]")"
+  "$(val "$radius+'|'+rwcTest.tracker()._styles.style.normal.radii[0]")"
 eset custom-style false
 chk "settings: and turned off, gtk.css counts again" "7" "$(wait_for 7 "$radius")"
 rm -f $ROOT/config/gtk-4.0/gtk.css
@@ -371,14 +371,14 @@ wait_for 9 "$radius" >/dev/null
 # The test windows are GTK 3, whose toolkit is listed out of the box with the border left alone.
 eset toolkit-styles "{}"
 eset border-method "'clip'"; eset border-width 3
-chk "settings: the border method reaches the effect" "clip|3" "$(wait_for 'clip|3' "rwcTest.effect($wl).rwcArgs.slice(6).join('|')")"
+chk "settings: the border method reaches the effect" "clip|3" "$(wait_for 'clip|3' "rwcTest.effect($wl).rwcArgs.slice(3).join('|')")"
 # The outline covers the app's border, so drop it to measure the border alone.
 eset outline-width 0
 ev "const w = ($wl).metaWindow; w.move_resize_frame(true, 40, 40, 400, 300); w.activate(global.get_current_time()); 0" >/dev/null
 wait_for ok "rwcTest.boundsError($wl) || 'ok'" >/dev/null
 border_with() {
   eset border-method "'$1'"
-  wait_for "$1" "rwcTest.effect($wl).rwcArgs[6]" >/dev/null
+  wait_for "$1" "rwcTest.effect($wl).rwcArgs[3]" >/dev/null
   sleep 0.5
   measure "rwcTest.borderShowing($wl)"
 }
@@ -405,7 +405,7 @@ chk "settings: and the libadwaita app's entry styles it once its switch is on" "
 # Values of the wrong type or out of range keep their defaults.
 eset toolkit-styles "{'gtk3': {'custom-style': <true>, 'corner-radius': <'4'>, 'outline-width': <99>, 'outline-position': <'nowhere'>}}"
 chk "settings: an app or toolkit style's invalid values keep their defaults" "15|1|-1" \
-  "$(wait_for '15|1|-1' "const a = rwcTest.effect($wl).rwcArgs; a[1][0] + '|' + a[2] + '|' + a[3]")"
+  "$(wait_for '15|1|-1' "const a = rwcTest.effect($wl).rwcArgs; a[1][0] + '|' + a[2].outlineWidth + '|' + a[2].outlineOffset")"
 eset toolkit-styles "{'gtk3': {'custom-style': <true>, 'corner-radius': <4>}}"
 # Marks the effects, so the next check sees only those made after enabling again.
 ev "[$wl,$x11,$adw].forEach(a => { rwcTest.effect(a).rwcStale = true; }); 0" >/dev/null
@@ -418,7 +418,7 @@ chk "settings: they apply again after disable and enable" "4,21,9" \
 gset --schemadir $EXT/schemas reset-recursively $SCHEMA
 chk "settings: resetting them all restores libadwaita's style" "15,15,false" \
   "$(wait_for 15,15,false "[$wl,$x11,$adw].map(a=>rwcTest.rounded(a) && rwcTest.effect(a).rwcArgs[1][0]).join()")"
-borders="[$wl,$x11].map(a=>rwcTest.effect(a).rwcArgs[6]).join()"
+borders="[$wl,$x11].map(a=>rwcTest.effect(a).rwcArgs[3]).join()"
 chk "settings: GTK 3 apps start with their border left alone" "off,off" "$(wait_for off,off "$borders")"
 eset app-styles "{'$WL_APP': {}}"
 chk "settings: an app's style inherits how its toolkit hides the border" "off,off" "$(wait_for off,off "$borders")"

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {SHADOW_SLOTS, compileShadow, shadowExtent} from './shadowProfile.js';
+import {FALLBACK_CSS, readWindowStyle} from './cssParse.js';
+import {SHADOW_SLOTS, compileShadow, compileStyle, shadowExtent} from './shadowProfile.js';
 
 const adwaita = [
     {dx: 0, dy: 0, blur: 14, spread: 5, color: [0, 0, 0, 0.15]},
@@ -51,4 +52,15 @@ test('more layers than slots leaves out the faintest and keeps the order', () =>
     const alphas = [0.01, 0.5, 0.02, 0.4, 0.03, 0.3, 0.2, 0.1];
     const s = compileShadow(alphas.map(a => ({dx: 0, dy: 0, blur: 2, spread: 0, color: [0, 0, 0, a]})));
     assert.deepEqual(s.map(slot => slot.color[3]), [0.5, 0.4, 0.03, 0.3, 0.2, 0.1]);
+});
+
+test('a compiled style has each look\'s slots, and room for both looks of each state', () => {
+    const style = readWindowStyle([FALLBACK_CSS], {dark: false, highContrast: false, rtl: false, colorName: () => null});
+    const {normal, tiled, maximized} = compileStyle(style);
+    assert.deepEqual([normal.reach, tiled.reach, maximized.reach], [27, 2, 1], 'the shadow, the tiled line, nothing; and a pixel');
+    assert.deepEqual(normal.focused.slots, compileShadow(style.normal.focused.shadow));
+    assert.deepEqual(normal.backdrop.slots, compileShadow(style.normal.backdrop.shadow));
+    assert.deepEqual(tiled.radii, [0, 0, 0, 0]);
+    const outside = compileStyle({...style, normal: {...style.normal, focused: {...style.normal.focused, outlineWidth: 30, outlineOffset: 0}}});
+    assert.equal(outside.normal.reach, 31, 'an outline wider than the shadow');
 });

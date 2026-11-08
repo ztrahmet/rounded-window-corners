@@ -10,7 +10,8 @@ const names = name => name.toLowerCase() === 'currentcolor' ? CURRENT : colorNam
 
 const LIGHT = {dark: false, highContrast: false, colorName};
 const styleOf = (...sheets) => readWindowStyle(sheets, LIGHT);
-const radiiOf = (...sheets) => styleOf(...sheets).radii;
+const radiiOf = (...sheets) => styleOf(...sheets).normal.radii;
+const lookOf = (...sheets) => styleOf(...sheets).normal.focused;
 const round = s => JSON.parse(JSON.stringify(s, (k, v) => typeof v === 'number' ? Number(v.toFixed(6)) : v));
 
 test('box-shadow: lengths, inset and color in any order, the color defaulting to currentColor', () => {
@@ -41,29 +42,25 @@ test('the fallback sheet gives libadwaita\'s window style', () => {
         {dx: 0, dy: 0, blur: 10, spread: 5, color: [0, 0, 0, 0.08]},
         {dx: 0, dy: 0, blur: 0, spread: 1, color: [0, 0, 0, alpha]},
     ];
-    // Tiled, no outline and a 1 px line in the window's color at the border opacity; maximized, neither.
+    // Tiled, square with no outline and a 1 px line in the window's color at the border opacity; maximized, neither.
     const color = dark => dark ? [1, 1, 1, 1] : [0, 0, 6 / 255, 0.8];
     const line = (dark, opacity) => [{dx: 0, dy: 0, blur: 0, spread: 1, color: [...color(dark).slice(0, 3), color(dark)[3] * opacity]}];
     const look = (dark, layers) => ({outlineWidth: 0, outlineOffset: -1, outlineColor: color(dark), shadow: layers});
-    const states = (dark, opacity) => ({
-        tiled: {...look(dark, line(dark, opacity)), backdrop: look(dark, line(dark, opacity))},
-        maximized: {...look(dark, []), backdrop: look(dark, [])},
-    });
+    const rounded = (focused, inBackdrop) => ({radii: [15, 15, 15, 15], focused, backdrop: inBackdrop});
+    const flat = (dark, layers) => ({radii: [0, 0, 0, 0], focused: look(dark, layers), backdrop: look(dark, layers)});
     for (const dark of [false, true]) {
-        assert.deepEqual(round(readWindowStyle([FALLBACK_CSS], {...LIGHT, dark})), round({
-            radii: [15, 15, 15, 15], outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.07], shadow: shadow(0.05),
-            backdrop: {outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.07], shadow: backdrop(0.05)},
-            ...states(dark, 0.15),
-        }));
-        assert.deepEqual(round(readWindowStyle([FALLBACK_CSS], {...LIGHT, dark, highContrast: true})), round({
-            radii: [15, 15, 15, 15], outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.3], shadow: shadow(0.8),
-            backdrop: {outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, 0.3], shadow: backdrop(0.8)},
-            ...states(dark, 0.5),
-        }));
+        for (const [highContrast, alpha, outline, opacity] of [[false, 0.05, 0.07, 0.15], [true, 0.8, 0.3, 0.5]]) {
+            const outlined = layers => ({outlineWidth: 1, outlineOffset: -1, outlineColor: [1, 1, 1, outline], shadow: layers});
+            assert.deepEqual(round(readWindowStyle([FALLBACK_CSS], {...LIGHT, dark, highContrast})), round({
+                normal: rounded(outlined(shadow(alpha)), outlined(backdrop(alpha))),
+                tiled: flat(dark, line(dark, opacity)),
+                maximized: flat(dark, []),
+            }));
+        }
     }
 
     // currentColor is the window's color.
-    const outline = dark => readWindowStyle([FALLBACK_CSS, 'window { outline-color: currentColor; }'], {...LIGHT, dark}).outlineColor;
+    const outline = dark => readWindowStyle([FALLBACK_CSS, 'window { outline-color: currentColor; }'], {...LIGHT, dark}).normal.focused.outlineColor;
     assert.deepEqual(round(outline(false)), [0, 0, round(6 / 255), 0.8]);
     assert.deepEqual(outline(true), [1, 1, 1, 1]);
 });
@@ -72,7 +69,7 @@ test('unreadable values are dropped, leaving the one before, as GTK does', () =>
     assert.deepEqual(radiiOf(FALLBACK_CSS, 'window { border-radius: 0 !important; }'), [15, 15, 15, 15]);
     assert.deepEqual(radiiOf('window { border-radius: 8px; border-radius: 1em; }'), [8, 8, 8, 8]);
     assert.deepEqual(radiiOf('window { border-radius: 4px; } window.csd { border-radius: 9px ! important; }'), [4, 4, 4, 4]);
-    const s = styleOf(FALLBACK_CSS, 'window { outline: 2px solid red !important; box-shadow: none !important; outline: ; }');
+    const s = lookOf(FALLBACK_CSS, 'window { outline: 2px solid red !important; box-shadow: none !important; outline: ; }');
     assert.equal(s.outlineWidth, 1);
     assert.equal(s.shadow.length, 3);
 });
@@ -82,16 +79,16 @@ test('a value with var() that cannot be read is unset, as GTK does at compute ti
     assert.deepEqual(radiiOf(FALLBACK_CSS, 'window { border-radius: var(--window-radius) !important; }'), [0, 0, 0, 0]);
     assert.deepEqual(radiiOf(FALLBACK_CSS, ':root { --r: 1em; } window { border-radius: var(--r); }'), [0, 0, 0, 0]);
     assert.deepEqual(radiiOf(FALLBACK_CSS, ':root { --a: var(--b); --b: var(--a); } window { border-radius: var(--a); }'), [0, 0, 0, 0]);
-    assert.equal(styleOf(FALLBACK_CSS, 'window { box-shadow: var(--nope); }').shadow.length, 0);
+    assert.equal(lookOf(FALLBACK_CSS, 'window { box-shadow: var(--nope); }').shadow.length, 0);
 });
 
 test('initial, inherit and unset give GTK\'s initial values', () => {
-    const s = styleOf(FALLBACK_CSS, 'window { box-shadow: initial; outline: unset; border-top-left-radius: inherit; }');
-    assert.deepEqual(s.shadow, []);
-    assert.equal(s.outlineWidth, 0);
+    const s = styleOf(FALLBACK_CSS, 'window { box-shadow: initial; outline: unset; border-top-left-radius: inherit; }').normal;
+    assert.deepEqual(s.focused.shadow, []);
+    assert.equal(s.focused.outlineWidth, 0);
     assert.deepEqual(s.radii, [0, 15, 15, 15]);
-    assert.deepEqual(styleOf(FALLBACK_CSS, 'window { all: initial; }').radii, [0, 0, 0, 0]);
-    assert.deepEqual(styleOf(FALLBACK_CSS, 'window { all: 3px; }').radii, [15, 15, 15, 15]);
+    assert.deepEqual(styleOf(FALLBACK_CSS, 'window { all: initial; }').normal.radii, [0, 0, 0, 0]);
+    assert.deepEqual(styleOf(FALLBACK_CSS, 'window { all: 3px; }').normal.radii, [15, 15, 15, 15]);
 });
 
 test('comments are ignored anywhere, as GTK ignores them', () => {
@@ -103,9 +100,9 @@ test('media queries: GTK\'s features, and no media types', () => {
     const css = `@media (prefers-color-scheme: dark) { window { border-radius: 1px; } }
         @media (prefers-contrast: more) and (prefers-color-scheme: light) { window { border-radius: 2px; } }
         @media screen { window { border-radius: 3px; } }`;
-    assert.equal(readWindowStyle([css], {...LIGHT, dark: true}).radii[0], 1);
-    assert.equal(readWindowStyle([css], {...LIGHT, highContrast: true}).radii[0], 2);
-    assert.equal(readWindowStyle([css], LIGHT).radii[0], 0);
+    assert.equal(readWindowStyle([css], {...LIGHT, dark: true}).normal.radii[0], 1);
+    assert.equal(readWindowStyle([css], {...LIGHT, highContrast: true}).normal.radii[0], 2);
+    assert.equal(readWindowStyle([css], LIGHT).normal.radii[0], 0);
 });
 
 test('selectors: those GTK matches to a libadwaita window apply', () => {
@@ -117,8 +114,8 @@ test('selectors: those GTK matches to a libadwaita window apply', () => {
 
 test('selectors: :dir() follows the text direction', () => {
     const css = 'window:dir(ltr) { border-radius: 4px; } window:not(:dir(ltr)) { border-radius: 6px; }';
-    assert.equal(readWindowStyle([css], LIGHT).radii[0], 4);
-    assert.equal(readWindowStyle([css], {...LIGHT, rtl: true}).radii[0], 6);
+    assert.equal(readWindowStyle([css], LIGHT).normal.radii[0], 4);
+    assert.equal(readWindowStyle([css], {...LIGHT, rtl: true}).normal.radii[0], 6);
     assert.equal(radiiOf('window:not(:not(.csd)) { border-radius: 7px; }')[0], 0, 'GTK does not nest :not()');
 });
 
@@ -152,7 +149,7 @@ test('cascade: variables resolve across stylesheets, and are case-sensitive', ()
     assert.equal(radiiOf(adw, ':root { --Window-Radius: 3px; }')[0], 15);
     assert.equal(radiiOf(adw, 'window { border-radius: var(--nope, 2px); }')[0], 2);
     assert.equal(radiiOf(adw, 'window { border-radius: var(--nope, var(--window-radius)); }')[0], 15);
-    assert.deepEqual(styleOf(adw, ':root { --c: rgb(0 0 255); } window { outline-color: var(--nope, var(--c)); }').outlineColor, [0, 0, 1, 1]);
+    assert.deepEqual(lookOf(adw, ':root { --c: rgb(0 0 255); } window { outline-color: var(--nope, var(--c)); }').outlineColor, [0, 0, 1, 1]);
 });
 
 test('colors: libadwaita\'s computed accent color reaches the window, clamped when drawn', () => {
@@ -161,9 +158,9 @@ test('colors: libadwaita\'s computed accent color reaches the window, clamped wh
         @media (prefers-color-scheme: dark) { :root { --standalone: max(l, 0.85) a b; } }`;
     const sheets = [adw, '@define-color accent_bg_color #3584e4;', 'window { outline: 2px solid var(--accent-color); }'];
     const near = (got, want) => assert.ok(got.every((v, i) => Math.abs(v - want[i]) < 1e-4), `${got}`);
-    near(readWindowStyle(sheets, LIGHT).outlineColor, [0.01646, 0.37937, 0.74356, 1]);
-    near(readWindowStyle(sheets, {...LIGHT, dark: true}).outlineColor, [0.50431, 0.81723, 1, 1]);
-    assert.equal(styleOf('window { outline: calc(1px + 2px) solid red; outline-offset: calc(-2px * 2); }').outlineWidth, 3);
+    near(readWindowStyle(sheets, LIGHT).normal.focused.outlineColor, [0.01646, 0.37937, 0.74356, 1]);
+    near(readWindowStyle(sheets, {...LIGHT, dark: true}).normal.focused.outlineColor, [0.50431, 0.81723, 1, 1]);
+    assert.equal(lookOf('window { outline: calc(1px + 2px) solid red; outline-offset: calc(-2px * 2); }').outlineWidth, 3);
 });
 
 test('@define-color: names resolve across stylesheets and media queries, as libadwaita\'s accent does', () => {
@@ -172,13 +169,13 @@ test('@define-color: names resolve across stylesheets and media queries, as liba
         @media (prefers-color-scheme: dark) { @define-color window_fg_color #fff; }`;
     const accent = '@define-color accent_bg_color #3584e4;';
     const user = 'window { outline: 2px solid var(--accent-bg-color); box-shadow: 0 0 2px @window_fg_color; }';
-    const light = readWindowStyle([adw, accent, user], LIGHT);
+    const light = readWindowStyle([adw, accent, user], LIGHT).normal.focused;
     assert.deepEqual(light.outlineColor, [0x35 / 255, 0x84 / 255, 0xe4 / 255, 1]);
     assert.deepEqual(light.shadow[0].color, [0, 0, 0, 1]);
-    assert.deepEqual(readWindowStyle([adw, accent, user], {...LIGHT, dark: true}).shadow[0].color, [1, 1, 1, 1]);
+    assert.deepEqual(readWindowStyle([adw, accent, user], {...LIGHT, dark: true}).normal.focused.shadow[0].color, [1, 1, 1, 1]);
 
     const loop = '@define-color a @b; @define-color b @a; window { outline-color: #fff; outline-color: @a; }';
-    assert.deepEqual(styleOf(loop).outlineColor, [1, 1, 1, 1]);
+    assert.deepEqual(lookOf(loop).outlineColor, [1, 1, 1, 1]);
 });
 
 test('radii: one to four corners, longhands, and elliptical corners as circles', () => {
@@ -195,25 +192,25 @@ test('radii: one to four corners, longhands, and elliptical corners as circles',
 test('outline: the shorthand resets what it omits to GTK\'s initial values, but not the offset', () => {
     const adw = '.background { color: #102030; } window.csd { outline: 1px solid RGB(255 255 255/7%); outline-offset: -1px; }';
     const user = 'window, .csd, decoration { outline: 8px solid #3584e4; outline-offset: -8px; }';
-    const s = styleOf(adw, user);
+    const s = lookOf(adw, user);
     assert.equal(s.outlineWidth, 8);
     assert.equal(s.outlineOffset, -8);
     assert.deepEqual(s.outlineColor, [0x35 / 255, 0x84 / 255, 0xe4 / 255, 1]);
 
     for (const outline of ['3px solid', '3px solid currentColor', 'solid 3px']) {
-        const t = styleOf(adw, `window { outline: ${outline}; }`);
+        const t = lookOf(adw, `window { outline: ${outline}; }`);
         assert.equal(t.outlineWidth, 3, outline);
         assert.equal(t.outlineOffset, -1, outline);
         assert.deepEqual(t.outlineColor, [0x10 / 255, 0x20 / 255, 0x30 / 255, 1], outline);
     }
 
-    assert.equal(styleOf('window { outline: 2px solid #fff; outline-width: 4px; }').outlineWidth, 4);
-    assert.equal(styleOf('window { outline-width: 4px; outline: 2px solid #fff; }').outlineWidth, 2);
-    assert.deepEqual(styleOf('window { outline: 2px solid red; }').outlineColor, [1, 0, 0, 1]);
+    assert.equal(lookOf('window { outline: 2px solid #fff; outline-width: 4px; }').outlineWidth, 4);
+    assert.equal(lookOf('window { outline-width: 4px; outline: 2px solid #fff; }').outlineWidth, 2);
+    assert.deepEqual(lookOf('window { outline: 2px solid red; }').outlineColor, [1, 0, 0, 1]);
 });
 
 test('outline: none, styles, and values GTK rejects', () => {
-    const widthOf = css => styleOf(`window { outline: 6px solid #fff; } ${css}`).outlineWidth;
+    const widthOf = css => lookOf(`window { outline: 6px solid #fff; } ${css}`).outlineWidth;
     assert.equal(widthOf('window { outline: none; }'), 0);
     assert.equal(widthOf('window { outline-style: hidden; }'), 0);
     assert.equal(widthOf('window { outline: solid #fff; }'), 0, 'GTK\'s initial width is 0');
@@ -222,31 +219,31 @@ test('outline: none, styles, and values GTK rejects', () => {
         assert.equal(widthOf(`window { outline-width: ${v}; }`), 6, v);
     for (const v of ['1px 2px solid', '1px solid solid', '1px solid #fff #000', '1px solid bogus', 'thick solid', '-1px solid'])
         assert.equal(widthOf(`window { outline: ${v}; }`), 6, v);
-    assert.equal(styleOf('window { outline-offset: 3px; }').outlineOffset, 3);
+    assert.equal(lookOf('window { outline-offset: 3px; }').outlineOffset, 3);
 });
 
 test('backdrop: the focused rules apply unless overridden or excluded', () => {
     const css = `
         window.csd { box-shadow: 0 0 4px #000; }
         window:not(:backdrop) { outline-width: 3px; }`;
-    const s = styleOf(css);
-    assert.deepEqual(s.backdrop.shadow, s.shadow);
-    assert.equal(styleOf(`${css} window.csd:backdrop { box-shadow: none; }`).backdrop.shadow.length, 0);
-    assert.equal(styleOf(`${css} window:backdrop { box-shadow: none; }`).shadow.length, 1);
+    const s = styleOf(css).normal;
+    assert.deepEqual(s.backdrop.shadow, s.focused.shadow);
+    assert.equal(styleOf(`${css} window.csd:backdrop { box-shadow: none; }`).normal.backdrop.shadow.length, 0);
+    assert.equal(lookOf(`${css} window:backdrop { box-shadow: none; }`).shadow.length, 1);
 
-    const outlined = styleOf('window { outline: 2px solid red; } window:backdrop { outline-color: transparent; }');
-    assert.deepEqual([outlined.outlineWidth, outlined.outlineColor], [2, [1, 0, 0, 1]]);
+    const outlined = styleOf('window { outline: 2px solid red; } window:backdrop { outline-color: transparent; }').normal;
+    assert.deepEqual([outlined.focused.outlineWidth, outlined.focused.outlineColor], [2, [1, 0, 0, 1]]);
     assert.deepEqual([outlined.backdrop.outlineWidth, outlined.backdrop.outlineColor], [2, [0, 0, 0, 0]]);
-    const excluded = styleOf(`window { outline: 1px solid red; } ${css}`);
-    assert.deepEqual([excluded.outlineWidth, excluded.backdrop.outlineWidth], [3, 1]);
+    const excluded = styleOf(`window { outline: 1px solid red; } ${css}`).normal;
+    assert.deepEqual([excluded.focused.outlineWidth, excluded.backdrop.outlineWidth], [3, 1]);
 });
 
 test('tiled and maximized: their own rules apply, and no shadow shows around a maximized window', () => {
-    const css = `window.csd { outline: 1px solid red; box-shadow: 0 0 4px #000; }
-        window.csd.tiled-left { outline-width: 2px; box-shadow: 0 0 0 1px red; }
-        window.csd.maximized { outline-width: 3px; box-shadow: 0 0 9px #000; }`;
-    const s = styleOf(css);
-    assert.deepEqual([s.outlineWidth, s.shadow[0].blur], [1, 4]);
-    assert.deepEqual([s.tiled.outlineWidth, s.tiled.shadow], [2, [{dx: 0, dy: 0, blur: 0, spread: 1, color: [1, 0, 0, 1]}]]);
-    assert.deepEqual([s.maximized.outlineWidth, s.maximized.shadow, s.maximized.backdrop.shadow], [3, [], []]);
+    const css = `window.csd { border-radius: 8px; outline: 1px solid red; box-shadow: 0 0 4px #000; }
+        window.csd.tiled-left { border-radius: 2px; outline-width: 2px; box-shadow: 0 0 0 1px red; }
+        window.csd.maximized { border-radius: 0; outline-width: 3px; box-shadow: 0 0 9px #000; }`;
+    const {normal, tiled, maximized} = styleOf(css);
+    assert.deepEqual([normal.radii[0], normal.focused.outlineWidth, normal.focused.shadow[0].blur], [8, 1, 4]);
+    assert.deepEqual([tiled.radii[0], tiled.focused.outlineWidth, tiled.focused.shadow], [2, 2, [{dx: 0, dy: 0, blur: 0, spread: 1, color: [1, 0, 0, 1]}]]);
+    assert.deepEqual([maximized.radii[0], maximized.focused.outlineWidth, maximized.focused.shadow, maximized.backdrop.shadow], [0, 3, [], []]);
 });
