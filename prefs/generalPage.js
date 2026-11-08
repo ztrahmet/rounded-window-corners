@@ -42,7 +42,7 @@ class GeneralPage extends Adw.PreferencesPage {
             ['round-maximized', _('Round Maximized and Tiled Windows'),
                 _('Without a shadow, as in libadwaita; fullscreen stays square')],
             // sharp-windows start
-            ['sharp-windows', _('Keep Windows Sharp'), _('At fractional scales and in the overview')],
+            ['sharp-windows', _('Keep Windows Sharp'), _('Experimental fix for blur at fractional scales and in the overview')],
             // sharp-windows end
         ]) {
             const row = new Adw.SwitchRow({title, subtitle});

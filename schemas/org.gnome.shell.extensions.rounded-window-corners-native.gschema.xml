@@ -17,7 +17,7 @@
     </key>
     <!-- sharp-windows start -->
     <key name="sharp-windows" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>Keep windows sharp at fractional scales and in the overview</summary>
       <description>Draws rounded windows at the scale they are shown at, not through a buffer at the next whole scale, which blurs them.</description>
     </key>

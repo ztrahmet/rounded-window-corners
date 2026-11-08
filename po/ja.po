@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-06 17:13+0300\n"
+"POT-Creation-Date: 2026-11-07 14:08+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Japanese\n"
@@ -264,8 +264,8 @@ msgid "Keep Windows Sharp"
 msgstr "ウィンドウを鮮明に保つ"
 
 #: prefs/generalPage.js
-msgid "At fractional scales and in the overview"
-msgstr "小数の拡大率とアクティビティ画面で"
+msgid "Experimental fix for blur at fractional scales and in the overview"
+msgstr "小数の拡大率とアクティビティ画面でのぼやけを補正する実験的機能"
 
 #: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"

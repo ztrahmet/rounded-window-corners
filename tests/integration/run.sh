@@ -453,6 +453,14 @@ gset --schemadir $EXT/schemas reset-recursively $SCHEMA.appearance:$SCHEMA_PATH/
 eset styled-apps "[]"
 eset styled-toolkits "[]"
 
+# sharp-windows start
+# Keep Windows Sharp is off by default, and the checks from here on draw with it on.
+drawing="$wl.get_effects().filter(e => e.enabled).map(e => e.get_name()).join()"
+chk "settings: Keep Windows Sharp is off by default" "rounded-window-corners-room,rounded-window-corners" "$(val "$drawing")"
+eset sharp-windows true
+wait_for 'rounded-window-corners-room,rounded-window-corners-sharp' "$drawing" >/dev/null
+# sharp-windows end
+
 # At fractional scales the app's border must stay hidden at every position (#10).
 monitor_scale="''+global.display.get_monitor_scale(0)"
 # sharp-windows removed
@@ -493,7 +501,6 @@ wait_for 1 "$monitor_scale" >/dev/null
 chk "back at 100%: the effect follows the scale" "ok" "$(wait_for ok "rwcTest.followsScale($wl) || 'ok'")"
 
 # The setting picks which of the two effects draws the window, live and without changing their order.
-drawing="$wl.get_effects().filter(e => e.enabled).map(e => e.get_name()).join()"
 order="$wl.get_effects().map(e => e.get_name()).join()"
 eset sharp-windows false
 chk "settings: with Keep Windows Sharp off, the effect draws the window, at the right bounds" \

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/"
 "issues\n"
-"POT-Creation-Date: 2026-11-06 17:13+0300\n"
+"POT-Creation-Date: 2026-11-07 14:08+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -267,7 +267,7 @@ msgid "Keep Windows Sharp"
 msgstr ""
 
 #: prefs/generalPage.js
-msgid "At fractional scales and in the overview"
+msgid "Experimental fix for blur at fractional scales and in the overview"
 msgstr ""
 
 #: prefs/generalPage.js

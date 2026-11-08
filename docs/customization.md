@@ -77,10 +77,10 @@ flowchart LR
 - **Round Maximized and Tiled Windows** keeps those windows rounded, with the look
   libadwaita gives them: no shadow when maximized, and a thin line around a tiled window.
   Fullscreen windows always stay square.
-- **Keep Windows Sharp**, on by default, draws rounded windows at the scale they're shown
-  at, so they stay sharp at fractional scales and in the overview. It works around a blur
-  in mutter. If a window looks wrong or something runs slowly, turn it off to see whether
-  it's the cause.
+- **Keep Windows Sharp** draws rounded windows at the scale they're shown at, so they stay
+  sharp at fractional scales and in the overview. It's an experimental workaround for a blur
+  in mutter, and is off by default for now. If a window looks wrong or something runs slowly
+  with it on, turn it off to see whether it's the cause.
 
 Apps are matched the way GNOME Shell matches them, by their desktop file, but a dialog
 that another app opens over a window, like the file chooser, counts as that other app's.
