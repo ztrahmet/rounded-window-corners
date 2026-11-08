@@ -489,6 +489,21 @@ else
     "$(val "const w='$shadow_wl'.split(',').map(Number), x='$shadow_x11'.split(',').map(Number);
        w.every((v, i) => Math.abs(v - x[i]) < 0.02) ? 'ok' : 'Wayland $shadow_wl, X11 $shadow_x11'")"
 fi
+# A window that already fills a monitor without the top bar changes state without changing size (#24); its look must
+# follow anyway.
+struts() { ev "const l = Main.layoutManager; l._trackedActors.find(a => a.actor === l.panelBox).affectsStruts = $1; l._queueUpdateRegions(); 0" >/dev/null; }
+struts false
+for kind in Wayland X11; do
+  a=$bare_wl; [ $kind = X11 ] && a=$bare_x11
+  ev "const w=($a).metaWindow, m=global.display.get_monitor_geometry(w.get_monitor()); w.unminimize(); w.move_resize_frame(false, m.x, m.y, m.width, m.height); 0" >/dev/null
+  need "true|true" "const w=($a).metaWindow, f=w.get_frame_rect(), m=global.display.get_monitor_geometry(w.get_monitor());
+    (f.width===m.width && f.height===m.height)+'|'+rwcTest.rounded($a)" "the $kind bare window did not fill the monitor"
+  ev "($a).metaWindow.make_fullscreen(); 0" >/dev/null
+  chk "$kind: a window that fills the monitor loses its rounding when it goes fullscreen" "false" "$(wait_for false "$(rounded "$a")")"
+  ev "($a).metaWindow.unmake_fullscreen(); 0" >/dev/null
+  chk "$kind: and gets it back when it leaves fullscreen" "true" "$(wait_for true "$(rounded "$a")")"
+done
+struts true
 ev "$bare.forEach(a=>a.metaWindow.delete(global.get_current_time()));
     global.get_window_actors().forEach(a=>a.metaWindow.unminimize()); 0" >/dev/null
 need 3 "$windows" "the bare windows did not close"
