@@ -13,7 +13,7 @@ const rwcTest = {
     shouldRound(actor) {
         const win = actor.metaWindow;
         return win.get_window_type() === Meta.WindowType.NORMAL && !rwcTest.isAdwaita(actor) &&
-            !win.maximizedHorizontally && !win.maximizedVertically && !win.fullscreen;
+            !(win.maximizedHorizontally && win.maximizedVertically) && !win.fullscreen;
     },
 
     // Records what each effect was last given, to compare with its window.

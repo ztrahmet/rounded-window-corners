@@ -133,7 +133,7 @@ ev 'global.get_window_actors().filter(a => a.metaWindow.get_title() === "rwc-pop
     .forEach(a => a.metaWindow.delete(global.get_current_time())); 0' >/dev/null
 need 3 "$windows" "the popover windows did not close"
 
-ev "rwcTest.spy(rwcTest.effect($wl)); rwcTest.tracker()._syncAll(); 0" >/dev/null
+ev "rwcTest.spy(rwcTest.effect($wl)); const t = rwcTest.tracker(); t._windows.forEach(w => w && (w._updated = [])); t._syncAll(); 0" >/dev/null
 chk "Wayland: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
 chk "X11: effect bounds match the window frame" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
 # On X11 the effect goes on the window actor too, so it replaces mutter's own shadow.
@@ -187,7 +187,8 @@ done
 chk "X11: bounds follow every resize" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
 # Spoil the bounds, then let only the app's picture report a new size: the bounds must recover.
 ev "const a=$x11; const e=rwcTest.effect(a);
-    e.update([0, 0, 1, 1], ...e.rwcArgs.slice(1)); a.get_texture().emit('size-changed'); 0" >/dev/null
+    e.update([0, 0, 1, 1], ...e.rwcArgs.slice(1)); rwcTest.tracker()._windows.get(a)._updated = [];
+    a.get_texture().emit('size-changed'); 0" >/dev/null
 chk "X11: a late redraw re-syncs the bounds" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
 ev "$wl.metaWindow.move_resize_frame(true, 300, 200, 640, 480); 0" >/dev/null
 chk "Wayland: bounds follow a resize" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
@@ -287,17 +288,26 @@ chk "settings: Round libadwaita Apps rounds the libadwaita window" "true,true,tr
 eset round-libadwaita-apps false
 chk "settings: and turned off, leaves it alone again" "true,true,false" "$(wait_for true,true,false "$states")"
 
-eset round-maximized true
-# They take libadwaita's look for them: no outline, and only a 1 px line around a tiled window.
-look="(() => { const a = rwcTest.effect($wl).rwcArgs; return a[2].outlineWidth + '|' + a[2].slots.filter(s => s.color[3] > 0).map(s => s.shape.join(' ')).join(); })()"
+# Tiled and maximized windows take libadwaita's look for them: square, no outline, and only a 1 px line around a tiled
+# window; maximized, nothing, so no effect at all.
+look="(() => { const a = rwcTest.effect($wl).rwcArgs; return a[1][0] + '|' + a[2].outlineWidth + '|' + a[2].slots.filter(s => s.color[3] > 0).map(s => s.shape.join(' ')).join(); })()"
 ev "$wl.metaWindow.set_maximize_flags(Meta.MaximizeFlags.VERTICAL); 0" >/dev/null
-chk "settings: a tiled window stays rounded, with libadwaita's line for its outline and shadow" "true|0|0 0 1 0" \
-  "$(wait_for 'true|0|0 0 1 0' "$(rounded "$wl")+'|'+$look")"
+chk "a tiled window is square, with libadwaita's line for its outline and shadow" "true|0|0|0 0 1 0" \
+  "$(wait_for 'true|0|0|0 0 1 0' "$(rounded "$wl")+'|'+$look")"
+printf 'window.csd.tiled, window.csd.tiled-left { --window-radius: 6px; }\n' > $ROOT/config/gtk-4.0/gtk.css
+chk "gtk.css can round tiled windows" "true|6|0|0 0 1 0" "$(wait_for 'true|6|0|0 0 1 0' "$(rounded "$wl")+'|'+$look")"
+rm -f $ROOT/config/gtk-4.0/gtk.css
 ev "$wl.metaWindow.maximize(); 0" >/dev/null
-chk "settings: a maximized window stays rounded, without an outline or shadow" "true|0|" \
-  "$(wait_for 'true|0|' "$(rounded "$wl")+'|'+$look")"
+chk "a maximized window has no effect" "false" "$(wait_for false "$(rounded "$wl")")"
+eset round-maximized true
+chk "settings: a maximized window stays rounded, without an outline or shadow" "true|15|0|" \
+  "$(wait_for 'true|15|0|' "$(rounded "$wl")+'|'+$look")"
+ev "$wl.metaWindow.set_maximize_flags(Meta.MaximizeFlags.VERTICAL); $wl.metaWindow.unmaximize(); $wl.metaWindow.set_maximize_flags(Meta.MaximizeFlags.VERTICAL); 0" >/dev/null
+chk "settings: a tiled window stays rounded, with libadwaita's line" "true|15|0|0 0 1 0" \
+  "$(wait_for 'true|15|0|0 0 1 0' "$(rounded "$wl")+'|'+$look")"
+ev "$wl.metaWindow.maximize(); 0" >/dev/null
 eset round-maximized false
-chk "settings: and turned off, it is square again" "false" "$(wait_for false "$(rounded "$wl")")"
+chk "settings: and turned off, a maximized window loses it again" "false" "$(wait_for false "$(rounded "$wl")")"
 ev "$wl.metaWindow.unmaximize(); 0" >/dev/null
 wait_for true "$(rounded "$wl")" >/dev/null
 

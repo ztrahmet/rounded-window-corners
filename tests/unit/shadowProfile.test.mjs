@@ -61,6 +61,9 @@ test('a compiled style has each look\'s slots, and room for both looks of each s
     assert.deepEqual(normal.focused.slots, compileShadow(style.normal.focused.shadow));
     assert.deepEqual(normal.backdrop.slots, compileShadow(style.normal.backdrop.shadow));
     assert.deepEqual(tiled.radii, [0, 0, 0, 0]);
+    assert.deepEqual([normal.draws, tiled.draws, maximized.draws], [true, true, false], 'a maximized window draws nothing');
+    const unlined = {...style.tiled, focused: {...style.tiled.focused, shadow: []}, backdrop: {...style.tiled.backdrop, shadow: []}};
+    assert.equal(compileStyle({...style, tiled: unlined}).tiled.draws, false);
     const outside = compileStyle({...style, normal: {...style.normal, focused: {...style.normal.focused, outlineWidth: 30, outlineOffset: 0}}});
     assert.equal(outside.normal.reach, 31, 'an outline wider than the shadow');
 });
