@@ -88,6 +88,13 @@ x11='global.get_window_actors().find(a=>a.metaWindow.get_client_type()===Meta.Wi
 adw='global.get_window_actors().find(a=>/adwaita/i.test(a.metaWindow.get_wm_class()||""))'
 windows='""+global.get_window_actors().length'
 rounded() { echo "\"\"+rwcTest.rounded($1)"; }
+# GJS can deadlock collecting a Gio.Settings while dconf delivers a change to it (GNOME/gjs!1134), so the settings of
+# the disabled extension are collected at once, before the next change.
+disable_ext() {
+  ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
+  wait_for 2 "''+Main.extensionManager.lookup('$UUID').state" >/dev/null
+  ev "imports.system.gc(); 0" >/dev/null
+}
 
 echo "$(gnome-shell --version)"
 ev "$(cat "$HERE/helpers.js"); 0" >/dev/null
@@ -173,8 +180,7 @@ chk "a later offscreen effect stays after ours" "rounded-window-corners-room,rou
   "$(val "$wl.get_effects().map(e=>e.get_name()).join()")"
 ev "$wl.remove_effect_by_name('foreign-dimmer'); 0" >/dev/null
 # So must one the window already has when the extension is enabled, like the Shell's dimmer after unlocking.
-ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
-wait_for 2 "''+Main.extensionManager.lookup('$UUID').state" >/dev/null
+disable_ext
 ev "$wl.add_effect_with_name('earlier-dimmer', new imports.gi.Clutter.BrightnessContrastEffect()); 0" >/dev/null
 ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
 chk "an earlier offscreen effect goes after ours" "rounded-window-corners-room,rounded-window-corners,earlier-dimmer" \
@@ -427,8 +433,7 @@ chk "settings: an app or toolkit style's invalid values keep their defaults" "15
 eset toolkit-styles "{'gtk3': {'custom-style': <true>, 'corner-radius': <4>}}"
 # Marks the effects, so the next check sees only those made after enabling again.
 ev "[$wl,$x11,$adw].forEach(a => { rwcTest.effect(a).rwcStale = true; }); 0" >/dev/null
-ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
-wait_for 2 "''+Main.extensionManager.lookup('$UUID').state" >/dev/null
+disable_ext
 ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
 chk "settings: they apply again after disable and enable" "4,21,9" \
   "$(wait_for 4,21,9 "[$wl,$x11,$adw].map(a=>rwcTest.rounded(a) && !rwcTest.effect(a).rwcStale && rwcTest.effect(a).rwcArgs[1][0]).join()")"
@@ -526,6 +531,27 @@ ev "$bare.forEach(a=>a.metaWindow.delete(global.get_current_time()));
     global.get_window_actors().forEach(a=>a.metaWindow.unminimize()); 0" >/dev/null
 need 3 "$windows" "the bare windows did not close"
 
+# A window whose main buffer is 1x1, stretched by a viewport, must still show what it draws (#27).
+if command -v gst-launch-1.0 >/dev/null; then
+  WAYLAND_DISPLAY=rwc-ci gst-launch-1.0 videotestsrc pattern=red ! waylandsink >/dev/null 2>&1 &
+  video='global.get_window_actors().find(a=>/gst/i.test(a.metaWindow.get_wm_class()||""))'
+  need true "''+!!($video)" "the video window did not open"
+  ev "const w=($video).metaWindow; w.move_resize_frame(true, 60, 60, 320, 240); w.activate(global.get_current_time()); 0" >/dev/null
+  wait_for 60,60 "const f=($video).metaWindow.get_frame_rect(); f.x+','+f.y" >/dev/null
+  sleep 1
+  shown=$(measure "rwcTest.colorAt($video)")
+  if [ "$shown" = unsupported ]; then
+    echo "  SKIP  a viewport-stretched window shows its video (needs --privileged)"
+  else
+    chk "a viewport-stretched window is rounded and shows its video" "true|red" \
+      "$(val "$(rounded "$video")+'|'+('$shown'.split(',').map(Number).every((v, i) => i === 0 ? v > 200 : v < 60) ? 'red' : '$shown')")"
+  fi
+  ev "($video).metaWindow.delete(global.get_current_time()); 0" >/dev/null
+  need 3 "$windows" "the video window did not close"
+else
+  echo "  SKIP  a viewport-stretched window shows its video (needs GStreamer's waylandsink)"
+fi
+
 # Stress: churn windows, states, the style and the extension itself, then audit every window.
 open_wl; open_wl; open_x11
 need 6 "$windows" "the stress windows did not open"
@@ -547,14 +573,13 @@ done
 # Enabling and disabling complete asynchronously, so wait for each one.
 state="''+Main.extensionManager.lookup('$UUID').state"
 for _ in $(seq 5); do
-  ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
-  wait_for 2 "$state" >/dev/null
+  disable_ext
   ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
   wait_for 1 "$state" >/dev/null
 done
 chk "after the stress, every window is in the right state" "ok" "$(wait_for ok 'rwcTest.audit()')"
 
-ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
+disable_ext
 chk "disable leaves no effects behind" "0" \
   "$(wait_for 0 'let n=0; const walk=a=>{if(a.get_effects)n+=rwcTest.ours(a);a.get_children().forEach(walk);};
      global.get_window_actors().forEach(walk); ""+n')"

@@ -7,6 +7,11 @@ RUN dnf install -y --setopt=install_weak_deps=False \
         libadwaita-demo procps-ng zip unzip xprop python3 \
     && dnf clean all
 
+# A video window whose main buffer is 1x1, stretched by a viewport, as mpv's dmabuf-wayland output draws it.
+RUN dnf install -y --setopt=install_weak_deps=False \
+        gstreamer1 gstreamer1-plugins-base gstreamer1-plugins-bad-free \
+    && dnf clean all
+
 # Real GTK themes, to check that the extension ignores them as libadwaita does.
 RUN dnf install -y --setopt=install_weak_deps=False --skip-unavailable \
         arc-theme breeze-gtk-gtk4 yaru-gtk4-theme \

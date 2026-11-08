@@ -119,6 +119,17 @@ const rwcTest = {
         return r < 16 && g < 16 && b > 239 ? 'ok' : `${r},${g},${b}`;
     },
 
+    // The color at the middle of the window, as r,g,b.
+    colorAt(actor) {
+        const pixel = rwcTest.pixels();
+        if (typeof pixel === 'string')
+            return pixel;
+
+        const s = rwcTest.shotScale;
+        const f = actor.metaWindow.get_frame_rect();
+        return pixel(Math.round((f.x + f.width / 2) * s), Math.round((f.y + f.height / 2) * s)).join();
+    },
+
     // How much the shadow darkens the background 1 to 12 px left of the window.
     shadowShowing(actor) {
         const pixel = rwcTest.pixels();
