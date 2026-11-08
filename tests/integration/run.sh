@@ -172,6 +172,14 @@ wait_for true "$(rounded "$wl")" >/dev/null
 chk "a later offscreen effect stays after ours" "rounded-window-corners-room,rounded-window-corners,foreign-dimmer" \
   "$(val "$wl.get_effects().map(e=>e.get_name()).join()")"
 ev "$wl.remove_effect_by_name('foreign-dimmer'); 0" >/dev/null
+# So must one the window already has when the extension is enabled, like the Shell's dimmer after unlocking.
+ev "Main.extensionManager.disableExtension('$UUID'); 0" >/dev/null
+wait_for 2 "''+Main.extensionManager.lookup('$UUID').state" >/dev/null
+ev "$wl.add_effect_with_name('earlier-dimmer', new imports.gi.Clutter.BrightnessContrastEffect()); 0" >/dev/null
+ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
+chk "an earlier offscreen effect goes after ours" "rounded-window-corners-room,rounded-window-corners,earlier-dimmer" \
+  "$(wait_for rounded-window-corners-room,rounded-window-corners,earlier-dimmer "$wl.get_effects().map(e=>e.get_name()).join()")"
+ev "$wl.remove_effect_by_name('earlier-dimmer'); 0" >/dev/null
 
 for size in "700 500" "900 650" "800 600"; do
   ev "$x11.metaWindow.move_resize_frame(true, 100, 100, ${size% *}, ${size#* }); 0" >/dev/null; sleep 0.3
