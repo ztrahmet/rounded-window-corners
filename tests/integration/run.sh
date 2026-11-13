@@ -336,6 +336,18 @@ eset allowlist "[]"; eset allowlist-toolkits "['libadwaita']"
 chk "settings: an allowlisted toolkit is rounded whatever its switch" "false,false,true" "$(wait_for false,false,true "$states")"
 eset allowlist-toolkits "[]"; eset use-allowlist false
 
+# A Wine app is told by Wine's ntdll.so, before the toolkits it may load too: here a copy of zlib named like it.
+mkdir -p $ROOT/wine/x86_64-unix
+cp "$(ldconfig -p | awk '/libz\.so\.1 /{print $NF; exit}')" $ROOT/wine/x86_64-unix/ntdll.so
+LD_PRELOAD=$ROOT/wine/x86_64-unix/ntdll.so WAYLAND_DISPLAY=rwc-ci GDK_BACKEND=wayland gjs $CLIENT >/dev/null 2>&1 &
+wine="global.get_window_actors().find(a=>a.metaWindow.get_pid()===$!)"
+need true "!!($wine)" "the Wine window did not open"
+eset blocklist-toolkits "['wine']"
+chk "settings: Wine apps are a toolkit of their own" "false,true" "$(wait_for false,true "[$wine,$wl].map(rwcTest.rounded).join()")"
+eset blocklist-toolkits "[]"
+ev "$wine.metaWindow.delete(global.get_current_time()); 0" >/dev/null
+need false "''+!!($wine)" "the Wine window did not close"
+
 # A window whose WM class changes moves to another app, and the lists must follow once the Shell has found it.
 reclass() { DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH python3 -c '
 import ctypes, sys

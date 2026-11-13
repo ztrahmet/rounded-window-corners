@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-09 02:54+0300\n"
+"POT-Creation-Date: 2026-11-13 04:46+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: German\n"
@@ -30,6 +30,10 @@ msgstr "libadwaita-Anwendungen"
 #: prefs/appListGroup.js
 msgid "libhandy Apps"
 msgstr "libhandy-Anwendungen"
+
+#: prefs/appListGroup.js
+msgid "Wine Apps"
+msgstr "Wine-Anwendungen"
 
 #: prefs/appListGroup.js
 msgid "Chromium and Electron Apps"

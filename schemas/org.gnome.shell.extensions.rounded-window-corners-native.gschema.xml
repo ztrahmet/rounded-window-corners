@@ -30,7 +30,7 @@
     <key name="blocklist-toolkits" type="as">
       <default>[]</default>
       <summary>Toolkits whose apps are not rounded</summary>
-      <description>Toolkits: libadwaita, libhandy, chromium, firefox, java, qt, gtk4 and gtk3.</description>
+      <description>Toolkits: libadwaita, libhandy, wine, chromium, firefox, java, qt, gtk4 and gtk3.</description>
     </key>
     <key name="allowlist-toolkits" type="as">
       <default>[]</default>

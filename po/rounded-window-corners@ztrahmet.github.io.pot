@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/"
 "issues\n"
-"POT-Creation-Date: 2026-11-09 02:54+0300\n"
+"POT-Creation-Date: 2026-11-13 04:46+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,6 +32,10 @@ msgstr ""
 
 #: prefs/appListGroup.js
 msgid "libhandy Apps"
+msgstr ""
+
+#: prefs/appListGroup.js
+msgid "Wine Apps"
 msgstr ""
 
 #: prefs/appListGroup.js
