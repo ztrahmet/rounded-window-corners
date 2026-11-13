@@ -22,6 +22,7 @@ function toolkitNames() {
     return new Map([
         ['libadwaita', _('libadwaita Apps')],
         ['libhandy', _('libhandy Apps')],
+        ['wine', _('Wine Apps')],
         ['chromium', _('Chromium and Electron Apps')],
         ['firefox', _('Firefox and Thunderbird')],
         ['java', _('Java Apps')],
