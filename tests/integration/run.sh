@@ -330,6 +330,23 @@ chk "settings: and turned off, a maximized window loses it again" "false" "$(wai
 ev "$wl.metaWindow.unmaximize(); 0" >/dev/null
 wait_for true "$(rounded "$wl")" >/dev/null
 
+# Shows or hides the overview and waits until it is still: true when shown, false when hidden.
+overview() {
+  ev "Main.overview.$1(); 0" >/dev/null
+  need "$2" "Main.overview.animationInProgress ? 'moving' : ''+Main.overview.visible" "the overview did not $1"
+}
+overview show true
+chk "settings: windows stay rounded in the overview" "true,true,false" "$(val "$states")"
+eset round-overview false
+chk "settings: with Round Overview Windows off, they are not, at once" "false,false,false" \
+  "$(wait_for false,false,false "$states")"
+overview hide false
+chk "settings: and rounded again as the overview hides" "true,true,false" "$(wait_for true,true,false "$states")"
+overview show true
+chk "settings: and not again when it shows" "false,false,false" "$(wait_for false,false,false "$states")"
+overview hide false
+eset round-overview true
+
 eset blocklist "['$WL_APP']"
 chk "settings: a blocklisted app is not rounded" "false,true,false" "$(wait_for false,true,false "$states")"
 eset blocklist "[]"; eset blocklist-toolkits "['gtk3']"

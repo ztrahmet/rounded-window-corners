@@ -31,6 +31,7 @@ class GeneralPage extends Adw.PreferencesPage {
             ['round-libhandy-apps', _('Round libhandy Apps'), _('Not all of them round their own windows')],
             ['round-maximized', _('Round Maximized and Tiled Windows'),
                 _('Without a shadow, as in libadwaita; fullscreen stays square')],
+            ['round-overview', _('Round Overview Windows'), _('Off, the overview shows them as their apps draw them')],
         ]) {
             const row = new Adw.SwitchRow({title, subtitle});
             settings.bind(key, row, 'active', Gio.SettingsBindFlags.DEFAULT);
