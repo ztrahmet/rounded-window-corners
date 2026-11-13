@@ -76,29 +76,21 @@ push that changes more than the docs and images, and weekly, to catch libadwaita
 After changing the text in the preferences, update the template and every translation:
 
 ```bash
-POT=po/rounded-window-corners@ztrahmet.github.io.pot
-xgettext --from-code=UTF-8 --add-comments=Translators --add-location=file \
-    --package-name=rounded-window-corners \
-    --msgid-bugs-address=https://github.com/ztrahmet/rounded-window-corners/issues \
-    -o $POT prefs.js prefs/*.js
-for po in po/*.po; do
-    msgmerge --update --no-wrap --backup=none "$po" $POT
-    msgattrib --no-obsolete --no-wrap -o "$po" "$po"
-done
+./scripts/update-translations.sh
 ```
 
-Then translate the new and changed strings, and check them with
-`msgfmt --check -o /dev/null po/<language>.po`. Follow the terms and punctuation GNOME's
-own translations use for each language.
+Then translate the new and changed strings, following the terms and punctuation GNOME's own
+translations use for each language, and check them:
+
+```bash
+./scripts/compile.sh
+```
 
 A new language starts from the template:
 
 ```bash
-msginit -i $POT -l <language> -o po/<language>.po
+msginit -i po/rounded-window-corners@ztrahmet.github.io.pot -l <language> -o po/<language>.po
 ```
-
-To see the translations in a shell running from the source tree, compile them first with
-`./scripts/compile.sh`.
 
 ## Packaging
 
