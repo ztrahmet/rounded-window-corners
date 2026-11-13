@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-13 12:08+0300\n"
+"POT-Creation-Date: 2026-11-13 15:29+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Turkish\n"
@@ -158,6 +158,14 @@ msgstr "Ekranı Kaplayan ve Döşenmiş Pencereleri Yuvarlat"
 #: prefs/generalPage.js
 msgid "Without a shadow, as in libadwaita; fullscreen stays square"
 msgstr "libadwaita’daki gibi gölgesiz; tam ekran köşeli kalır"
+
+#: prefs/generalPage.js
+msgid "Round Overview Windows"
+msgstr "Genel Görünümdeki Pencereleri Yuvarlat"
+
+#: prefs/generalPage.js
+msgid "Off, the overview shows them as their apps draw them"
+msgstr "Kapalıyken genel görünüm, pencereleri uygulamalarının çizdiği gibi gösterir"
 
 #: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"

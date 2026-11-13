@@ -15,6 +15,11 @@
       <summary>Keep maximized and tiled windows rounded</summary>
       <description>Their outline and shadow follow libadwaita. Fullscreen windows stay square.</description>
     </key>
+    <key name="round-overview" type="b">
+      <default>true</default>
+      <summary>Keep windows rounded in the overview</summary>
+      <description>Off, the overview shows them as their apps draw them.</description>
+    </key>
     <key name="use-allowlist" type="b">
       <default>false</default>
       <summary>Use the allowlist instead of the blocklist</summary>
