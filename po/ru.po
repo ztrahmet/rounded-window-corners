@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-13 15:29+0300\n"
+"POT-Creation-Date: 2026-11-13 17:41+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Russian\n"
@@ -166,6 +166,14 @@ msgstr "Скруглять окна в обзоре"
 #: prefs/generalPage.js
 msgid "Off, the overview shows them as their apps draw them"
 msgstr "Если выключено, обзор показывает окна так, как их рисуют приложения"
+
+#: prefs/generalPage.js
+msgid "Keep Windows Sharp (Experimental)"
+msgstr "Сохранять чёткость окон (экспериментально)"
+
+#: prefs/generalPage.js
+msgid "At fractional scales and in the overview"
+msgstr "При дробном масштабе и в обзоре"
 
 #: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"
