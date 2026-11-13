@@ -16,6 +16,9 @@ const rwcTest = {
             !(win.maximizedHorizontally && win.maximizedVertically) && !win.fullscreen;
     },
 
+    // Every top-left radius the effects were given.
+    radii: [],
+
     // Records what each effect was last given, to compare with its window.
     spy(effect) {
         const proto = Object.getPrototypeOf(effect);
@@ -24,6 +27,7 @@ const rwcTest = {
         const update = proto.update;
         proto.update = function (...args) {
             this.rwcArgs = args;
+            rwcTest.radii.push(args[1][0]);
             return update.apply(this, args);
         };
         proto.rwcSpied = true;

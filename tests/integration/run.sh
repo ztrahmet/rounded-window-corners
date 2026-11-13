@@ -234,6 +234,10 @@ wait_for 8,8,8,8 "$radii" >/dev/null
 touch $ROOT/config/gtk-4.0/gtk.css
 sleep 1
 chk "a gtk.css save reloads the style once, touching it doesn't" "1" "$(val "''+rwcReloads")"
+# No window may show libadwaita's look before gtk.css is read.
+disable_ext
+ev "rwcTest.radii = []; Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
+chk "enabling draws windows with gtk.css from the start" "8" "$(wait_for 8 "[...new Set(rwcTest.radii)].join()")"
 rm -f $ROOT/config/gtk-4.0/gtk.css
 wait_for 15,15,15,15 "$radii" >/dev/null
 
@@ -406,8 +410,10 @@ radius="''+rwcTest.effect($wl).rwcArgs[1][0]"
 printf 'window.csd { border-radius: 7px; }\n' > $ROOT/config/gtk-4.0/gtk.css
 sleep 1.5
 chk "settings: the custom style stops reading gtk.css" "9|null" "$(val "$radius+'|'+rwcTest.tracker()._styles")"
+ev "rwcTest.radii = []; 0" >/dev/null
 eset custom-style false
 chk "settings: and turned off, gtk.css counts again" "7" "$(wait_for 7 "$radius")"
+chk "settings: the custom style stays until gtk.css is read" "7" "$(val "[...new Set(rwcTest.radii)].join()")"
 rm -f $ROOT/config/gtk-4.0/gtk.css
 eset custom-style true
 wait_for 9 "$radius" >/dev/null
