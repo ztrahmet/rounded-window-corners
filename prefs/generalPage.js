@@ -32,6 +32,7 @@ class GeneralPage extends Adw.PreferencesPage {
             ['round-maximized', _('Round Maximized and Tiled Windows'),
                 _('Without a shadow, as in libadwaita; fullscreen stays square')],
             ['round-overview', _('Round Overview Windows'), _('Off, the overview shows them as their apps draw them')],
+            ['sharp-windows', _('Keep Windows Sharp (Experimental)'), _('At fractional scales and in the overview')],
         ]) {
             const row = new Adw.SwitchRow({title, subtitle});
             settings.bind(key, row, 'active', Gio.SettingsBindFlags.DEFAULT);

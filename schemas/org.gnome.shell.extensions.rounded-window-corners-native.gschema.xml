@@ -20,6 +20,13 @@
       <summary>Keep windows rounded in the overview</summary>
       <description>Off, the overview shows them as their apps draw them.</description>
     </key>
+    <key name="sharp-windows" type="b">
+      <default>false</default>
+      <summary>Keep rounded windows sharp at fractional scales and in the overview</summary>
+      <description>
+        Experimental. Draws them through a buffer at the scale they are shown at, not one at the next whole scale.
+      </description>
+    </key>
     <key name="use-allowlist" type="b">
       <default>false</default>
       <summary>Use the allowlist instead of the blocklist</summary>

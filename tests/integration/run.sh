@@ -70,10 +70,11 @@ need() {
   got=$(wait_for "$1" "$2")
   [ "$got" = "$1" ] || { echo "FATAL: $3 (want '$1' got '$got')"; exit 1; }
 }
-# Captures the screen and prints the measure a JS expression takes of it, or why there is none.
+# Captures the screen, or the given width and height of it, and prints the measure a JS expression takes of it, or why
+# there is none.
 measure() {
   local got=
-  ev "rwcTest.capture(); 0" >/dev/null
+  ev "rwcTest.capture(${2:-}); 0" >/dev/null
   for _ in $(seq 50); do
     got=$(val "$1")
     [ "$got" != pending ] && break
@@ -176,15 +177,16 @@ ev "$wl.add_effect_with_name('foreign-dimmer', new imports.gi.Clutter.Brightness
 wait_for false "$(rounded "$wl")" >/dev/null
 ev "$wl.metaWindow.unmaximize(); 0" >/dev/null
 wait_for true "$(rounded "$wl")" >/dev/null
-chk "a later offscreen effect stays after ours" "rounded-window-corners-room,rounded-window-corners,foreign-dimmer" \
+ours=rounded-window-corners-room,rounded-window-corners,rounded-window-corners-sharp
+chk "a later offscreen effect stays after ours" "$ours,foreign-dimmer" \
   "$(val "$wl.get_effects().map(e=>e.get_name()).join()")"
 ev "$wl.remove_effect_by_name('foreign-dimmer'); 0" >/dev/null
 # So must one the window already has when the extension is enabled, like the Shell's dimmer after unlocking.
 disable_ext
 ev "$wl.add_effect_with_name('earlier-dimmer', new imports.gi.Clutter.BrightnessContrastEffect()); 0" >/dev/null
 ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
-chk "an earlier offscreen effect goes after ours" "rounded-window-corners-room,rounded-window-corners,earlier-dimmer" \
-  "$(wait_for rounded-window-corners-room,rounded-window-corners,earlier-dimmer "$wl.get_effects().map(e=>e.get_name()).join()")"
+chk "an earlier offscreen effect goes after ours" "$ours,earlier-dimmer" \
+  "$(wait_for $ours,earlier-dimmer "$wl.get_effects().map(e=>e.get_name()).join()")"
 ev "$wl.remove_effect_by_name('earlier-dimmer'); 0" >/dev/null
 
 for size in "700 500" "900 650" "800 600"; do
@@ -496,32 +498,91 @@ eset toolkit-styles "{}"
 # At fractional scales the app's border must stay hidden at every position (#10).
 monitor_scale="''+global.display.get_monitor_scale(0)"
 smear="''+rwcTest.effect($wl)._smear"
-for scale in 1.25 1.5; do
-  ev "rwcTest.setScale($scale); 0" >/dev/null
-  wait_for $scale "$monitor_scale" >/dev/null
-  worst=0
-  for x in 40 41 42 43; do
-    ev "const w = ($wl).metaWindow; w.move_resize_frame(true, $x, 40, 400, 300); w.activate(global.get_current_time()); 0" >/dev/null
-    wait_for ok "rwcTest.boundsError($wl) || 'ok'" >/dev/null
-    sleep 0.5
-    shown=$(measure "rwcTest.borderShowing($wl)")
-    [ "$shown" = unsupported ] && break
-    worst=$(awk -v a=$worst -v b=$shown 'BEGIN { print (b > a) ? b : a }')
+for sharp in false true; do
+  eset sharp-windows $sharp
+  mode=$([ $sharp = true ] && echo ' with Keep Windows Sharp')
+  for scale in 1.25 1.5; do
+    ev "rwcTest.setScale($scale); 0" >/dev/null
+    wait_for $scale "$monitor_scale" >/dev/null
+    worst=0
+    for x in 40 41 42 43; do
+      ev "const w = ($wl).metaWindow; w.move_resize_frame(true, $x, 40, 400, 300);
+          w.activate(global.get_current_time()); 0" >/dev/null
+      wait_for ok "rwcTest.boundsError($wl) || 'ok'" >/dev/null
+      sleep 0.5
+      shown=$(measure "rwcTest.borderShowing($wl)")
+      [ "$shown" = unsupported ] && break
+      worst=$(awk -v a=$worst -v b=$shown 'BEGIN { print (b > a) ? b : a }')
+    done
+    if [ $sharp = false ]; then
+      chk "at $scale: smear handling is on and the bounds match" "1|ok" \
+        "$(val "$smear+'|'+(rwcTest.boundsError($wl) || 'ok')")"
+    else
+      chk "at $scale$mode: the sharp effect draws the window and the bounds match" "true|ok" \
+        "$(val "''+$wl.get_effect('rounded-window-corners-sharp').enabled+'|'+(rwcTest.boundsError($wl) || 'ok')")"
+    fi
+    if [ "$shown" = unsupported ]; then
+      echo "  SKIP  at $scale$mode: the app's border stays hidden (needs --privileged)"
+    elif [ "$colors" != ok ]; then
+      echo "  SKIP  at $scale$mode: the app's border stays hidden (the capture shows the window's blue as $colors)"
+    else
+      chk "at $scale$mode: the app's border stays hidden at every position" "ok" \
+        "$(awk -v w=$worst 'BEGIN { print (w < 0.05) ? "ok" : "showing " w }')"
+    fi
   done
-  chk "at $scale: smear handling is on and the bounds match" "1|ok" \
-    "$(val "$smear+'|'+(rwcTest.boundsError($wl) || 'ok')")"
-  if [ "$shown" = unsupported ]; then
-    echo "  SKIP  at $scale: the app's border stays hidden (needs --privileged)"
-  elif [ "$colors" != ok ]; then
-    echo "  SKIP  at $scale: the app's border stays hidden (the capture shows the window's blue as $colors)"
-  else
-    chk "at $scale: the app's border stays hidden at every position" "ok" \
-      "$(awk -v w=$worst 'BEGIN { print (w < 0.05) ? "ok" : "showing " w }')"
-  fi
 done
+eset sharp-windows false
 ev "rwcTest.setScale(1); 0" >/dev/null
 wait_for 1 "$monitor_scale" >/dev/null
 chk "back at 100%: smear handling is off" "0" "$(wait_for 0 "$smear")"
+
+# Clutter draws a window through a buffer at the next whole scale, which resamples it at fractional scales (#20), and
+# samples that buffer unfiltered in the overview (#2); with Keep Windows Sharp it's drawn as without the extension.
+WAYLAND_DISPLAY=rwc-ci GDK_BACKEND=wayland gjs /tests/integration/clients/pattern-gtk4.js >/dev/null 2>&1 &
+pattern='global.get_window_actors().find(a=>a.metaWindow.get_title()==="rwc-pattern")'
+need true "$(rounded "$pattern")" "the pattern window did not open"
+sharp_on="''+$pattern.get_effect('rounded-window-corners-sharp').enabled"
+# Buffer pixels per logical pixel of the pattern window, which follows the monitor's scale once the app redraws.
+density="const t=($pattern).get_texture(); const [, w]=t.get_preferred_size(); ''+t.get_texture().get_width() / w"
+# Keeps an area of the pattern window, insideOf or previewOf, without the extension and with each effect.
+keep_pattern() {
+  disable_ext
+  measure "rwcTest.keep('$1-plain', rwcTest.$2($pattern))" "${3:-}" >/dev/null
+  ev "Main.extensionManager.enableExtension('$UUID'); 0" >/dev/null
+  wait_for true "$(rounded "$pattern")" >/dev/null
+  for sharp in false true; do
+    eset sharp-windows $sharp
+    wait_for $sharp "$sharp_on" >/dev/null
+    sleep 1
+    measure "rwcTest.keep('$1-$sharp', rwcTest.$2($pattern))" "${3:-}" >/dev/null
+  done
+  eset sharp-windows false
+}
+ev "rwcTest.setScale(1.25); 0" >/dev/null
+wait_for 1.25 "$monitor_scale" >/dev/null
+ev "const w = ($pattern).metaWindow; w.move_resize_frame(true, 40, 40, 400, 300);
+    w.activate(global.get_current_time()); 0" >/dev/null
+need 40,40 "const f=($pattern).metaWindow.get_frame_rect(); f.x+','+f.y" "the pattern window did not move"
+need 1.25 "$density" "the pattern window did not redraw at 125%"
+keep_pattern desktop insideOf
+ev "rwcTest.setScale(1); 0" >/dev/null
+wait_for 1 "$monitor_scale" >/dev/null
+ev "const w = ($pattern).metaWindow; w.move_resize_frame(true, 40, 40, 1360, 820);
+    w.activate(global.get_current_time()); 0" >/dev/null
+need 1 "$density" "the pattern window did not redraw at 100%"
+overview show true
+keep_pattern overview previewOf "global.stage.width, global.stage.height"
+overview hide false
+# Out of 255, so Clutter's own differ clearly and the sharp effect's not at all.
+for scene in desktop overview; do
+  where=$([ $scene = desktop ] && echo 'at 125%' || echo 'in the overview')
+  chk "$where, Clutter's buffer changes how a window looks" "changed" \
+    "$(val "const d = rwcTest.difference('$scene-false', '$scene-plain'); d > 1 ? 'changed' : 'differs by ' + d")"
+  chk "$where, Keep Windows Sharp draws a window as without the extension" "same" \
+    "$(val "const d = rwcTest.difference('$scene-true', '$scene-plain'); d < 0.5 ? 'same' : 'differs by ' + d")"
+done
+ev "($pattern).metaWindow.delete(global.get_current_time()); 0" >/dev/null
+need false "''+!!($pattern)" "the pattern window did not close"
 
 # Windows that leave no room of their own still get the whole shadow (#14), and on X11 only ours.
 RWC_BARE=1 WAYLAND_DISPLAY=rwc-ci GDK_BACKEND=wayland gjs $CLIENT >/dev/null 2>&1 &
