@@ -26,7 +26,8 @@ class GeneralPage extends Adw.PreferencesPage {
         const windows = new Adw.PreferencesGroup({title: _('Windows')});
         this.add(windows);
         for (const [key, title, subtitle] of [
-            ['round-libadwaita-apps', _('Round libadwaita Apps'), _('Only needed for a custom style or when maximized')],
+            ['round-libadwaita-apps', _('Round libadwaita Apps'),
+                _('Only needed for a custom style or when maximized')],
             ['round-libhandy-apps', _('Round libhandy Apps'), _('Not all of them round their own windows')],
             ['round-maximized', _('Round Maximized and Tiled Windows'),
                 _('Without a shadow, as in libadwaita; fullscreen stays square')],

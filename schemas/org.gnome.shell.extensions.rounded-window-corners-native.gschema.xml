@@ -117,12 +117,23 @@
     <key name="app-styles" type="a{sa{sv}}">
       <default>{}</default>
       <summary>Styles of their own, by the apps’ desktop IDs</summary>
-      <description>Each holds any of the keys from custom-style to border-width that it sets; the others keep their defaults. Without a border-method, the toolkit’s style decides how the app’s border is hidden, then the general one.</description>
+      <description>
+        Each holds any of the keys from custom-style to border-width that it sets; the others keep their defaults.
+        Without a border-method, the toolkit’s style decides how the app’s border is hidden, then the general one.
+      </description>
     </key>
     <key name="toolkit-styles" type="a{sa{sv}}">
-      <default>{'chromium': {'border-method': &lt;'off'&gt;}, 'firefox': {'border-method': &lt;'off'&gt;}, 'gtk4': {'border-method': &lt;'off'&gt;}, 'gtk3': {'border-method': &lt;'off'&gt;}}</default>
+      <default>{
+        'chromium': {'border-method': &lt;'off'&gt;},
+        'firefox': {'border-method': &lt;'off'&gt;},
+        'gtk4': {'border-method': &lt;'off'&gt;},
+        'gtk3': {'border-method': &lt;'off'&gt;}
+      }</default>
       <summary>Styles of their own, by toolkit</summary>
-      <description>As in app-styles, by the toolkits in blocklist-toolkits. Those listed by default draw little or no border of their own, so they leave it alone.</description>
+      <description>
+        As in app-styles, by the toolkits in blocklist-toolkits.
+        Those listed by default draw little or no border of their own, so they leave it alone.
+      </description>
     </key>
   </schema>
 </schemalist>
