@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-13 04:46+0300\n"
+"POT-Creation-Date: 2026-11-13 12:08+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Chinese (simplified)\n"
@@ -71,34 +71,6 @@ msgstr "添加工具集"
 msgid "Remove"
 msgstr "移除"
 
-#: prefs/appsPage.js
-msgid "Apps"
-msgstr "应用"
-
-#: prefs/appsPage.js
-msgid "Active List"
-msgstr "当前列表"
-
-#: prefs/appsPage.js
-msgid "Switching keeps both lists"
-msgstr "切换时两个列表都会保留"
-
-#: prefs/appsPage.js
-msgid "Blocklist"
-msgstr "阻止列表"
-
-#: prefs/appsPage.js
-msgid "Allowlist"
-msgstr "允许列表"
-
-#: prefs/appsPage.js
-msgid "These apps are never rounded"
-msgstr "这些应用始终不使用圆角"
-
-#: prefs/appsPage.js
-msgid "Only these apps are rounded"
-msgstr "仅这些应用使用圆角"
-
 #: prefs/appStylesPage.js
 msgid "App Styles"
 msgstr "样式"
@@ -126,6 +98,34 @@ msgstr "替代工具集样式和常规样式"
 #: prefs/appStylesPage.js
 msgid "Replaces the general style"
 msgstr "替代常规样式"
+
+#: prefs/appsPage.js
+msgid "Apps"
+msgstr "应用"
+
+#: prefs/appsPage.js
+msgid "Active List"
+msgstr "当前列表"
+
+#: prefs/appsPage.js
+msgid "Switching keeps both lists"
+msgstr "切换时两个列表都会保留"
+
+#: prefs/appsPage.js
+msgid "Blocklist"
+msgstr "阻止列表"
+
+#: prefs/appsPage.js
+msgid "Allowlist"
+msgstr "允许列表"
+
+#: prefs/appsPage.js
+msgid "These apps are never rounded"
+msgstr "这些应用始终不使用圆角"
+
+#: prefs/appsPage.js
+msgid "Only these apps are rounded"
+msgstr "仅这些应用使用圆角"
 
 #: prefs/generalPage.js
 msgid "General"

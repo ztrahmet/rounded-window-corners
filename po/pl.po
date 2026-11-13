@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-13 04:46+0300\n"
+"POT-Creation-Date: 2026-11-13 12:08+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Polish\n"
@@ -71,34 +71,6 @@ msgstr "Dodaj zestaw narzędzi"
 msgid "Remove"
 msgstr "Usuń"
 
-#: prefs/appsPage.js
-msgid "Apps"
-msgstr "Aplikacje"
-
-#: prefs/appsPage.js
-msgid "Active List"
-msgstr "Aktywna lista"
-
-#: prefs/appsPage.js
-msgid "Switching keeps both lists"
-msgstr "Po przełączeniu obie listy zostają zachowane"
-
-#: prefs/appsPage.js
-msgid "Blocklist"
-msgstr "Lista blokowanych"
-
-#: prefs/appsPage.js
-msgid "Allowlist"
-msgstr "Lista dozwolonych"
-
-#: prefs/appsPage.js
-msgid "These apps are never rounded"
-msgstr "Te aplikacje nigdy nie są zaokrąglane"
-
-#: prefs/appsPage.js
-msgid "Only these apps are rounded"
-msgstr "Zaokrąglane są tylko te aplikacje"
-
 #: prefs/appStylesPage.js
 msgid "App Styles"
 msgstr "Style"
@@ -126,6 +98,34 @@ msgstr "Zastępuje styl zestawu narzędzi i styl ogólny"
 #: prefs/appStylesPage.js
 msgid "Replaces the general style"
 msgstr "Zastępuje styl ogólny"
+
+#: prefs/appsPage.js
+msgid "Apps"
+msgstr "Aplikacje"
+
+#: prefs/appsPage.js
+msgid "Active List"
+msgstr "Aktywna lista"
+
+#: prefs/appsPage.js
+msgid "Switching keeps both lists"
+msgstr "Po przełączeniu obie listy zostają zachowane"
+
+#: prefs/appsPage.js
+msgid "Blocklist"
+msgstr "Lista blokowanych"
+
+#: prefs/appsPage.js
+msgid "Allowlist"
+msgstr "Lista dozwolonych"
+
+#: prefs/appsPage.js
+msgid "These apps are never rounded"
+msgstr "Te aplikacje nigdy nie są zaokrąglane"
+
+#: prefs/appsPage.js
+msgid "Only these apps are rounded"
+msgstr "Zaokrąglane są tylko te aplikacje"
 
 #: prefs/generalPage.js
 msgid "General"

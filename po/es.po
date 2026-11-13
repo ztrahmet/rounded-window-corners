@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-13 04:46+0300\n"
+"POT-Creation-Date: 2026-11-13 12:08+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Spanish\n"
@@ -71,34 +71,6 @@ msgstr "Añadir kit de herramientas"
 msgid "Remove"
 msgstr "Quitar"
 
-#: prefs/appsPage.js
-msgid "Apps"
-msgstr "Aplicaciones"
-
-#: prefs/appsPage.js
-msgid "Active List"
-msgstr "Lista activa"
-
-#: prefs/appsPage.js
-msgid "Switching keeps both lists"
-msgstr "Al cambiar se conservan las dos listas"
-
-#: prefs/appsPage.js
-msgid "Blocklist"
-msgstr "Lista de bloqueados"
-
-#: prefs/appsPage.js
-msgid "Allowlist"
-msgstr "Lista de permitidos"
-
-#: prefs/appsPage.js
-msgid "These apps are never rounded"
-msgstr "Estas aplicaciones nunca se redondean"
-
-#: prefs/appsPage.js
-msgid "Only these apps are rounded"
-msgstr "Solo se redondean estas aplicaciones"
-
 #: prefs/appStylesPage.js
 msgid "App Styles"
 msgstr "Estilos"
@@ -126,6 +98,34 @@ msgstr "Sustituye al estilo del kit de herramientas y al general"
 #: prefs/appStylesPage.js
 msgid "Replaces the general style"
 msgstr "Sustituye al estilo general"
+
+#: prefs/appsPage.js
+msgid "Apps"
+msgstr "Aplicaciones"
+
+#: prefs/appsPage.js
+msgid "Active List"
+msgstr "Lista activa"
+
+#: prefs/appsPage.js
+msgid "Switching keeps both lists"
+msgstr "Al cambiar se conservan las dos listas"
+
+#: prefs/appsPage.js
+msgid "Blocklist"
+msgstr "Lista de bloqueados"
+
+#: prefs/appsPage.js
+msgid "Allowlist"
+msgstr "Lista de permitidos"
+
+#: prefs/appsPage.js
+msgid "These apps are never rounded"
+msgstr "Estas aplicaciones nunca se redondean"
+
+#: prefs/appsPage.js
+msgid "Only these apps are rounded"
+msgstr "Solo se redondean estas aplicaciones"
 
 #: prefs/generalPage.js
 msgid "General"

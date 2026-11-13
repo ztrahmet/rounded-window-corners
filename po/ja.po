@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-13 04:46+0300\n"
+"POT-Creation-Date: 2026-11-13 12:08+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Japanese\n"
@@ -71,34 +71,6 @@ msgstr "ツールキットを追加"
 msgid "Remove"
 msgstr "削除"
 
-#: prefs/appsPage.js
-msgid "Apps"
-msgstr "アプリ"
-
-#: prefs/appsPage.js
-msgid "Active List"
-msgstr "有効なリスト"
-
-#: prefs/appsPage.js
-msgid "Switching keeps both lists"
-msgstr "切り替えても両方のリストは保持されます"
-
-#: prefs/appsPage.js
-msgid "Blocklist"
-msgstr "ブロックリスト"
-
-#: prefs/appsPage.js
-msgid "Allowlist"
-msgstr "許可リスト"
-
-#: prefs/appsPage.js
-msgid "These apps are never rounded"
-msgstr "これらのアプリは角を丸めません"
-
-#: prefs/appsPage.js
-msgid "Only these apps are rounded"
-msgstr "これらのアプリだけ角を丸めます"
-
 #: prefs/appStylesPage.js
 msgid "App Styles"
 msgstr "スタイル"
@@ -126,6 +98,34 @@ msgstr "ツールキットと全般のスタイルを置き換えます"
 #: prefs/appStylesPage.js
 msgid "Replaces the general style"
 msgstr "全般のスタイルを置き換えます"
+
+#: prefs/appsPage.js
+msgid "Apps"
+msgstr "アプリ"
+
+#: prefs/appsPage.js
+msgid "Active List"
+msgstr "有効なリスト"
+
+#: prefs/appsPage.js
+msgid "Switching keeps both lists"
+msgstr "切り替えても両方のリストは保持されます"
+
+#: prefs/appsPage.js
+msgid "Blocklist"
+msgstr "ブロックリスト"
+
+#: prefs/appsPage.js
+msgid "Allowlist"
+msgstr "許可リスト"
+
+#: prefs/appsPage.js
+msgid "These apps are never rounded"
+msgstr "これらのアプリは角を丸めません"
+
+#: prefs/appsPage.js
+msgid "Only these apps are rounded"
+msgstr "これらのアプリだけ角を丸めます"
 
 #: prefs/generalPage.js
 msgid "General"

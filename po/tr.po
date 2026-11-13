@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-13 04:46+0300\n"
+"POT-Creation-Date: 2026-11-13 12:08+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Turkish\n"
@@ -71,34 +71,6 @@ msgstr "Araç Takımı Ekle"
 msgid "Remove"
 msgstr "Kaldır"
 
-#: prefs/appsPage.js
-msgid "Apps"
-msgstr "Uygulamalar"
-
-#: prefs/appsPage.js
-msgid "Active List"
-msgstr "Etkin Liste"
-
-#: prefs/appsPage.js
-msgid "Switching keeps both lists"
-msgstr "Geçiş yapınca iki liste de korunur"
-
-#: prefs/appsPage.js
-msgid "Blocklist"
-msgstr "Engel Listesi"
-
-#: prefs/appsPage.js
-msgid "Allowlist"
-msgstr "İzin Listesi"
-
-#: prefs/appsPage.js
-msgid "These apps are never rounded"
-msgstr "Bu uygulamalar asla yuvarlatılmaz"
-
-#: prefs/appsPage.js
-msgid "Only these apps are rounded"
-msgstr "Yalnızca bu uygulamalar yuvarlatılır"
-
 #: prefs/appStylesPage.js
 msgid "App Styles"
 msgstr "Biçimler"
@@ -126,6 +98,34 @@ msgstr "Araç takımı ve genel biçimler yerine kullanılır"
 #: prefs/appStylesPage.js
 msgid "Replaces the general style"
 msgstr "Genel biçim yerine kullanılır"
+
+#: prefs/appsPage.js
+msgid "Apps"
+msgstr "Uygulamalar"
+
+#: prefs/appsPage.js
+msgid "Active List"
+msgstr "Etkin Liste"
+
+#: prefs/appsPage.js
+msgid "Switching keeps both lists"
+msgstr "Geçiş yapınca iki liste de korunur"
+
+#: prefs/appsPage.js
+msgid "Blocklist"
+msgstr "Engel Listesi"
+
+#: prefs/appsPage.js
+msgid "Allowlist"
+msgstr "İzin Listesi"
+
+#: prefs/appsPage.js
+msgid "These apps are never rounded"
+msgstr "Bu uygulamalar asla yuvarlatılmaz"
+
+#: prefs/appsPage.js
+msgid "Only these apps are rounded"
+msgstr "Yalnızca bu uygulamalar yuvarlatılır"
 
 #: prefs/generalPage.js
 msgid "General"

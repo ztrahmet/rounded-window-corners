@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/"
 "issues\n"
-"POT-Creation-Date: 2026-11-13 04:46+0300\n"
+"POT-Creation-Date: 2026-11-13 12:08+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,34 +74,6 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: prefs/appsPage.js
-msgid "Apps"
-msgstr ""
-
-#: prefs/appsPage.js
-msgid "Active List"
-msgstr ""
-
-#: prefs/appsPage.js
-msgid "Switching keeps both lists"
-msgstr ""
-
-#: prefs/appsPage.js
-msgid "Blocklist"
-msgstr ""
-
-#: prefs/appsPage.js
-msgid "Allowlist"
-msgstr ""
-
-#: prefs/appsPage.js
-msgid "These apps are never rounded"
-msgstr ""
-
-#: prefs/appsPage.js
-msgid "Only these apps are rounded"
-msgstr ""
-
 #: prefs/appStylesPage.js
 msgid "App Styles"
 msgstr ""
@@ -128,6 +100,34 @@ msgstr ""
 
 #: prefs/appStylesPage.js
 msgid "Replaces the general style"
+msgstr ""
+
+#: prefs/appsPage.js
+msgid "Apps"
+msgstr ""
+
+#: prefs/appsPage.js
+msgid "Active List"
+msgstr ""
+
+#: prefs/appsPage.js
+msgid "Switching keeps both lists"
+msgstr ""
+
+#: prefs/appsPage.js
+msgid "Blocklist"
+msgstr ""
+
+#: prefs/appsPage.js
+msgid "Allowlist"
+msgstr ""
+
+#: prefs/appsPage.js
+msgid "These apps are never rounded"
+msgstr ""
+
+#: prefs/appsPage.js
+msgid "Only these apps are rounded"
 msgstr ""
 
 #: prefs/generalPage.js
