@@ -235,7 +235,7 @@ export function addStyleGroups(page, style, customSubtitle, parent = null) {
     const custom = new Adw.SwitchRow({title: _('Custom Style'), subtitle: customSubtitle});
     custom.connect('notify::active', () => {
         const values = {'custom-style': custom.active};
-        if (!style.isSet('custom-style') && parent?.get('custom-style')) {
+        if (custom.active && !style.isSet('custom-style') && parent?.get('custom-style')) {
             for (const key of STYLE_KEYS.filter(k => !NOT_DRAWN.has(k)))
                 values[key] = parent.get(key);
         }
