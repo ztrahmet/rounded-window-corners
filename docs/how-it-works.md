@@ -19,7 +19,7 @@ The shader draws each window in four steps:
 
 The shadow is computed the way GTK's renderer computes libadwaita's, and always at its full
 size, even for apps that leave no room around their window. Edges are drawn at the
-screen's pixel density, so they stay as crisp as libadwaita's at any scale.
+screen's pixel density, so at 100% and 200% they are as crisp as libadwaita's.
 
 The outline and shadow belong to the window itself, so the overview and the window
 switcher show them too. On X11 apps, mutter's title bar is rounded with the rest of the
@@ -44,8 +44,8 @@ values from the settings.
 ## Maximized, tiled and fullscreen
 
 By default, maximized, tiled and fullscreen windows are left square, as libadwaita leaves
-its own. As in libadwaita, a window's look changes once the app has drawn its new size,
-not the moment its state changes, so there is no flash of the wrong corners.
+its own. As in libadwaita, a window's look changes with the app's next picture, not the
+moment its state changes, so there is no flash of the wrong corners.
 
 At a radius of 0, a window keeps its outline and shadow, as libadwaita's do.
 

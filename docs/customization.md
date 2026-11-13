@@ -80,8 +80,8 @@ flowchart LR
 
 Apps are matched the way GNOME Shell matches them, by their desktop file, but a dialog
 that another app opens over a window, like the file chooser, counts as that other app's.
-Toolkits are recognized by the libraries an app has loaded: libadwaita, libhandy, Chromium
-and Electron, Firefox and Thunderbird, Java, Qt, GTK 4 and GTK 3.
+Toolkits are recognized by the libraries an app has loaded: libadwaita, libhandy, Wine,
+Chromium and Electron, Firefox and Thunderbird, Java, Qt, GTK 4 and GTK 3.
 
 ## Which style a window gets
 
