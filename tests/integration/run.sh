@@ -531,11 +531,38 @@ else
   chk "X11: mutter's own shadow does not add to it" "ok" \
     "$(val "const w='$shadow_wl'.split(',').map(Number), x='$shadow_x11'.split(',').map(Number);
        w.every((v, i) => Math.abs(v - x[i]) < 0.02) ? 'ok' : 'Wayland $shadow_wl, X11 $shadow_x11'")"
+  # Mutter fades the picture of an X11 window that asks for an opacity, and libadwaita's shadow is in its picture.
+  opacity() { DISPLAY=$XDISPLAY XAUTHORITY=$XAUTH python3 -c '
+import ctypes, sys
+x = ctypes.CDLL("libX11.so.6")
+x.XOpenDisplay.restype = ctypes.c_void_p
+x.XInternAtom.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]
+x.XChangeProperty.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_int, ctypes.c_int,
+                              ctypes.POINTER(ctypes.c_ulong), ctypes.c_int]
+x.XDeleteProperty.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_ulong]
+x.XCloseDisplay.argtypes = [ctypes.c_void_p]
+d = x.XOpenDisplay(None)
+win, atom = int(sys.argv[1], 16), x.XInternAtom(d, b"_NET_WM_WINDOW_OPACITY", 0)
+if sys.argv[2] == "none":
+    x.XDeleteProperty(d, win, atom)
+else:
+    x.XChangeProperty(d, win, atom, 6, 32, 0, ctypes.byref(ctypes.c_ulong(int(sys.argv[2], 16))), 1)
+x.XCloseDisplay(d)' "$(val "($bare_x11).metaWindow.get_description().split(' ')[0]")" "$1"; }
+  opacity 0x7fffffff
+  wait_for 127 "''+$bare_x11.get_children().find(c => c.constructor.\$gtype.name.startsWith('MetaSurface')).opacity" >/dev/null
+  shadow_half=$(shadow_of "$bare_x11")
+  chk "X11: the shadow fades with the opacity the window asks for" "ok" \
+    "$(val "const x='$shadow_x11'.split(',').map(Number), h='$shadow_half'.split(',').map(Number);
+       Math.abs(h[2] / x[2] - 0.5) < 0.05 ? 'ok' : 'opaque $shadow_x11, at half $shadow_half'")"
+  opacity none
 fi
 # A window that already fills a monitor without the top bar changes state without changing size (#24); its look must
 # follow anyway.
 struts() { ev "const l = Main.layoutManager; l._trackedActors.find(a => a.actor === l.panelBox).affectsStruts = $1; l._queueUpdateRegions(); 0" >/dev/null; }
 struts false
+# The Shell updates the work area later, and a window moved before then is kept below the top bar.
+need true "const a=global.workspace_manager.get_active_workspace().get_work_area_all_monitors(); ''+(a.y===0)" \
+  "the top bar kept its room"
 for kind in Wayland X11; do
   a=$bare_wl; [ $kind = X11 ] && a=$bare_x11
   ev "const w=($a).metaWindow, m=global.display.get_monitor_geometry(w.get_monitor()); w.unminimize(); w.move_resize_frame(false, m.x, m.y, m.width, m.height); 0" >/dev/null
