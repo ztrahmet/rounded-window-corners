@@ -50,7 +50,7 @@ The unit tests cover the CSS reading, the shadow math and the custom style:
 ```
 
 The integration tests run a real headless GNOME Shell in a Fedora container. They open
-Wayland, XWayland and libadwaita windows, check what the extension does with them under
+Wayland, Xwayland and libadwaita windows, check what the extension does with them under
 every setting, and open the preferences:
 
 ```bash
