@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-13 15:29+0300\n"
+"POT-Creation-Date: 2026-11-13 17:41+0300\n"
 "PO-Revision-Date: 2026-11-06 04:25+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: Chinese (simplified)\n"
@@ -166,6 +166,14 @@ msgstr "为概览中的窗口启用圆角"
 #: prefs/generalPage.js
 msgid "Off, the overview shows them as their apps draw them"
 msgstr "关闭后，概览按应用自身绘制的样子显示窗口"
+
+#: prefs/generalPage.js
+msgid "Keep Windows Sharp (Experimental)"
+msgstr "保持窗口清晰（实验性）"
+
+#: prefs/generalPage.js
+msgid "At fractional scales and in the overview"
+msgstr "在分数缩放和概览中"
 
 #: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"

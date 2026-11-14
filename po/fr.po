@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rounded-window-corners\n"
 "Report-Msgid-Bugs-To: https://github.com/ztrahmet/rounded-window-corners/issues\n"
-"POT-Creation-Date: 2026-11-13 15:29+0300\n"
+"POT-Creation-Date: 2026-11-13 17:41+0300\n"
 "PO-Revision-Date: 2026-11-05 12:56+0300\n"
 "Last-Translator: Ahmet Öztürk <141689708+ztrahmet@users.noreply.github.com>\n"
 "Language-Team: French\n"
@@ -166,6 +166,14 @@ msgstr "Arrondir les fenêtres dans la vue d’ensemble"
 #: prefs/generalPage.js
 msgid "Off, the overview shows them as their apps draw them"
 msgstr "Si désactivé, la vue d’ensemble affiche les fenêtres telles que leurs applications les dessinent"
+
+#: prefs/generalPage.js
+msgid "Keep Windows Sharp (Experimental)"
+msgstr "Garder les fenêtres nettes (expérimental)"
+
+#: prefs/generalPage.js
+msgid "At fractional scales and in the overview"
+msgstr "Aux échelles fractionnaires et dans la vue d’ensemble"
 
 #: prefs/generalPage.js
 msgid "Replaces libadwaita’s style and gtk.css"
