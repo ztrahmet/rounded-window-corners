@@ -581,6 +581,43 @@ for scene in desktop overview; do
   chk "$where, Keep Windows Sharp draws a window as without the extension" "same" \
     "$(val "const d = rwcTest.difference('$scene-true', '$scene-plain'); d < 0.5 ? 'same' : 'differs by ' + d")"
 done
+# Shows the pattern window at more sizes, as a dock's previews do: clones at the given scales.
+clone_pattern() {
+  ev "globalThis.rwcClones = [$1].map((s, i) => {
+        const c = new imports.gi.Clutter.Clone({source: $pattern, x: 40 + i * 300, y: 500, scale_x: s, scale_y: s});
+        Main.layoutManager.uiGroup.add_child(c);
+        return c;
+      }); 0" >/dev/null
+}
+# Shown at more sizes than Keep Windows Sharp keeps buffers for, a window still goes idle.
+eset sharp-windows true
+wait_for true "$sharp_on" >/dev/null
+clone_pattern 0.5,0.4,0.3,0.2
+sleep 2
+ev "globalThis.rwcFrames = 0; globalThis.rwcHook = global.stage.connect('after-paint', () => rwcFrames++); 0" >/dev/null
+sleep 2
+chk "Keep Windows Sharp: a window shown at five sizes goes idle" "idle" \
+  "$(val "global.stage.disconnect(rwcHook); rwcClones.forEach(c => c.destroy());
+     rwcFrames < 10 ? 'idle' : rwcFrames + ' frames in 2 s'")"
+# Shown at three sizes and left idle, it keeps a buffer for each, so the next repaint takes one frame.
+clone_pattern 0.5,0.3
+sleep 3
+ev "globalThis.rwcFrames = 0; globalThis.rwcHook = global.stage.connect('after-paint', () => rwcFrames++);
+    global.stage.queue_redraw(); 0" >/dev/null
+sleep 1
+chk "Keep Windows Sharp: a window left idle at three sizes repaints in one frame" "1" \
+  "$(val "global.stage.disconnect(rwcHook); rwcClones.forEach(c => c.destroy()); ''+rwcFrames")"
+# Maximizing switches the effect off and on; it must not build its shader again each time, which Cogl warns of.
+for _ in $(seq 60); do
+  ev "($pattern).metaWindow.maximize(); 0" >/dev/null
+  wait_for false "$sharp_on" >/dev/null
+  ev "($pattern).metaWindow.unmaximize(); 0" >/dev/null
+  wait_for true "$sharp_on" >/dev/null
+  sleep 0.1
+done
+chk "Keep Windows Sharp: switching it off and on builds no new shaders" "0" \
+  "$(grep -c 'Over 50 separate' $ROOT/log/shell.log)"
+eset sharp-windows false
 ev "($pattern).metaWindow.delete(global.get_current_time()); 0" >/dev/null
 need false "''+!!($pattern)" "the pattern window did not close"
 
