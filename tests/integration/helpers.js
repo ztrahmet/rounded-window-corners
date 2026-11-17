@@ -65,11 +65,11 @@ const rwcTest = {
     },
 
     // Stores a pixbuf of the top-left of the stage, or the error, in rwcTest.shot.
-    capture() {
+    capture(width = 500, height = 400) {
         const {Clutter, Gio, Mtk, Shell} = imports.gi;
         rwcTest.shot = null;
         rwcTest.shotScale = global.display.get_monitor_scale(0);
-        const content = global.stage.paint_to_content(new Mtk.Rectangle({x: 0, y: 0, width: 500, height: 400}),
+        const content = global.stage.paint_to_content(new Mtk.Rectangle({x: 0, y: 0, width, height}),
             rwcTest.shotScale, null, Clutter.PaintFlag.NO_CURSORS);
         Shell.Screenshot.composite_to_stream(content.get_texture(), 0, 0, -1, -1, 1, null, 0, 0, 1,
             Gio.MemoryOutputStream.new_resizable(), (o, res) => {
@@ -146,6 +146,58 @@ const rwcTest = {
         const light = x => pixel(Math.floor(x * s), y).reduce((sum, v) => sum + v, 0);
         const far = light(f.x - 45);
         return Array.from({length: 12}, (_, i) => ((far - light(f.x - 1 - i)) / far).toFixed(3)).join();
+    },
+
+    // Pixels kept from captures, by name.
+    kept: {},
+
+    // The inside of the window, away from its edges and title bar: [x1, y1, x2, y2].
+    insideOf(actor) {
+        const f = actor.metaWindow.get_frame_rect();
+        return [f.x + 20, f.y + 60, f.x + f.width - 20, f.y + f.height - 20];
+    },
+
+    // The middle of the window's largest preview in the overview: [x1, y1, x2, y2].
+    previewOf(actor) {
+        let best = null;
+        const walk = parent => parent.get_children().forEach(child => {
+            if (child instanceof imports.gi.Clutter.Clone && child.source === actor) {
+                const [x, y] = child.get_transformed_position();
+                const [w, h] = child.get_transformed_size();
+                if (Number.isFinite(w) && (!best || w > best[2] - best[0]))
+                    best = [x, y, x + w, y + h];
+            }
+            walk(child);
+        });
+        walk(global.stage);
+        const [x1, y1, x2, y2] = best;
+        return [x1 + (x2 - x1) / 5, y1 + (y2 - y1) / 5, x2 - (x2 - x1) / 5, y2 - (y2 - y1) / 5];
+    },
+
+    // Keeps the pixels of an area of the last capture, given as [x1, y1, x2, y2].
+    keep(name, [x1, y1, x2, y2]) {
+        const pixel = rwcTest.pixels();
+        if (typeof pixel === 'string')
+            return pixel;
+        const s = rwcTest.shotScale;
+        const values = [];
+        for (let y = Math.ceil(y1 * s); y < Math.floor(y2 * s); y++) {
+            for (let x = Math.ceil(x1 * s); x < Math.floor(x2 * s); x++)
+                values.push(...pixel(x, y));
+        }
+        rwcTest.kept[name] = values;
+        return 'ok';
+    },
+
+    // Root mean square difference of two kept areas, out of 255.
+    difference(a, b) {
+        const [p, q] = [rwcTest.kept[a], rwcTest.kept[b]];
+        if (!p || !q || p.length !== q.length)
+            return 'unlike areas';
+        let sum = 0;
+        for (let i = 0; i < p.length; i++)
+            sum += (p[i] - q[i]) ** 2;
+        return Math.sqrt(sum / p.length).toFixed(2);
     },
 
     // The last capture as pixel(x, y) => [r, g, b], or why there is none.

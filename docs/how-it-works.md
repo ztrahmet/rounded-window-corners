@@ -57,10 +57,10 @@ At a radius of 0, a window keeps its outline and shadow, as libadwaita's do.
 - Toolkits are recognized by the libraries an app has loaded, which Linux hides for apps
   that guard their memory. Their windows are still rounded, but toolkit lists and styles
   don't apply to them.
-- At fractional scales, windows are slightly blurred in the overview
-  ([#2](https://github.com/ztrahmet/rounded-window-corners/issues/2)) and while rounded
-  ([#20](https://github.com/ztrahmet/rounded-window-corners/issues/20)). Both come from
-  mutter and are tracked upstream.
+- Rounded windows are slightly blurred in the overview
+  ([#2](https://github.com/ztrahmet/rounded-window-corners/issues/2)) and, at fractional
+  scales, everywhere ([#20](https://github.com/ztrahmet/rounded-window-corners/issues/20)),
+  unless **Keep Windows Sharp** is on. Both come from mutter and are tracked upstream.
 
 ## Performance
 
