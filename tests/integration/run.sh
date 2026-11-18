@@ -635,6 +635,25 @@ for _ in $(seq 60); do
 done
 chk "Keep Windows Sharp: switching it off and on builds no new shaders" "0" \
   "$(grep -c 'Over 50 separate' $ROOT/log/shell.log)"
+# GJS keeps each buffer a paint replaces until it collects, so a resize must not replace the window's buffer at
+# every size: only at its first, as any single size change does, and when the window outgrows it.
+ev "const win = ($pattern).metaWindow;
+    const {x, y, width, height} = win.get_frame_rect();
+    const sharp = rwcTest.tracker()._windows.get($pattern)._sharp;
+    const seen = new Set();
+    globalThis.rwcHook = global.stage.connect('after-paint', () => seen.add(sharp._buffers[0].framebuffer));
+    const timeline = new imports.gi.Clutter.Timeline({duration: 2000, actor: global.stage});
+    let frame = 0;
+    timeline.connect('new-frame', () => win.move_resize_frame(true, x, y, width - 4 * (++frame % 30), height));
+    timeline.connect('completed', () => {
+        global.stage.disconnect(rwcHook);
+        rwcBuffers = seen.size;
+    });
+    globalThis.rwcBuffers = null;
+    globalThis.rwcTimeline = timeline;
+    timeline.start(); 0" >/dev/null
+chk "Keep Windows Sharp: a resize replaces the window's buffer at most twice" "kept" \
+  "$(wait_for kept "rwcBuffers === null ? 'resizing' : rwcBuffers <= 3 ? 'kept' : rwcBuffers + ' buffers'")"
 eset sharp-windows false
 ev "($pattern).metaWindow.delete(global.get_current_time()); 0" >/dev/null
 need false "''+!!($pattern)" "the pattern window did not close"
