@@ -64,11 +64,12 @@ At a radius of 0, a window keeps its outline and shadow, as libadwaita's do.
 
 ## Performance
 
-A rounded window is drawn through a buffer the size of the window and its shadow. On a
-GPU this takes a fraction of a millisecond per frame, even for a window that repaints
+A rounded window is drawn through a buffer the size of the window and its shadow. On an
+integrated GPU this takes about a millisecond per frame, even for a window that repaints
 all the time, so apps stay as smooth as without the extension.
 
-Maximized and fullscreen windows cost nothing extra while they are left square.
+Maximized and fullscreen windows are drawn as without the extension while they are left
+square.
 
 ## Turning it off
 
