@@ -198,6 +198,24 @@ ev "const a=$x11; const e=rwcTest.effect(a);
     e.update([0, 0, 1, 1], ...e.rwcArgs.slice(1)); rwcTest.tracker()._windows.get(a)._updated = [];
     a.get_texture().emit('size-changed'); 0" >/dev/null
 chk "X11: a late redraw re-syncs the bounds" "ok" "$(wait_for ok "rwcTest.boundsError($x11) || 'ok'")"
+# Rendered in software, a window's buffers are the Shell's memory. JavaScript handed a paint would keep its buffers
+# until a collection, so the Shell would grow with each size a resize passes through.
+ev "const rss = () => parseInt(new TextDecoder().decode(imports.gi.GLib.file_get_contents('/proc/self/status')[1])
+      .split('VmRSS:')[1]);
+    const win = $wl.metaWindow;
+    imports.system.gc();
+    const before = rss();
+    const timeline = new imports.gi.Clutter.Timeline({duration: 2000, actor: global.stage});
+    let frame = 0;
+    timeline.connect('new-frame', () => win.move_resize_frame(true, 300, 200, 700 - 4 * (++frame % 30), 480));
+    timeline.connect('completed', () => {
+        rwcGrown = (rss() - before) >> 10;
+    });
+    globalThis.rwcGrown = null;
+    globalThis.rwcTimeline = timeline;
+    timeline.start(); 0" >/dev/null
+chk "Wayland: resizing frees the window's old buffers" "freed" \
+  "$(wait_for freed "rwcGrown === null ? 'resizing' : rwcGrown < 16 ? 'freed' : 'grew by ' + rwcGrown + ' MiB'")"
 ev "$wl.metaWindow.move_resize_frame(true, 300, 200, 640, 480); 0" >/dev/null
 chk "Wayland: bounds follow a resize" "ok" "$(wait_for ok "rwcTest.boundsError($wl) || 'ok'")"
 
