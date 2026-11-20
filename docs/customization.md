@@ -77,6 +77,8 @@ flowchart LR
 - **Round Maximized and Tiled Windows** keeps those windows rounded, with the look
   libadwaita gives them: no shadow when maximized, and a thin line around a tiled window.
   Fullscreen windows always stay square.
+- **Round Overview Windows**, on by default, keeps windows rounded in the overview. Off,
+  the overview shows them as their apps draw them.
 
 Apps are matched the way GNOME Shell matches them, by their desktop file, but a dialog
 that another app opens over a window, like the file chooser, counts as that other app's.
