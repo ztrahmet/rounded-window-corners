@@ -617,14 +617,19 @@ sleep 2
 chk "Keep Windows Sharp: a window shown at five sizes goes idle" "idle" \
   "$(val "global.stage.disconnect(rwcHook); rwcClones.forEach(c => c.destroy());
      rwcFrames < 10 ? 'idle' : rwcFrames + ' frames in 2 s'")"
-# Shown at three sizes and left idle, it keeps a buffer for each, so the next repaint takes one frame.
+# Shown at three sizes and left idle, it keeps a buffer for each, and draws the next repaint from them. Frames
+# aren't counted, as the top bar's clock and the apps draw their own.
 clone_pattern 0.5,0.3
 sleep 3
-ev "globalThis.rwcFrames = 0; globalThis.rwcHook = global.stage.connect('after-paint', () => rwcFrames++);
+sharp_effect="rwcTest.tracker()._windows.get($pattern)._sharp"
+ev "globalThis.rwcKept = new Set($sharp_effect._buffers);
+    globalThis.rwcSince = imports.gi.GLib.get_monotonic_time();
     global.stage.queue_redraw(); 0" >/dev/null
 sleep 1
-chk "Keep Windows Sharp: a window left idle at three sizes repaints in one frame" "1" \
-  "$(val "global.stage.disconnect(rwcHook); rwcClones.forEach(c => c.destroy()); ''+rwcFrames")"
+chk "Keep Windows Sharp: a window left idle at three sizes keeps a buffer for each" "3 kept, 3 drawn" \
+  "$(val "const buffers = $sharp_effect._buffers; rwcClones.forEach(c => c.destroy());
+     const kept = buffers.filter(b => rwcKept.has(b)).length;
+     kept + ' kept, ' + buffers.filter(b => b.drawn > rwcSince).length + ' drawn'")"
 # Maximizing switches the effect off and on; it must not build its shader again each time, which Cogl warns of.
 for _ in $(seq 60); do
   ev "($pattern).metaWindow.maximize(); 0" >/dev/null
@@ -639,7 +644,7 @@ chk "Keep Windows Sharp: switching it off and on builds no new shaders" "0" \
 # every size: only at its first, as any single size change does, and when the window outgrows it.
 ev "const win = ($pattern).metaWindow;
     const {x, y, width, height} = win.get_frame_rect();
-    const sharp = rwcTest.tracker()._windows.get($pattern)._sharp;
+    const sharp = $sharp_effect;
     const seen = new Set();
     globalThis.rwcHook = global.stage.connect('after-paint', () => seen.add(sharp._buffers[0].framebuffer));
     const timeline = new imports.gi.Clutter.Timeline({duration: 2000, actor: global.stage});
