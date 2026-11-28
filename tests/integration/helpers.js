@@ -52,18 +52,21 @@ const rwcTest = {
     // Empty when what the effect last set from its window, as it changed, still matches the window.
     inputsError(actor) {
         const effect = rwcTest.effect(actor);
-        const content = actor.get_texture();
-        const buffer = content.get_texture();
-        const [, width, height] = content.get_preferred_size();
-        const appScale = Math.sqrt(buffer.get_width() * buffer.get_height() / (width * height));
+        let removal = 0;
+        // Reading the app's buffer keeps it until a collection, so as in the extension, only for a border it hides.
+        if (effect._borderWidth > 0) {
+            const content = actor.get_texture();
+            const buffer = content.get_texture();
+            const [, width, height] = content.get_preferred_size();
+            const appScale = Math.sqrt(buffer.get_width() * buffer.get_height() / (width * height));
+            removal = effect._borderWidth + (appScale > 1 && appScale % 1 !== 0 ? 1 / appScale : 0);
+        }
         const scales = actor.peek_stage_views().map(view => view.get_scale());
         const picture = actor.get_children().find(c => c.constructor.$gtype.name.startsWith('MetaSurface'));
         const want = {
             texelScale: actor.get_resource_scale(),
             smear: scales.length > 0 ? Number(Math.max(...scales) % 1 !== 0) : effect._smear,
-            borderRemovalWidth: effect._borderWidth > 0
-                ? effect._borderWidth + (appScale > 1 && appScale % 1 !== 0 ? 1 / appScale : 0)
-                : 0,
+            borderRemovalWidth: removal,
             pictureOpacity: picture.opacity / 255,
         };
         return Object.entries(want).filter(([name, value]) => effect._uniforms.get(name)[0] !== value)
