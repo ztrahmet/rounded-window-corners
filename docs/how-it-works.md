@@ -61,6 +61,8 @@ At a radius of 0, a window keeps its outline and shadow, as libadwaita's do.
   ([#2](https://github.com/ztrahmet/rounded-window-corners/issues/2)) and, at fractional
   scales, everywhere ([#20](https://github.com/ztrahmet/rounded-window-corners/issues/20)),
   unless **Keep Windows Sharp** is on. Both come from mutter and are tracked upstream.
+- Mutter doesn't count a window with an effect as hidden, so a rounded window covered by
+  other windows keeps drawing whenever its app does.
 
 ## Performance
 
