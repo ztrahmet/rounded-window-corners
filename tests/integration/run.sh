@@ -126,6 +126,17 @@ chk "X11 window is rounded" "true" "$(wait_for true "$(rounded "$x11")")"
 sleep 1
 chk "libadwaita window is left alone" "false" "$(val "$(rounded "$adw")")"
 
+# What the effect sets from its window as it changes must match the window whenever it's drawn, in every check below.
+ev "globalThis.rwcInputs = '';
+    globalThis.rwcInputsHook = global.stage.connect('after-paint', (stage, view) => {
+      for (const a of global.get_window_actors()) {
+        const drawn = rwcTest.effect(a)?.enabled && a.peek_stage_views().includes(view);
+        const error = !rwcInputs && drawn && rwcTest.inputsError(a);
+        if (error)
+          rwcInputs = a.metaWindow.get_wm_class() + ': ' + error;
+      }
+    }); 0" >/dev/null
+
 # Popups are never rounded, so they are neither probed nor tracked.
 ev "globalThis.rwcPopups = [];
     globalThis.rwcHook = global.display.connect('window-created', (d, w) =>
@@ -659,6 +670,21 @@ ev "const win = ($pattern).metaWindow;
     timeline.start(); 0" >/dev/null
 chk "Keep Windows Sharp: a resize replaces the window's buffer at most twice" "kept" \
   "$(wait_for kept "rwcBuffers === null ? 'resizing' : rwcBuffers <= 3 ? 'kept' : rwcBuffers + ' buffers'")"
+# Shown at four scales in the overview, a window whose app draws at 2x on a 125% monitor must keep its buffers.
+ev "rwcTest.setScale(1.25); 0" >/dev/null
+wait_for 1.25 "$monitor_scale" >/dev/null
+need 2 "const t=($wl).get_texture(); const [, w]=t.get_preferred_size(); ''+t.get_texture().get_width() / w" \
+  "the Wayland window did not redraw at 125%"
+wl_sharp="rwcTest.tracker()._windows.get($wl)._sharp"
+cycle_overview() { overview show true; sleep 0.5; overview hide false; sleep 0.5; }
+cycle_overview
+ev "globalThis.rwcKept = new Set($wl_sharp._buffers); 0" >/dev/null
+cycle_overview; cycle_overview
+chk "Keep Windows Sharp: overview after overview, a window keeps its buffers" "kept" \
+  "$(val "const fresh = $wl_sharp._buffers.filter(b => !rwcKept.has(b)).length;
+     fresh ? fresh + ' new buffers' : 'kept'")"
+ev "rwcTest.setScale(1); 0" >/dev/null
+wait_for 1 "$monitor_scale" >/dev/null
 eset sharp-windows false
 ev "($pattern).metaWindow.delete(global.get_current_time()); 0" >/dev/null
 need false "''+!!($pattern)" "the pattern window did not close"
@@ -810,6 +836,9 @@ chk "opening the preferences leaves the stored values alone" "'#ffffff'|'red'|{'
 gset --schemadir $EXT/schemas reset-recursively $SCHEMA
 ev "$prefs.metaWindow.delete(global.get_current_time()); 0" >/dev/null
 need false "''+!!($prefs)" "the preferences did not close"
+
+chk "what the effect read from its window matched the window whenever it was drawn" "ok" \
+  "$(val "global.stage.disconnect(rwcInputsHook); rwcInputs || 'ok'")"
 
 chk "no errors or warnings logged by the extension" "0" \
   "$(grep -cE "rounded-window-corners:|JS ERROR|JS WARNING: [^ ]*$UUID|Unhandled promise rejection" $ROOT/log/shell.log)"
